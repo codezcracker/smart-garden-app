@@ -1,0 +1,28 @@
+{
+  "version": 2,
+  "name": "smart-garden-app",
+  "builds": [
+    {
+      "src": "package.json",
+      "use": "@vercel/next"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "/api/$1"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/$1"
+    }
+  ],
+  "env": {
+    "NODE_ENV": "production"
+  },
+  "functions": {
+    "src/app/api/plants-converted/route.js": {
+      "maxDuration": 30
+    }
+  }
+} 
