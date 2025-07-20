@@ -1,6 +1,5 @@
 {
   "version": 2,
-  "name": "smart-garden-app",
   "builds": [
     {
       "src": "package.json",
@@ -19,10 +18,5 @@
   ],
   "env": {
     "NODE_ENV": "production"
-  },
-  "functions": {
-    "src/app/api/plants-converted/route.js": {
-      "maxDuration": 30
-    }
   }
 } 
