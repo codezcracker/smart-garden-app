@@ -122,18 +122,20 @@ export default function Plants() {
 
         {/* Search and Filters */}
         <div className="bg-gray-50 dark:bg-gray-800 rounded-lg shadow-lg p-6 border border-gray-200 dark:border-gray-700 mb-8">
-          <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
-            <input
-              type="text"
-              placeholder="Search plants by name, family, category, or climate..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="bg-white dark:bg-gray-700 text-gray-900 dark:text-white px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 focus:border-blue-500 focus:outline-none"
-            />
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+            <div className="lg:col-span-2">
+              <input
+                type="text"
+                placeholder="Search plants by name, family, category, or climate..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full bg-white dark:bg-gray-700 text-gray-900 dark:text-white px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 focus:border-blue-500 focus:outline-none"
+              />
+            </div>
             <select
               value={selectedFamily}
               onChange={(e) => setSelectedFamily(e.target.value)}
-              className="bg-white dark:bg-gray-700 text-gray-900 dark:text-white px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 focus:border-blue-500 focus:outline-none"
+              className="w-full bg-white dark:bg-gray-700 text-gray-900 dark:text-white px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 focus:border-blue-500 focus:outline-none"
             >
               <option value="">All Families</option>
               {plantData?.filters.families.map((family) => (
@@ -143,7 +145,7 @@ export default function Plants() {
             <select
               value={selectedClimate}
               onChange={(e) => setSelectedClimate(e.target.value)}
-              className="bg-white dark:bg-gray-700 text-gray-900 dark:text-white px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 focus:border-blue-500 focus:outline-none"
+              className="w-full bg-white dark:bg-gray-700 text-gray-900 dark:text-white px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 focus:border-blue-500 focus:outline-none"
             >
               <option value="">All Climates</option>
               {plantData?.filters.climates.map((climate) => (
@@ -153,7 +155,7 @@ export default function Plants() {
             <select
               value={selectedCategory}
               onChange={(e) => setSelectedCategory(e.target.value)}
-              className="bg-white dark:bg-gray-700 text-gray-900 dark:text-white px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 focus:border-blue-500 focus:outline-none"
+              className="w-full bg-white dark:bg-gray-700 text-gray-900 dark:text-white px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 focus:border-blue-500 focus:outline-none"
             >
               <option value="">All Categories</option>
               {plantData?.filters.categories.map((category) => (
@@ -162,7 +164,7 @@ export default function Plants() {
             </select>
             <button
               onClick={clearAllFilters}
-              className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors"
+              className="w-full bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors"
             >
               Clear All
             </button>
@@ -243,45 +245,45 @@ export default function Plants() {
           </div>
         ) : (
           <>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 lg:gap-6 mb-8">
               {plantData?.plants.map((plant) => (
-                <div key={plant.id} className="bg-gray-50 dark:bg-gray-800 rounded-lg shadow-lg p-6 border border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 transition-colors">
-                  <div className="flex items-center justify-between mb-4">
-                    <div className="flex items-center space-x-3">
-                      <span className="text-3xl">{plant.emoji}</span>
-                      <div>
-                        <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{plant.name}</h3>
-                        <p className="text-gray-600 dark:text-gray-400 text-sm">{plant.category} • {plant.family}</p>
+                <div key={plant.id} className="bg-gray-50 dark:bg-gray-800 rounded-lg shadow-lg p-4 lg:p-6 border border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 transition-colors">
+                  <div className="flex items-center justify-between mb-3 lg:mb-4">
+                    <div className="flex items-center space-x-2 lg:space-x-3">
+                      <span className="text-2xl lg:text-3xl">{plant.emoji}</span>
+                      <div className="min-w-0 flex-1">
+                        <h3 className="text-base lg:text-lg font-semibold text-gray-900 dark:text-white truncate">{plant.name}</h3>
+                        <p className="text-gray-600 dark:text-gray-400 text-xs lg:text-sm truncate">{plant.category} • {plant.family}</p>
                       </div>
                     </div>
-                    <span className={`text-sm font-medium ${getHealthColor(plant.difficulty)}`}>
+                    <span className={`text-xs lg:text-sm font-medium ${getHealthColor(plant.difficulty)} flex-shrink-0`}>
                       {plant.difficulty}
                     </span>
                   </div>
                   
-                  <div className="space-y-3">
+                  <div className="space-y-2 lg:space-y-3">
                     <div className="flex items-center justify-between">
-                      <span className="text-gray-600 dark:text-gray-300 text-sm">Climate</span>
-                      <span className="text-gray-700 dark:text-gray-400 text-sm">{plant.climate}</span>
+                      <span className="text-gray-600 dark:text-gray-300 text-xs lg:text-sm">Climate</span>
+                      <span className="text-gray-700 dark:text-gray-400 text-xs lg:text-sm truncate">{plant.climate}</span>
                     </div>
                     
                     <div className="flex items-center justify-between">
-                      <span className="text-gray-600 dark:text-gray-300 text-sm">Growth Time</span>
-                      <span className={`text-sm font-medium ${getGrowthColor(plant.growthTime)}`}>
+                      <span className="text-gray-600 dark:text-gray-300 text-xs lg:text-sm">Growth Time</span>
+                      <span className={`text-xs lg:text-sm font-medium ${getGrowthColor(plant.growthTime)}`}>
                         {plant.growthTime}
                       </span>
                     </div>
                     
                     <div className="flex items-center justify-between">
-                      <span className="text-gray-600 dark:text-gray-300 text-sm">Family</span>
-                      <span className="text-gray-700 dark:text-gray-400 text-sm">{plant.family}</span>
+                      <span className="text-gray-600 dark:text-gray-300 text-xs lg:text-sm">Family</span>
+                      <span className="text-gray-700 dark:text-gray-400 text-xs lg:text-sm truncate">{plant.family}</span>
                     </div>
                     
                     <div className="flex space-x-2 pt-2">
-                      <button className="flex-1 bg-green-600 text-white py-2 px-3 rounded-lg text-sm hover:bg-green-700 transition-colors">
-                        🌱 Add to Garden
+                      <button className="flex-1 bg-green-600 text-white py-1.5 lg:py-2 px-2 lg:px-3 rounded-lg text-xs lg:text-sm hover:bg-green-700 transition-colors">
+                        🌱 Add
                       </button>
-                      <button className="flex-1 bg-blue-600 text-white py-2 px-3 rounded-lg text-sm hover:bg-blue-700 transition-colors">
+                      <button className="flex-1 bg-blue-600 text-white py-1.5 lg:py-2 px-2 lg:px-3 rounded-lg text-xs lg:text-sm hover:bg-blue-700 transition-colors">
                         📊 Details
                       </button>
                     </div>

@@ -81,21 +81,21 @@ export default function Analytics() {
         </div>
 
         {/* Key Metrics */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6 mb-8">
           {metrics.map((metric) => (
-            <div key={metric.id} className="bg-gray-800 rounded-lg shadow-lg p-6 border border-gray-700">
-              <div className="flex items-center justify-between mb-4">
-                <span className="text-2xl">{metric.icon}</span>
-                <div className={`flex items-center space-x-1 text-sm ${getTrendColor(metric.trend)}`}>
+            <div key={metric.id} className="bg-gray-800 rounded-lg shadow-lg p-4 lg:p-6 border border-gray-700">
+              <div className="flex items-center justify-between mb-3 lg:mb-4">
+                <span className="text-xl lg:text-2xl">{metric.icon}</span>
+                <div className={`flex items-center space-x-1 text-xs lg:text-sm ${getTrendColor(metric.trend)}`}>
                   <span>{getTrendIcon(metric.trend)}</span>
                   <span>{metric.change}</span>
                 </div>
               </div>
               <div className="mb-2">
-                <div className="text-3xl font-bold text-white">
+                <div className="text-2xl lg:text-3xl font-bold text-white">
                   {metric.value} {metric.unit}
                 </div>
-                <div className="text-gray-400 text-sm">{metric.name}</div>
+                <div className="text-gray-400 text-xs lg:text-sm">{metric.name}</div>
               </div>
               <div className="text-gray-500 text-xs">{metric.period}</div>
             </div>
@@ -103,7 +103,7 @@ export default function Analytics() {
         </div>
 
         {/* Charts Section */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6 mb-8">
           {/* Weekly Trends */}
           <div className="bg-gray-800 rounded-lg shadow-lg p-6 border border-gray-700">
             <h3 className="text-xl font-semibold text-white mb-4">📈 Weekly Trends</h3>

@@ -47,50 +47,50 @@ export default function Weather() {
         </div>
 
         {/* Current Weather */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-          <div className="lg:col-span-2 bg-gray-800 rounded-lg shadow-lg p-8 border border-gray-700">
-            <div className="flex items-center justify-between mb-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 lg:gap-6 mb-8">
+          <div className="lg:col-span-2 bg-gray-800 rounded-lg shadow-lg p-4 lg:p-8 border border-gray-700">
+            <div className="flex items-center justify-between mb-4 lg:mb-6">
               <div>
-                <h2 className="text-2xl font-bold text-white mb-2">Current Conditions</h2>
-                <p className="text-gray-400">Updated just now</p>
+                <h2 className="text-xl lg:text-2xl font-bold text-white mb-2">Current Conditions</h2>
+                <p className="text-gray-400 text-sm lg:text-base">Updated just now</p>
               </div>
               <div className="text-right">
-                <div className="text-6xl mb-2">{currentWeather.icon}</div>
-                <div className="text-gray-400">{currentWeather.condition}</div>
+                <div className="text-4xl lg:text-6xl mb-2">{currentWeather.icon}</div>
+                <div className="text-gray-400 text-sm lg:text-base">{currentWeather.condition}</div>
               </div>
             </div>
             
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 lg:gap-6">
               <div className="text-center">
-                <div className="text-3xl font-bold text-white mb-1">{currentWeather.temperature}°F</div>
-                <div className="text-gray-400 text-sm">Temperature</div>
+                <div className="text-2xl lg:text-3xl font-bold text-white mb-1">{currentWeather.temperature}°F</div>
+                <div className="text-gray-400 text-xs lg:text-sm">Temperature</div>
               </div>
               <div className="text-center">
-                <div className="text-3xl font-bold text-blue-400 mb-1">{currentWeather.humidity}%</div>
-                <div className="text-gray-400 text-sm">Humidity</div>
+                <div className="text-2xl lg:text-3xl font-bold text-blue-400 mb-1">{currentWeather.humidity}%</div>
+                <div className="text-gray-400 text-xs lg:text-sm">Humidity</div>
               </div>
               <div className="text-center">
-                <div className="text-3xl font-bold text-gray-300 mb-1">{currentWeather.wind} mph</div>
-                <div className="text-gray-400 text-sm">Wind Speed</div>
+                <div className="text-2xl lg:text-3xl font-bold text-gray-300 mb-1">{currentWeather.wind} mph</div>
+                <div className="text-gray-400 text-xs lg:text-sm">Wind Speed</div>
               </div>
               <div className="text-center">
-                <div className="text-3xl font-bold text-yellow-400 mb-1">{currentWeather.uvIndex}</div>
-                <div className="text-gray-400 text-sm">UV Index</div>
+                <div className="text-2xl lg:text-3xl font-bold text-yellow-400 mb-1">{currentWeather.uvIndex}</div>
+                <div className="text-gray-400 text-xs lg:text-sm">UV Index</div>
               </div>
             </div>
             
-            <div className="mt-6 pt-6 border-t border-gray-700">
+            <div className="mt-4 lg:mt-6 pt-4 lg:pt-6 border-t border-gray-700">
               <div className="flex items-center justify-between">
-                <span className="text-gray-300">Feels Like</span>
-                <span className="text-white text-xl font-semibold">{currentWeather.feelsLike}°F</span>
+                <span className="text-gray-300 text-sm lg:text-base">Feels Like</span>
+                <span className="text-white text-lg lg:text-xl font-semibold">{currentWeather.feelsLike}°F</span>
               </div>
             </div>
           </div>
 
           {/* Weather Alerts */}
-          <div className="bg-gray-800 rounded-lg shadow-lg p-6 border border-gray-700">
-            <h3 className="text-xl font-semibold text-white mb-4">⚠️ Weather Alerts</h3>
-            <div className="space-y-4">
+          <div className="bg-gray-800 rounded-lg shadow-lg p-4 lg:p-6 border border-gray-700">
+            <h3 className="text-lg lg:text-xl font-semibold text-white mb-4">⚠️ Weather Alerts</h3>
+            <div className="space-y-3 lg:space-y-4">
               {weatherAlerts.map((alert, index) => (
                 <div key={index} className="p-3 bg-yellow-900/20 border border-yellow-700 rounded-lg">
                   <div className="flex items-start space-x-3">

@@ -120,54 +120,54 @@ export default function Automation() {
         </div>
 
         {/* Automation Overview */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-          <div className="bg-gray-800 rounded-lg shadow-lg p-6 border border-gray-700">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6 mb-8">
+          <div className="bg-gray-800 rounded-lg shadow-lg p-4 lg:p-6 border border-gray-700">
             <div className="flex items-center">
-              <span className="text-2xl mr-3">⚙️</span>
+              <span className="text-xl lg:text-2xl mr-3">⚙️</span>
               <div>
-                <p className="text-gray-400 text-sm">Total Systems</p>
-                <p className="text-white text-2xl font-bold">{automationSystems.length}</p>
+                <p className="text-gray-400 text-xs lg:text-sm">Total Systems</p>
+                <p className="text-white text-xl lg:text-2xl font-bold">{automationSystems.length}</p>
               </div>
             </div>
           </div>
           
-          <div className="bg-gray-800 rounded-lg shadow-lg p-6 border border-gray-700">
+          <div className="bg-gray-800 rounded-lg shadow-lg p-4 lg:p-6 border border-gray-700">
             <div className="flex items-center">
-              <span className="text-2xl mr-3">🟢</span>
+              <span className="text-xl lg:text-2xl mr-3">🟢</span>
               <div>
-                <p className="text-gray-400 text-sm">Active</p>
-                <p className="text-green-400 text-2xl font-bold">
+                <p className="text-gray-400 text-xs lg:text-sm">Active</p>
+                <p className="text-green-400 text-xl lg:text-2xl font-bold">
                   {automationSystems.filter(s => s.status === 'ON').length}
                 </p>
               </div>
             </div>
           </div>
           
-          <div className="bg-gray-800 rounded-lg shadow-lg p-6 border border-gray-700">
+          <div className="bg-gray-800 rounded-lg shadow-lg p-4 lg:p-6 border border-gray-700">
             <div className="flex items-center">
-              <span className="text-2xl mr-3">📈</span>
+              <span className="text-xl lg:text-2xl mr-3">📈</span>
               <div>
-                <p className="text-gray-400 text-sm">Avg Efficiency</p>
-                <p className="text-blue-400 text-2xl font-bold">
+                <p className="text-gray-400 text-xs lg:text-sm">Avg Efficiency</p>
+                <p className="text-blue-400 text-xl lg:text-2xl font-bold">
                   {Math.round(automationSystems.reduce((acc, s) => acc + s.efficiency, 0) / automationSystems.length)}%
                 </p>
               </div>
             </div>
           </div>
           
-          <div className="bg-gray-800 rounded-lg shadow-lg p-6 border border-gray-700">
+          <div className="bg-gray-800 rounded-lg shadow-lg p-4 lg:p-6 border border-gray-700">
             <div className="flex items-center">
-              <span className="text-2xl mr-3">⏰</span>
+              <span className="text-xl lg:text-2xl mr-3">⏰</span>
               <div>
-                <p className="text-gray-400 text-sm">Schedules</p>
-                <p className="text-yellow-400 text-2xl font-bold">{schedules.length}</p>
+                <p className="text-gray-400 text-xs lg:text-sm">Schedules</p>
+                <p className="text-yellow-400 text-xl lg:text-2xl font-bold">{schedules.length}</p>
               </div>
             </div>
           </div>
         </div>
 
         {/* Automation Systems */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-6 mb-8">
           {automationSystems.map((system) => (
             <div key={system.id} className="bg-gray-800 rounded-lg shadow-lg p-6 border border-gray-700 hover:border-gray-600 transition-colors">
               <div className="flex items-center justify-between mb-4">

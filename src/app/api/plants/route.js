@@ -153,23 +153,20 @@ async function loadPlants() {
   }
 
   try {
-    // Try to use the database with common names first
-    const csvPath = path.join(process.cwd(), 'data', 'plant-database-common-names.csv');
-    const fallbackPath = path.join(process.cwd(), 'data', 'plant-database.csv');
-    
-    const filePath = fs.existsSync(csvPath) ? csvPath : fallbackPath;
+    // Use the full database with 2.5 million plants
+    const csvPath = path.join(process.cwd(), 'data', 'plant-database.csv');
     
     return new Promise((resolve) => {
       const plants = [];
-      fs.createReadStream(filePath)
+      fs.createReadStream(csvPath)
         .pipe(csv())
         .on('data', (row) => {
-          // Handle both databases (with and without common names)
+          // Handle the full database format
           if (row.name && row.emoji && row.category && row.family && row.climate && row.difficulty && row.growthTime) {
             const plant = {
               id: row.id || Math.random().toString(36).substr(2, 9),
               name: row.name.trim(),
-              commonName: row.commonName || null, // Will be null for the original database
+              commonName: null, // Full database doesn't have common names
               emoji: row.emoji.trim(),
               category: row.category.trim(),
               family: row.family.trim(),

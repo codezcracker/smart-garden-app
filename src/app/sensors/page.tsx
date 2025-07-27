@@ -143,52 +143,52 @@ export default function Sensors() {
         </div>
 
         {/* Sensor Overview */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-          <div className="bg-gray-800 rounded-lg shadow-lg p-6 border border-gray-700">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6 mb-8">
+          <div className="bg-gray-800 rounded-lg shadow-lg p-4 lg:p-6 border border-gray-700">
             <div className="flex items-center">
-              <span className="text-2xl mr-3">📡</span>
+              <span className="text-xl lg:text-2xl mr-3">📡</span>
               <div>
-                <p className="text-gray-400 text-sm">Total Sensors</p>
-                <p className="text-white text-2xl font-bold">{sensors.length}</p>
+                <p className="text-gray-400 text-xs lg:text-sm">Total Sensors</p>
+                <p className="text-white text-xl lg:text-2xl font-bold">{sensors.length}</p>
               </div>
             </div>
           </div>
           
-          <div className="bg-gray-800 rounded-lg shadow-lg p-6 border border-gray-700">
+          <div className="bg-gray-800 rounded-lg shadow-lg p-4 lg:p-6 border border-gray-700">
             <div className="flex items-center">
-              <span className="text-2xl mr-3">🟢</span>
+              <span className="text-xl lg:text-2xl mr-3">🟢</span>
               <div>
-                <p className="text-gray-400 text-sm">Online</p>
-                <p className="text-green-400 text-2xl font-bold">
+                <p className="text-gray-400 text-xs lg:text-sm">Online</p>
+                <p className="text-green-400 text-xl lg:text-2xl font-bold">
                   {sensors.filter(s => s.status === 'Online').length}
                 </p>
               </div>
             </div>
           </div>
           
-          <div className="bg-gray-800 rounded-lg shadow-lg p-6 border border-gray-700">
+          <div className="bg-gray-800 rounded-lg shadow-lg p-4 lg:p-6 border border-gray-700">
             <div className="flex items-center">
-              <span className="text-2xl mr-3">⚠️</span>
+              <span className="text-xl lg:text-2xl mr-3">⚠️</span>
               <div>
-                <p className="text-gray-400 text-sm">Alerts</p>
-                <p className="text-yellow-400 text-2xl font-bold">2</p>
+                <p className="text-gray-400 text-xs lg:text-sm">Alerts</p>
+                <p className="text-yellow-400 text-xl lg:text-2xl font-bold">2</p>
               </div>
             </div>
           </div>
           
-          <div className="bg-gray-800 rounded-lg shadow-lg p-6 border border-gray-700">
+          <div className="bg-gray-800 rounded-lg shadow-lg p-4 lg:p-6 border border-gray-700">
             <div className="flex items-center">
-              <span className="text-2xl mr-3">⚡</span>
+              <span className="text-xl lg:text-2xl mr-3">⚡</span>
               <div>
-                <p className="text-gray-400 text-sm">Battery</p>
-                <p className="text-blue-400 text-2xl font-bold">87%</p>
+                <p className="text-gray-400 text-xs lg:text-sm">Battery</p>
+                <p className="text-blue-400 text-xl lg:text-2xl font-bold">87%</p>
               </div>
             </div>
           </div>
         </div>
 
         {/* Sensors Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-6">
           {sensors.map((sensor) => (
             <div key={sensor.id} className="bg-gray-800 rounded-lg shadow-lg p-6 border border-gray-700 hover:border-gray-600 transition-colors">
               <div className="flex items-center justify-between mb-4">
