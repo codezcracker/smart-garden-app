@@ -1,0 +1,6 @@
+id,name,commonName,emoji,category,family,climate,difficulty,growthTime
+carrot-1,"Daucus carota","Carrot",🥕,"Vegetable","Apiaceae","Temperate","Easy","1 year"
+tomato-1,"Solanum lycopersicum","Tomato",🍅,"Vegetable","Solanaceae","Temperate","Medium","1 year"
+basil-1,"Ocimum basilicum","Basil",🌿,"Herb","Lamiaceae","Tropical","Easy","1 year"
+apple-1,"Malus domestica","Apple",🍎,"Fruit","Rosaceae","Temperate","Medium","5 years"
+strawberry-1,"Fragaria ananassa","Strawberry",🍓,"Fruit","Rosaceae","Temperate","Easy","1 year"

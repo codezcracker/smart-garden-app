@@ -1,419 +1,328 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { useTheme } from '../theme-context';
+import { useState, useEffect, useCallback } from 'react';
+import Navigation from '@/components/Navigation';
 
-export default function PlantsPage() {
-  const { theme } = useTheme();
-  const [plants, setPlants] = useState([]);
-  const [totalPlants, setTotalPlants] = useState(0);
+export default function Plants() {
+  const [plantData, setPlantData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState('all');
-  const [selectedFamily, setSelectedFamily] = useState('all');
-  const [categories, setCategories] = useState([{ name: 'all', count: 0 }]);
-  const [families, setFamilies] = useState([{ name: 'all', count: 0 }]);
   const [currentPage, setCurrentPage] = useState(1);
-  const [viewMode, setViewMode] = useState('cards'); // 'cards' or 'list'
-  const [listLoading, setListLoading] = useState(false);
-  const [totalPages, setTotalPages] = useState(1);
-  const [selectedPlant, setSelectedPlant] = useState(null);
-  const [showModal, setShowModal] = useState(false);
-  const plantsPerPage = 24; // Show 24 plants per page (6 rows x 4 columns)
-  const [isSearching, setIsSearching] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState('');
+  const [selectedFamily, setSelectedFamily] = useState('');
+  const [selectedClimate, setSelectedClimate] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState('');
+  const [searchInfo, setSearchInfo] = useState(null);
 
-  const fetchPlantsFromConvertedCSV = async (search = '', isFilterChange = false) => {
+  // Debounce search term
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearchTerm(searchTerm);
+    }, 300); // 300ms delay
+
+    return () => clearTimeout(timer);
+  }, [searchTerm]);
+
+  const fetchPlants = useCallback(async () => {
     try {
-      if (isFilterChange) {
-        setListLoading(true);
-        setCurrentPage(1); // Reset to first page when filters change
-      } else {
-        setLoading(true);
-      }
-      
+      setLoading(true);
       const params = new URLSearchParams({
-        limit: '24', // Show 24 plants per page (6 rows x 4 columns)
-        page: currentPage.toString()
+        page: currentPage.toString(),
+        limit: '20', // Increased limit for better pagination
+        ...(debouncedSearchTerm && { search: debouncedSearchTerm }),
+        ...(selectedFamily && { family: selectedFamily }),
+        ...(selectedClimate && { climate: selectedClimate }),
+        ...(selectedCategory && { category: selectedCategory })
       });
-      
-      if (search) {
-        params.append('search', search);
+
+      const response = await fetch(`/api/plants?${params}`);
+      if (!response.ok) {
+        throw new Error('Failed to fetch plants');
       }
       
-      if (selectedFamily !== 'all') {
-        params.append('family', selectedFamily);
-      }
-      
-      if (selectedCategory !== 'all') {
-        params.append('category', selectedCategory);
-      }
-      
-      const response = await fetch(`/api/plants-converted?${params}`);
       const data = await response.json();
-      
-      if (data.success) {
-        setPlants(data.plants);
-        setTotalPlants(data.total || 0);
-        setCategories(data.categories || [{ name: 'all', count: 0 }]);
-        setFamilies(data.families || [{ name: 'all', count: 0 }]);
-        setTotalPages(data.totalPages || 1);
-      } else {
-        setError(data.error || 'Failed to fetch plants');
-      }
+      setPlantData(data);
+      setSearchInfo(data.searchInfo);
+      setError(null);
     } catch (err) {
-      setError('Failed to fetch plants from converted CSV');
-      console.error('Error:', err);
+      setError(err instanceof Error ? err.message : 'An error occurred');
     } finally {
       setLoading(false);
-      setListLoading(false);
-      setIsSearching(false);
+    }
+  }, [currentPage, debouncedSearchTerm, selectedFamily, selectedClimate, selectedCategory]);
+
+  useEffect(() => {
+    fetchPlants();
+  }, [fetchPlants]);
+
+  const getHealthColor = (difficulty) => {
+    switch (difficulty) {
+      case 'Easy':
+        return 'text-green-400';
+      case 'Medium':
+        return 'text-blue-400';
+      case 'Hard':
+        return 'text-red-400';
+      default:
+        return 'text-gray-400';
     }
   };
 
-  useEffect(() => {
-    fetchPlantsFromConvertedCSV();
-  }, []);
-
-  // Debounced search for better performance
-  useEffect(() => {
-    const timeoutId = setTimeout(() => {
-      if (searchTerm) {
-        setIsSearching(true);
-        fetchPlantsFromConvertedCSV(searchTerm, true);
-      } else {
-        fetchPlantsFromConvertedCSV('', true);
-      }
-    }, 500); // Wait 500ms after user stops typing
-
-    return () => clearTimeout(timeoutId);
-  }, [searchTerm, selectedCategory, selectedFamily, currentPage]);
-
-
-
-  // Get unique categories from plants (for display purposes)
-  const plantCategories = ['all', ...new Set(plants.map(plant => plant.family || 'Unknown').filter(Boolean))];
-
-  // Filter plants based on search, family, and category
-  const filteredPlants = plants.filter(plant => {
-    const matchesSearch = plant.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         plant.family?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         plant.category?.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesFamily = selectedFamily === 'all' || plant.family === selectedFamily;
-    const matchesCategory = selectedCategory === 'all' || plant.category === selectedCategory;
-    return matchesSearch && matchesFamily && matchesCategory;
-  });
-
-  // Show all plants (no pagination limits)
-  const paginatedPlants = filteredPlants;
-
-  const openModal = (plant) => {
-    setSelectedPlant(plant);
-    setShowModal(true);
+  const getGrowthColor = (growthTime) => {
+    if (growthTime.includes('1 year') || growthTime.includes('2 years')) return 'text-green-400';
+    if (growthTime.includes('3 years') || growthTime.includes('5 years')) return 'text-blue-400';
+    if (growthTime.includes('10 years') || growthTime.includes('15 years')) return 'text-yellow-400';
+    return 'text-red-400';
   };
 
-  const closeModal = () => {
-    setShowModal(false);
-    setSelectedPlant(null);
+  const clearAllFilters = () => {
+    setSearchTerm('');
+    setSelectedFamily('');
+    setSelectedClimate('');
+    setSelectedCategory('');
+    setCurrentPage(1);
   };
 
-  if (loading) {
+  if (loading && !plantData) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="loading-spinner"></div>
+      <div className="min-h-screen bg-white dark:bg-gray-900">
+        <Navigation />
+        <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="text-center">
+            <div className="text-gray-900 dark:text-white text-xl">Loading plants...</div>
+          </div>
+        </main>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="error-container">
-          <h2 className="text-xl font-semibold mb-4">Error Loading Plants</h2>
-          <p className="text-gray-600 mb-4">{error}</p>
-          <button 
-            onClick={fetchPlantsFromConvertedCSV}
-            className="btn-primary"
-          >
-            Try Again
-          </button>
-        </div>
+      <div className="min-h-screen bg-white dark:bg-gray-900">
+        <Navigation />
+        <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="text-center">
+            <div className="text-red-400 text-xl">Error: {error}</div>
+          </div>
+        </main>
       </div>
     );
   }
 
   return (
-    <div className="plants-container">
-      {/* Header */}
-      <div className="plants-header">
-        <h1 className="plants-title">Plant Database</h1>
-        <p className="plants-subtitle">
-          Discover {totalPlants.toLocaleString()} plant species from around the world
-        </p>
-      </div>
+    <div className="min-h-screen bg-white dark:bg-gray-900">
+      <Navigation />
+      
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">🌱 Plants & Search</h1>
+          <p className="text-gray-600 dark:text-gray-400">Search, filter, and manage your garden plants from our comprehensive database</p>
+        </div>
 
-      {/* Search and Filters */}
-      <div className="search-filters">
-        <div className="search-box">
-          <input
-            type="text"
-            placeholder="Search plants..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="search-input"
-          />
-          {isSearching && <div className="search-spinner"></div>}
-        </div>
-        
-        <div className="filter-box">
-          <select
-            value={selectedFamily}
-            onChange={(e) => setSelectedFamily(e.target.value)}
-            className="filter-select"
-          >
-            {families.map(family => (
-              <option key={family.name} value={family.name}>
-                {family.name === 'all' ? `All Families (${family.count.toLocaleString()})` : `${family.name} (${family.count.toLocaleString()})`}
-              </option>
-            ))}
-          </select>
-        </div>
-        
-        <div className="filter-box">
-          <select
-            value={selectedCategory}
-            onChange={(e) => setSelectedCategory(e.target.value)}
-            className="filter-select"
-          >
-            {categories.map(category => (
-              <option key={category.name} value={category.name}>
-                {category.name === 'all' ? `All Categories (${category.count.toLocaleString()})` : `${category.name} (${category.count.toLocaleString()})`}
-              </option>
-            ))}
-          </select>
-        </div>
-        
-        <div className="view-toggle">
-          <button
-            className={`view-btn ${viewMode === 'cards' ? 'active' : ''}`}
-            onClick={() => setViewMode('cards')}
-            title="Card View"
-          >
-            📋
-          </button>
-          <button
-            className={`view-btn ${viewMode === 'list' ? 'active' : ''}`}
-            onClick={() => setViewMode('list')}
-            title="List View"
-          >
-            📝
-          </button>
-        </div>
-      </div>
-
-      {/* Results Info */}
-      <div className="results-info">
-        <p>
-          Showing {plants.length.toLocaleString()} plants
-          {searchTerm && ` matching "${searchTerm}"`}
-          {selectedFamily !== 'all' && ` in ${selectedFamily} family`}
-          {selectedCategory !== 'all' && ` of ${selectedCategory} type`}
-        </p>
-        {listLoading && <div className="list-loading">🔄 Loading plants...</div>}
-      </div>
-
-      {/* Plants Display */}
-      {viewMode === 'cards' ? (
-        <div className="plants-grid">
-          {paginatedPlants.map((plant, index) => (
-            <div
-              key={`${plant.name}-${index}`}
-              className="plant-card"
-              onClick={() => openModal(plant)}
+        {/* Search and Filters */}
+        <div className="bg-gray-50 dark:bg-gray-800 rounded-lg shadow-lg p-6 border border-gray-200 dark:border-gray-700 mb-8">
+          <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+            <input
+              type="text"
+              placeholder="Search plants by name, family, category, or climate..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="bg-white dark:bg-gray-700 text-gray-900 dark:text-white px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 focus:border-blue-500 focus:outline-none"
+            />
+            <select
+              value={selectedFamily}
+              onChange={(e) => setSelectedFamily(e.target.value)}
+              className="bg-white dark:bg-gray-700 text-gray-900 dark:text-white px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 focus:border-blue-500 focus:outline-none"
             >
-              <div className="plant-card-header">
-                <h3 className="plant-name">{plant.name || 'Unknown Plant'}</h3>
-                <span className="plant-emoji">{plant.emoji || '🪴'}</span>
+              <option value="">All Families</option>
+              {plantData?.filters.families.map((family) => (
+                <option key={family} value={family}>{family}</option>
+              ))}
+            </select>
+            <select
+              value={selectedClimate}
+              onChange={(e) => setSelectedClimate(e.target.value)}
+              className="bg-white dark:bg-gray-700 text-gray-900 dark:text-white px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 focus:border-blue-500 focus:outline-none"
+            >
+              <option value="">All Climates</option>
+              {plantData?.filters.climates.map((climate) => (
+                <option key={climate} value={climate}>{climate}</option>
+              ))}
+            </select>
+            <select
+              value={selectedCategory}
+              onChange={(e) => setSelectedCategory(e.target.value)}
+              className="bg-white dark:bg-gray-700 text-gray-900 dark:text-white px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 focus:border-blue-500 focus:outline-none"
+            >
+              <option value="">All Categories</option>
+              {plantData?.filters.categories.map((category) => (
+                <option key={category} value={category}>{category}</option>
+              ))}
+            </select>
+            <button
+              onClick={clearAllFilters}
+              className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors"
+            >
+              Clear All
+            </button>
+          </div>
+        </div>
+
+        {/* Search Results Info */}
+        {searchInfo && (searchInfo.searchTerm || searchInfo.resultsFound !== searchInfo.totalInDatabase) && (
+          <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4 mb-6 border border-blue-200 dark:border-blue-800">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-blue-800 dark:text-blue-200 font-medium">
+                  {searchInfo.searchTerm ? `Search results for "${searchInfo.searchTerm}"` : 'Filtered results'}
+                </p>
+                <p className="text-blue-600 dark:text-blue-300 text-sm">
+                  Found {searchInfo.resultsFound.toLocaleString()} plants out of {searchInfo.totalInDatabase.toLocaleString()} total
+                </p>
               </div>
-              
-              <div className="plant-card-body">
-                <div className="plant-info">
-                  <span className="info-label">Family:</span>
-                  <span className="info-value">{plant.family || 'Unknown'}</span>
-                </div>
-                
-                <div className="plant-info">
-                  <span className="info-label">Category:</span>
-                  <span className="info-value">{plant.category || 'Unknown'}</span>
-                </div>
-                
-                {plant.climate && plant.climate !== 'Unknown' && (
-                  <div className="plant-info">
-                    <span className="info-label">Climate:</span>
-                    <span className="info-value">{plant.climate}</span>
-                  </div>
-                )}
-                
-                {plant.difficulty && plant.difficulty !== 'Unknown' && (
-                  <div className="plant-info">
-                    <span className="info-label">Difficulty:</span>
-                    <span className="info-value">{plant.difficulty}</span>
-                  </div>
-                )}
-              </div>
-              
-              <div className="plant-card-footer">
-                <span className="view-details">Click to view details</span>
+              <button
+                onClick={clearAllFilters}
+                className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-200 text-sm font-medium"
+              >
+                Clear filters
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Plant Stats */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+          <div className="bg-gray-50 dark:bg-gray-800 rounded-lg shadow-lg p-6 border border-gray-200 dark:border-gray-700">
+            <div className="flex items-center">
+              <span className="text-2xl mr-3">🌱</span>
+              <div>
+                <p className="text-gray-600 dark:text-gray-400 text-sm">Total Plants</p>
+                <p className="text-gray-900 dark:text-white text-2xl font-bold">
+                  {searchInfo ? searchInfo.resultsFound.toLocaleString() : plantData?.pagination.totalPlants.toLocaleString() || 0}
+                </p>
               </div>
             </div>
-          ))}
-        </div>
-      ) : (
-        <div className="plants-list">
-          {paginatedPlants.map((plant, index) => (
-            <div
-              key={`${plant.name}-${index}`}
-              className="plant-list-item"
-              onClick={() => openModal(plant)}
-            >
-              <div className="plant-list-emoji">{plant.emoji || '🪴'}</div>
-              <div className="plant-list-content">
-                <h3 className="plant-list-name">{plant.name || 'Unknown Plant'}</h3>
-                <div className="plant-list-details">
-                  <span className="plant-list-family">{plant.family || 'Unknown'}</span>
-                  <span className="plant-list-category">{plant.category || 'Unknown'}</span>
-                  {plant.climate && plant.climate !== 'Unknown' && (
-                    <span className="plant-list-climate">{plant.climate}</span>
-                  )}
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
-
-      {/* Results Info */}
-      <div className="results-info">
-        <p>
-          Showing {plants.length.toLocaleString()} plants
-          {searchTerm && ` matching "${searchTerm}"`}
-          {selectedFamily !== 'all' && ` in ${selectedFamily} family`}
-          {selectedCategory !== 'all' && ` of ${selectedCategory} type`}
-          {` (Page ${currentPage} of ${totalPages})`}
-        </p>
-      </div>
-
-      {/* Pagination Controls */}
-      {totalPages > 1 && (
-        <div className="pagination">
-          <button
-            onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-            disabled={currentPage === 1 || listLoading}
-            className="pagination-btn"
-          >
-            Previous
-          </button>
+          </div>
           
-          <div className="pagination-numbers">
-            {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
-              let pageNum;
-              if (totalPages <= 5) {
-                pageNum = i + 1;
-              } else if (currentPage <= 3) {
-                pageNum = i + 1;
-              } else if (currentPage >= totalPages - 2) {
-                pageNum = totalPages - 4 + i;
-              } else {
-                pageNum = currentPage - 2 + i;
-              }
-              
-              return (
+          <div className="bg-gray-50 dark:bg-gray-800 rounded-lg shadow-lg p-6 border border-gray-200 dark:border-gray-700">
+            <div className="flex items-center">
+              <span className="text-2xl mr-3">🏷️</span>
+              <div>
+                <p className="text-gray-600 dark:text-gray-400 text-sm">Families</p>
+                <p className="text-green-600 dark:text-green-400 text-2xl font-bold">{plantData?.filters.families.length || 0}</p>
+              </div>
+            </div>
+          </div>
+          
+          <div className="bg-gray-50 dark:bg-gray-800 rounded-lg shadow-lg p-6 border border-gray-200 dark:border-gray-700">
+            <div className="flex items-center">
+              <span className="text-2xl mr-3">🌍</span>
+              <div>
+                <p className="text-gray-600 dark:text-gray-400 text-sm">Climates</p>
+                <p className="text-blue-600 dark:text-blue-400 text-2xl font-bold">{plantData?.filters.climates.length || 0}</p>
+              </div>
+            </div>
+          </div>
+          
+          <div className="bg-gray-50 dark:bg-gray-800 rounded-lg shadow-lg p-6 border border-gray-200 dark:border-gray-700">
+            <div className="flex items-center">
+              <span className="text-2xl mr-3">📊</span>
+              <div>
+                <p className="text-gray-600 dark:text-gray-400 text-sm">Categories</p>
+                <p className="text-yellow-600 dark:text-yellow-400 text-2xl font-bold">{plantData?.filters.categories.length || 0}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Plants Grid */}
+        {loading ? (
+          <div className="text-center py-8">
+            <div className="text-gray-900 dark:text-white text-xl">Loading plants...</div>
+          </div>
+        ) : (
+          <>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+              {plantData?.plants.map((plant) => (
+                <div key={plant.id} className="bg-gray-50 dark:bg-gray-800 rounded-lg shadow-lg p-6 border border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 transition-colors">
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center space-x-3">
+                      <span className="text-3xl">{plant.emoji}</span>
+                      <div>
+                        <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{plant.name}</h3>
+                        <p className="text-gray-600 dark:text-gray-400 text-sm">{plant.category} • {plant.family}</p>
+                      </div>
+                    </div>
+                    <span className={`text-sm font-medium ${getHealthColor(plant.difficulty)}`}>
+                      {plant.difficulty}
+                    </span>
+                  </div>
+                  
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <span className="text-gray-600 dark:text-gray-300 text-sm">Climate</span>
+                      <span className="text-gray-700 dark:text-gray-400 text-sm">{plant.climate}</span>
+                    </div>
+                    
+                    <div className="flex items-center justify-between">
+                      <span className="text-gray-600 dark:text-gray-300 text-sm">Growth Time</span>
+                      <span className={`text-sm font-medium ${getGrowthColor(plant.growthTime)}`}>
+                        {plant.growthTime}
+                      </span>
+                    </div>
+                    
+                    <div className="flex items-center justify-between">
+                      <span className="text-gray-600 dark:text-gray-300 text-sm">Family</span>
+                      <span className="text-gray-700 dark:text-gray-400 text-sm">{plant.family}</span>
+                    </div>
+                    
+                    <div className="flex space-x-2 pt-2">
+                      <button className="flex-1 bg-green-600 text-white py-2 px-3 rounded-lg text-sm hover:bg-green-700 transition-colors">
+                        🌱 Add to Garden
+                      </button>
+                      <button className="flex-1 bg-blue-600 text-white py-2 px-3 rounded-lg text-sm hover:bg-blue-700 transition-colors">
+                        📊 Details
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Pagination */}
+            {plantData && plantData.pagination.totalPages > 1 && (
+              <div className="flex justify-center items-center space-x-4 mb-8">
                 <button
-                  key={pageNum}
-                  onClick={() => setCurrentPage(pageNum)}
-                  disabled={listLoading}
-                  className={`pagination-num ${currentPage === pageNum ? 'active' : ''}`}
+                  onClick={() => setCurrentPage(currentPage - 1)}
+                  disabled={!plantData.pagination.hasPrev}
+                  className="bg-gray-600 dark:bg-gray-700 text-white px-4 py-2 rounded-lg hover:bg-gray-500 dark:hover:bg-gray-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  {pageNum}
+                  Previous
                 </button>
-              );
-            })}
-            {totalPages > 5 && currentPage < totalPages - 2 && (
-              <div className="pagination-extra">
-                <span className="pagination-ellipsis">...</span>
+                <span className="text-gray-900 dark:text-white">
+                  Page {plantData.pagination.page} of {plantData.pagination.totalPages} 
+                  ({plantData.pagination.totalPlants.toLocaleString()} total plants)
+                </span>
                 <button
-                  onClick={() => setCurrentPage(totalPages)}
-                  disabled={listLoading}
-                  className={`pagination-num ${currentPage === totalPages ? 'active' : ''}`}
+                  onClick={() => setCurrentPage(currentPage + 1)}
+                  disabled={!plantData.pagination.hasNext}
+                  className="bg-gray-600 dark:bg-gray-700 text-white px-4 py-2 rounded-lg hover:bg-gray-500 dark:hover:bg-gray-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  {totalPages}
+                  Next
                 </button>
               </div>
             )}
-          </div>
-          
-          <button
-            onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
-            disabled={currentPage === totalPages || listLoading}
-            className="pagination-btn"
-          >
-            Next
+          </>
+        )}
+
+        {/* Add Plant Button */}
+        <div className="mt-8 text-center">
+          <button className="bg-green-600 text-white py-3 px-6 rounded-lg hover:bg-green-700 transition-colors font-medium">
+            🌱 Add New Plant
           </button>
         </div>
-      )}
-
-      {/* Plant Details Modal */}
-      {showModal && selectedPlant && (
-        <div className="modal-overlay" onClick={closeModal}>
-          <div className="modal-content" onClick={e => e.stopPropagation()}>
-            <div className="modal-header">
-              <h2 className="modal-title">{selectedPlant.name || 'Unknown Plant'}</h2>
-              <span className="modal-emoji">{selectedPlant.emoji || '🪴'}</span>
-              <button onClick={closeModal} className="modal-close">&times;</button>
-            </div>
-            
-            <div className="modal-body">
-              <div className="plant-details">
-                <div className="detail-row">
-                  <span className="detail-label">Plant Name:</span>
-                  <span className="detail-value">{selectedPlant.name}</span>
-                </div>
-                
-                <div className="detail-row">
-                  <span className="detail-label">Family:</span>
-                  <span className="detail-value">{selectedPlant.family || 'Unknown'}</span>
-                </div>
-                
-                <div className="detail-row">
-                  <span className="detail-label">Category:</span>
-                  <span className="detail-value">{selectedPlant.category || 'Unknown'}</span>
-                </div>
-                
-                {selectedPlant.climate && selectedPlant.climate !== 'Unknown' && (
-                  <div className="detail-row">
-                    <span className="detail-label">Climate:</span>
-                    <span className="detail-value">{selectedPlant.climate}</span>
-                  </div>
-                )}
-                
-                {selectedPlant.difficulty && selectedPlant.difficulty !== 'Unknown' && (
-                  <div className="detail-row">
-                    <span className="detail-label">Difficulty:</span>
-                    <span className="detail-value">{selectedPlant.difficulty}</span>
-                  </div>
-                )}
-                
-                {selectedPlant.growthTime && selectedPlant.growthTime !== 'Unknown' && (
-                  <div className="detail-row">
-                    <span className="detail-label">Growth Time:</span>
-                    <span className="detail-value">{selectedPlant.growthTime}</span>
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+      </main>
     </div>
   );
 } 

@@ -1,100 +1,101 @@
 id,name,emoji,category,family,climate,difficulty,growthTime
-0,Schoenoxiphium ecklonii var. ecklonii,🪴,Species,Cyperaceae,Unknown,Unknown,Unknown
-1,Cyperus violifolia,🪴,Species,Cyperaceae,Unknown,Unknown,Unknown
-2,Carex viridula var. viridula,🪴,Species,Cyperaceae,Unknown,Unknown,Unknown
-3,Mariscus phleoides,🪴,Species,Cyperaceae,Unknown,Unknown,Unknown
-4,Tetraria compar,🪴,Species,Cyperaceae,Unknown,Unknown,Unknown
-5,Fimbristylis schulzii,🪴,Species,Cyperaceae,Unknown,Unknown,Unknown
-6,Scirpus orbicephala,🪴,Species,Cyperaceae,Unknown,Unknown,Unknown
-7,Trichophorum bracteatum,🪴,Species,Cyperaceae,Unknown,Unknown,Unknown
-8,Scirpus uniflorum,🪴,Species,Cyperaceae,Unknown,Unknown,Unknown
-9,Blysmopsis exilis,🪴,Species,Cyperaceae,Unknown,Unknown,Unknown
-10,Carex arcatica f. taldycola,🪴,Species,Cyperaceae,Unknown,Unknown,Unknown
-11,Carex Ã prolixa,🪴,Species,Cyperaceae,Unknown,Unknown,Unknown
-12,Carex bigelowii subsp. ensifolia,🪴,Species,Cyperaceae,Unknown,Unknown,Unknown
-13,Carex bigelowii subsp. hyperborea,🪴,Species,Cyperaceae,Unknown,Unknown,Unknown
-14,Carex capitata subsp. arctogena,🪴,Species,Cyperaceae,Unknown,Unknown,Unknown
-15,Kobresia bucharica,🪴,Species,Cyperaceae,Unknown,Unknown,Unknown
-16,Carex caespitosa var. inumbrata,🪴,Species,Cyperaceae,Unknown,Unknown,Unknown
-17,Carex caespitosa f. retorta,🪴,Species,Cyperaceae,Unknown,Unknown,Unknown
-18,Carex cyperoides,🪴,Species,Cyperaceae,Unknown,Unknown,Unknown
-19,Carex depressa subsp. transsilvanica,🪴,Species,Cyperaceae,Unknown,Unknown,Unknown
-20,Carex Ã descendens,🪴,Species,Cyperaceae,Unknown,Unknown,Unknown
-21,Carex divisa var. coarcta,🪴,Species,Cyperaceae,Unknown,Unknown,Unknown
-22,Carex dominii,🪴,Species,Cyperaceae,Unknown,Unknown,Unknown
-23,Carex filipes subsp. oligostachys,🪴,Species,Cyperaceae,Unknown,Unknown,Unknown
-24,Carex flacca subsp. cuspidata,🪴,Species,Cyperaceae,Unknown,Unknown,Unknown
-25,Carex fujidae,🪴,Species,Cyperaceae,Unknown,Unknown,Unknown
-26,Carex glauca subsp. serrulata,🪴,Species,Cyperaceae,Unknown,Unknown,Unknown
-27,Carex graciliformis,🪴,Species,Cyperaceae,Unknown,Unknown,Unknown
-28,Carex Ã grahamii,🪴,Species,Cyperaceae,Unknown,Unknown,Unknown
-29,Carex karoi var. selengensis,🪴,Species,Cyperaceae,Unknown,Unknown,Unknown
-30,Carex kattegatensis,🪴,Species,Cyperaceae,Unknown,Unknown,Unknown
-31,Carex krascheninnikowii,🪴,Species,Cyperaceae,Unknown,Unknown,Unknown
-32,Carex leerseana,🪴,Species,Cyperaceae,Unknown,Unknown,Unknown
-33,Carex litwinowii,🪴,Species,Cyperaceae,Unknown,Unknown,Unknown
-34,Carex lumnitzeri,🪴,Species,Cyperaceae,Unknown,Unknown,Unknown
-35,Carex musartiana,🪴,Species,Cyperaceae,Unknown,Unknown,Unknown
-36,Carex nigra subsp. juncella,🪴,Species,Cyperaceae,Unknown,Unknown,Unknown
-37,Carex nigrita,🪴,Species,Cyperaceae,Unknown,Unknown,Unknown
-38,Carex pairae subsp. lumnitzeri,🪴,Species,Cyperaceae,Unknown,Unknown,Unknown
-39,Carex pediformis subsp. rhizodes,🪴,Species,Cyperaceae,Unknown,Unknown,Unknown
-40,Carex platyrhyncha,🪴,Species,Cyperaceae,Unknown,Unknown,Unknown
-41,Carex polygama subsp. mutica,🪴,Species,Cyperaceae,Unknown,Unknown,Unknown
-42,Carex putjatini,🪴,Species,Cyperaceae,Unknown,Unknown,Unknown
-43,Carex pyrenaica var. micropoda,🪴,Species,Cyperaceae,Unknown,Unknown,Unknown
-44,Carex rigidioides,🪴,Species,Cyperaceae,Unknown,Unknown,Unknown
-45,Carex squamigera,🪴,Species,Cyperaceae,Unknown,Unknown,Unknown
-46,Carex stenophylla subsp. stenophylloides,🪴,Species,Cyperaceae,Unknown,Unknown,Unknown
-47,Carex umbrosa subsp. huetiana,🪴,Species,Cyperaceae,Unknown,Unknown,Unknown
-48,Carex xyphium,🪴,Species,Cyperaceae,Unknown,Unknown,Unknown
-49,Cyperus latespicatus var. setiformis,🪴,Species,Cyperaceae,Unknown,Unknown,Unknown
-50,Cyperus longus subsp. badius,🪴,Species,Cyperaceae,Unknown,Unknown,Unknown
-51,Cyperus truncatus,🪴,Species,Cyperaceae,Unknown,Unknown,Unknown
-52,Eleocharis argyrolepis,🪴,Species,Cyperaceae,Unknown,Unknown,Unknown
-53,Cyperus globularis,🪴,Species,Cyperaceae,Unknown,Unknown,Unknown
-54,Cyperus intersita,🪴,Species,Cyperaceae,Unknown,Unknown,Unknown
-55,Cyperus kamtschatica,🪴,Species,Cyperaceae,Unknown,Unknown,Unknown
-56,Eleocharis mamillata subsp. austriaca,🪴,Species,Cyperaceae,Unknown,Unknown,Unknown
-57,Eleocharis palustris var. mamillata,🪴,Species,Cyperaceae,Unknown,Unknown,Unknown
-58,Eleocharis parvula subsp. oppermannii,🪴,Species,Cyperaceae,Unknown,Unknown,Unknown
-59,Cyperus paucidentata,🪴,Species,Cyperaceae,Unknown,Unknown,Unknown
-60,Cyperus pauciflora,🪴,Species,Cyperaceae,Unknown,Unknown,Unknown
-61,Cyperus pellucida,🪴,Species,Cyperaceae,Unknown,Unknown,Unknown
-62,Cyperus petasata,🪴,Species,Cyperaceae,Unknown,Unknown,Unknown
-63,Cyperus quinqueflora,🪴,Species,Cyperaceae,Unknown,Unknown,Unknown
-64,Elyna myosuroides,🪴,Species,Cyperaceae,Unknown,Unknown,Unknown
-65,Eriophorum gracile subsp. asiaticum,🪴,Species,Cyperaceae,Unknown,Unknown,Unknown
-66,Eriophorum gracile subsp. coreanum,🪴,Species,Cyperaceae,Unknown,Unknown,Unknown
-67,Eriophorum gracile var. coreanum,🪴,Species,Cyperaceae,Unknown,Unknown,Unknown
-68,Scirpus fauriei subsp. vaginatus,🪴,Species,Cyperaceae,Unknown,Unknown,Unknown
-69,Eriophorum vaginatum subsp. fauriei,🪴,Species,Cyperaceae,Unknown,Unknown,Unknown
-70,Holoschoenus romanus subsp. holoschoenus,🪴,Species,Cyperaceae,Unknown,Unknown,Unknown
-71,Kobresia capillifolia subsp. pamirica,🪴,Species,Cyperaceae,Unknown,Unknown,Unknown
-72,Mariscus cyri,🪴,Species,Cyperaceae,Unknown,Unknown,Unknown
-73,Pycreus rehmannii,🪴,Species,Cyperaceae,Unknown,Unknown,Unknown
-74,Pycreus nilagiricus,🪴,Species,Cyperaceae,Unknown,Unknown,Unknown
-75,Schoenoplectus kalmussii,🪴,Species,Cyperaceae,Unknown,Unknown,Unknown
-76,Schoenoplectus komarovii,🪴,Species,Cyperaceae,Unknown,Unknown,Unknown
-77,Schoenoplectus nipponicus,🪴,Species,Cyperaceae,Unknown,Unknown,Unknown
-78,Schoenoplectus triquetriformis,🪴,Species,Cyperaceae,Unknown,Unknown,Unknown
-79,Scirpus etuberculatus subsp. nipponicus,🪴,Species,Cyperaceae,Unknown,Unknown,Unknown
-80,Scirpus kalmussii,🪴,Species,Cyperaceae,Unknown,Unknown,Unknown
-81,Scirpus triquetriformis,🪴,Species,Cyperaceae,Unknown,Unknown,Unknown
-82,Trichophorum uniflorum,🪴,Species,Cyperaceae,Unknown,Unknown,Unknown
-83,Cyperus potundus,🪴,Species,Cyperaceae,Unknown,Unknown,Unknown
-84,Mariscus compactus,🪴,Species,Cyperaceae,Unknown,Unknown,Unknown
-85,Carex inflata,🪴,Species,Cyperaceae,Unknown,Unknown,Unknown
-86,Carex fusca subsp. dacica,🪴,Species,Cyperaceae,Unknown,Unknown,Unknown
-87,Carex vulgaris var. juncella,🪴,Species,Cyperaceae,Unknown,Unknown,Unknown
-88,Eleocharis pellucida var. maximoviczii,🪴,Species,Cyperaceae,Unknown,Unknown,Unknown
-89,Eleocharis quinqueflora var. meridionalis,🪴,Species,Cyperaceae,Unknown,Unknown,Unknown
-90,Mariscus umbilensis,🪴,Species,Cyperaceae,Unknown,Unknown,Unknown
-91,Scirpus maritimus var. nobilis,🪴,Species,Cyperaceae,Unknown,Unknown,Unknown
-92,Scirpus loeteflorens,🪴,Species,Cyperaceae,Unknown,Unknown,Unknown
-93,Isolepis leucocarpa,🪴,Species,Cyperaceae,Unknown,Unknown,Unknown
-94,Anosporum monocephalum,🪴,Species,Cyperaceae,Unknown,Unknown,Unknown
-95,Cyperus eragrostis var. eragrostis,🪴,Species,Cyperaceae,Unknown,Unknown,Unknown
-96,Carex ragnoldsii,🪴,Species,Cyperaceae,Unknown,Unknown,Unknown
-97,Pycreus rufescens,🪴,Species,Cyperaceae,Unknown,Unknown,Unknown
-98,Scirpus microcephalus,🪴,Species,Cyperaceae,Unknown,Unknown,Unknown
+0,"Vicia longifolia Britton",🥒,"Cultivar","Cucurbitaceae","Tropical","Medium","1 year"
+1,"Linum spicata nothosubsp. aquatica",🫐,"Hybrid","Ericaceae","Boreal","Medium","3 years"
+2,"Fragaria perennis",🌿,"Cultivar","Marantaceae","Tropical","Easy","1 year"
+3,"Lathyrus caroliniana",🌳,"Subspecies","Fagaceae","Temperate","Medium","10 years"
+4,"Aesculus aurea",🫘,"Species","Fabaceae","Temperate","Easy","1 year"
+5,"Avena brevifolia nothosubsp. quinquefolia Mill.",🌿,"Subspecies","Marantaceae","Tropical","Easy","1 year"
+6,"Maianthemum uniflora",🌺,"Cultivar","Heliconiaceae","Tropical","Medium","2 years"
+7,"Taxus palustris",🌿,"Subspecies","Marantaceae","Tropical","Easy","1 year"
+8,"Hesperis pilosa hybrid simplex Fernald",🌿,"Hybrid","Lauraceae","Tropical","Medium","5 years"
+9,"Taxus racemosa Small",🌸,"Subspecies","Caprifoliaceae","Temperate","Easy","2 years"
+10,"Cynoglossum obtusa",🫐,"Hybrid","Myrtaceae","Tropical","Medium","4 years"
+11,"Chimaphila chinensis ssp. rotundifolia Pursh",🌿,"Subspecies","Cycadaceae","Tropical","Hard","15 years"
+12,"Polygonum canadensis f. majus",🫒,"Species","Oleaceae","Mediterranean","Medium","5 years"
+13,"Helianthus perennis nothovar. fragilis",🌳,"Subspecies","Ginkgoaceae","Temperate","Medium","20 years"
+14,"Bromus erecta",🌲,"Species","Taxodiaceae","Temperate","Medium","10 years"
+15,"Hesperis californica f. fragilis Mill.",🌿,"Species","Welwitschiaceae","Arid","Hard","20 years"
+16,"Digitaria cinerea var. subulata",🌺,"Cultivar","Cannaceae","Tropical","Easy","1 year"
+17,"Diervilla verna",🌹,"Variety","Rosaceae","Temperate","Medium","2 years"
+18,"Astragalus cinerea var. ciliata",🍅,"Species","Solanaceae","Temperate","Medium","1 year"
+19,"Muhlenbergia aspera var. densa",🌴,"Species","Arecaceae","Tropical","Medium","8 years"
+20,"Linum glomerata Small",🌰,"Subspecies","Juglandaceae","Temperate","Medium","7 years"
+21,"Allium linearis nothovar. leucantha",🌲,"Hybrid","Araucariaceae","Tropical","Medium","12 years"
+22,"Aloe barbata",🌹,"Species","Rosaceae","Temperate","Medium","2 years"
+23,"Epilobium erecta × spinosum",🌿,"Variety","Welwitschiaceae","Arid","Hard","20 years"
+24,"Cichorium majus cv. arborescens",🍇,"Variety","Vitaceae","Temperate","Medium","3 years"
+25,"Vaccinium crispa Britton",🌵,"Variety","Euphorbiaceae","Arid","Easy","1 year"
+26,"Acacia chinensis",🌿,"Cultivar","Cycadaceae","Tropical","Hard","15 years"
+27,"Eupatorium edulis",🥕,"Cultivar","Apiaceae","Temperate","Easy","1 year"
+28,"Vaccinium lutea",🫚,"Subspecies","Zingiberaceae","Tropical","Medium","2 years"
+29,"Juncus erecta",🌺,"Subspecies","Strelitziaceae","Tropical","Medium","3 years"
+30,"Digitaria dulcis",🌿,"Variety","Lamiaceae","Temperate","Easy","1 year"
+31,"Polygonum salicifolia",🌺,"Subspecies","Cannaceae","Tropical","Easy","1 year"
+32,"Achillea patens nothosubsp. canadensis Mill.",🌹,"Hybrid","Rosaceae","Temperate","Medium","2 years"
+33,"Bromus linearis",🌲,"Species","Cephalotaxaceae","Temperate","Medium","12 years"
+34,"Desmodium elliptica",🌿,"Species","Marantaceae","Tropical","Easy","1 year"
+35,"Fragaria californica",🫘,"Hybrid","Fabaceae","Temperate","Easy","1 year"
+36,"Betula tenuifolia Gleason",🌹,"Hybrid","Rosaceae","Temperate","Medium","2 years"
+37,"Dryopteris umbellata Nutt.",🌿,"Species","Welwitschiaceae","Arid","Hard","20 years"
+38,"Hypericum arborescens",🥕,"Subspecies","Apiaceae","Temperate","Easy","1 year"
+39,"Saxifraga velutina cultivar decumbens",🌵,"Subspecies","Euphorbiaceae","Arid","Easy","1 year"
+40,"Angelica nana",🫐,"Subspecies","Ericaceae","Boreal","Medium","3 years"
+41,"Muhlenbergia flava",🥝,"Hybrid","Actinidiaceae","Temperate","Medium","3 years"
+42,"Claytonia cordata",🌺,"Hybrid","Heliconiaceae","Tropical","Medium","2 years"
+43,"Aesculus platyphylla",🌲,"Hybrid","Taxodiaceae","Temperate","Medium","10 years"
+44,"Ophioglossum elegans",🌸,"Cultivar","Caprifoliaceae","Temperate","Easy","2 years"
+45,"Comandra floribunda",🌺,"Cultivar","Strelitziaceae","Tropical","Medium","3 years"
+46,"Hieracium fasciculata Torr.",🌿,"Subspecies","Lauraceae","Tropical","Medium","5 years"
+47,"Vicia lutea Small",🫐,"Subspecies","Grossulariaceae","Temperate","Medium","2 years"
+48,"Lonicera barbata Small",🍋,"Cultivar","Rutaceae","Tropical","Medium","3 years"
+49,"Pteridium quadrifolia cultivar rigida",🌲,"Cultivar","Cephalotaxaceae","Temperate","Medium","12 years"
+50,"Dodecatheon floribunda",🌿,"Variety","Marantaceae","Tropical","Easy","1 year"
+51,"Drosera borealis",🍁,"Variety","Sapindaceae","Temperate","Medium","6 years"
+52,"Hamamelis edulis cv. platyphylla L.",🥝,"Variety","Actinidiaceae","Temperate","Medium","3 years"
+53,"Oxalis villosa Pursh",🌺,"Species","Heliconiaceae","Tropical","Medium","2 years"
+54,"Delphinium scabra hybrid alba",🌴,"Species","Arecaceae","Tropical","Medium","8 years"
+55,"Ranunculus elliptica subsp. flexuosa",🍍,"Variety","Bromeliaceae","Tropical","Easy","2 years"
+56,"Scutellaria cernua",🥭,"Subspecies","Anacardiaceae","Tropical","Medium","4 years"
+57,"Heracleum verticillata L.",🌼,"Cultivar","Asteraceae","Temperate","Easy","1 year"
+58,"Nuphar sagittata",🌿,"Subspecies","Cycadaceae","Tropical","Hard","15 years"
+59,"Juniperus subulata Pursh",🌺,"Subspecies","Malvaceae","Tropical","Easy","1 year"
+60,"Bromus setosa hybrid montana",🫚,"Variety","Zingiberaceae","Tropical","Medium","2 years"
+61,"Lysimachia laevis subsp. obtusa",🌸,"Variety","Orchidaceae","Tropical","Hard","2 years"
+62,"Drosera aquatica ssp. humilis",🌲,"Variety","Sciadopityaceae","Temperate","Medium","15 years"
+63,"Lysimachia borealis f. verna",🌲,"Variety","Cephalotaxaceae","Temperate","Medium","12 years"
+64,"Sanicula latifolia hybrid capillaris",🌲,"Cultivar","Podocarpaceae","Tropical","Medium","10 years"
+65,"Hesperis arborescens nothovar. flexuosa",🍇,"Cultivar","Vitaceae","Temperate","Medium","3 years"
+66,"Hypoxis japonica subsp. nivea",🌿,"Cultivar","Welwitschiaceae","Arid","Hard","20 years"
+67,"Rosa corymbosa L.",🧄,"Variety","Alliaceae","Temperate","Easy","1 year"
+68,"Rhus tenuifolia f. glomerata Pursh",🥭,"Species","Anacardiaceae","Tropical","Medium","4 years"
+69,"Onoclea racemosa Pursh",🌲,"Subspecies","Araucariaceae","Tropical","Medium","12 years"
+70,"Dichanthelium mollis var. pensylvanica",🌺,"Variety","Heliconiaceae","Tropical","Medium","2 years"
+71,"Elymus quadrifolia",🌿,"Subspecies","Cycadaceae","Tropical","Hard","15 years"
+72,"Campanula subulata × rigida",🌲,"Species","Cupressaceae","Boreal","Easy","8 years"
+73,"Pulsatilla fruticosa",🥒,"Species","Cucurbitaceae","Tropical","Medium","1 year"
+74,"Symphyotrichum umbellata Britton",🍁,"Cultivar","Sapindaceae","Temperate","Medium","6 years"
+75,"Lonicera pubescens Fernald",🌳,"Variety","Betulaceae","Boreal","Easy","5 years"
+76,"Symplocarpus racemosa Mill.",🫚,"Cultivar","Zingiberaceae","Tropical","Medium","2 years"
+77,"Podophyllum scabra",🌵,"Subspecies","Euphorbiaceae","Arid","Easy","1 year"
+78,"Symplocarpus flexuosa",🌿,"Hybrid","Lamiaceae","Temperate","Easy","1 year"
+79,"Helenium odorata",🌳,"Variety","Betulaceae","Boreal","Easy","5 years"
+80,"Ophioglossum arborescens Britton",🌺,"Variety","Strelitziaceae","Tropical","Medium","3 years"
+81,"Agave cristata subsp. aquatica",🌲,"Variety","Taxaceae","Boreal","Medium","15 years"
+82,"Liriodendron pensylvanica nothosubsp. aquatica Small",🍅,"Hybrid","Solanaceae","Temperate","Medium","1 year"
+83,"Chelone quinquefolia Gray",🥒,"Cultivar","Cucurbitaceae","Tropical","Medium","1 year"
+84,"Campanula palustris f. divaricata",🌲,"Variety","Taxaceae","Boreal","Medium","15 years"
+85,"Smilax corymbosa",🌺,"Subspecies","Strelitziaceae","Tropical","Medium","3 years"
+86,"Euphorbia villosa Fernald",🌳,"Cultivar","Ginkgoaceae","Temperate","Medium","20 years"
+87,"Viola densa cultivar borealis",🥝,"Subspecies","Actinidiaceae","Temperate","Medium","3 years"
+88,"Astragalus caroliniana nothosubsp. bicolor",🌳,"Species","Betulaceae","Boreal","Easy","5 years"
+89,"Draba perennis Fernald",🌳,"Cultivar","Ginkgoaceae","Temperate","Medium","20 years"
+90,"Cynoglossum laevis × patens Torr.",🪴,"Species","Unknown","Temperate","Easy","1 year"
+91,"Trifolium montana Small",🌹,"Cultivar","Rosaceae","Temperate","Medium","2 years"
+92,"Collinsonia palustris Mill.",🧄,"Cultivar","Alliaceae","Temperate","Easy","1 year"
+93,"Parthenocissus ovata subsp. uniflora Nutt.",🫐,"Cultivar","Myrtaceae","Tropical","Medium","4 years"
+94,"Danthonia triloba cultivar verna",🍌,"Subspecies","Musaceae","Tropical","Medium","2 years"
+95,"Xanthium leucantha ssp. indica",🌼,"Species","Asteraceae","Temperate","Easy","1 year"
+96,"Potentilla officinalis Torr.",🌿,"Species","Zamiaceae","Tropical","Hard","10 years"
+97,"Achillea rugosa L.",🌳,"Variety","Ulmaceae","Temperate","Medium","8 years"
+98,"Sparganium scabra Fernald",🌳,"Cultivar","Salicaceae","Temperate","Easy","3 years"
+99,"Liatris serotina",🫐,"Subspecies","Ericaceae","Boreal","Medium","3 years"

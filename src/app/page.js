@@ -1,211 +1,142 @@
-'use client'
-import { useState, useEffect } from 'react'
+'use client';
+
+import Navigation from '@/components/Navigation';
 
 export default function Dashboard() {
-  const [plants, setPlants] = useState([])
-  const [sensors, setSensors] = useState([])
-  const [loading, setLoading] = useState(true)
-
-  // Mock data for demonstration
-  useEffect(() => {
-    const mockPlants = [
-      {
-        id: 1,
-        name: 'Tomato Plant',
-        type: 'Vegetable',
-        health: 85,
-        moisture: 72,
-        temperature: 24,
-        lastWatered: '2 hours ago',
-        status: 'healthy'
-      },
-      {
-        id: 2,
-        name: 'Basil',
-        type: 'Herb',
-        health: 92,
-        moisture: 68,
-        temperature: 22,
-        lastWatered: '1 hour ago',
-        status: 'healthy'
-      },
-      {
-        id: 3,
-        name: 'Lettuce',
-        type: 'Leafy Green',
-        health: 78,
-        moisture: 45,
-        temperature: 26,
-        lastWatered: '4 hours ago',
-        status: 'needs-water'
-      }
-    ]
-
-    const mockSensors = [
-      { id: 1, name: 'Soil Moisture Sensor 1', status: 'online', value: '72%', location: 'Garden Bed A' },
-      { id: 2, name: 'Temperature Sensor 1', status: 'online', value: '24°C', location: 'Garden Bed A' },
-      { id: 3, name: 'Humidity Sensor 1', status: 'online', value: '65%', location: 'Garden Bed A' },
-      { id: 4, name: 'Light Sensor 1', status: 'offline', value: 'N/A', location: 'Garden Bed B' }
-    ]
-
-    setTimeout(() => {
-      setPlants(mockPlants)
-      setSensors(mockSensors)
-      setLoading(false)
-    }, 1000)
-  }, [])
-
-  const getHealthColor = (health) => {
-    if (health >= 80) return 'status-online'
-    if (health >= 60) return 'status-warning'
-    return 'status-offline'
-  }
-
-  const getStatusIcon = (status) => {
-    switch (status) {
-      case 'online': return '🟢'
-      case 'offline': return '🔴'
-      case 'needs-water': return '💧'
-      case 'healthy': return '🌱'
-      default: return '⚪'
-    }
-  }
-
-  if (loading) {
-    return (
-      <div className="container">
-        <div className="card animate-fade-in">
-          <h2>Loading Dashboard...</h2>
-        </div>
-      </div>
-    )
-  }
-
   return (
-    <div className="container">
-      {/* Welcome Section */}
-      <div className="card mb-6 animate-fade-in">
-        <h1 className="text-large mb-2 text-primary">
-          Welcome to Your Smart Garden 🌱
-        </h1>
-        <p className="text-secondary text-small">
-          Monitor your plants, track sensor data, and automate your garden care
-        </p>
-      </div>
-
-      {/* Quick Stats */}
-      <div className="stats-grid">
-        <div className="stats-card animate-fade-in hover-lift" style={{ animationDelay: '0.1s' }}>
-          <h3 className="stats-label">Total Plants</h3>
-          <p className="stats-number">{plants.length}</p>
+    <div className="min-h-screen bg-white dark:bg-gray-900">
+      <Navigation />
+      
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">🏠 Smart Garden Dashboard</h1>
+          <p className="text-gray-600 dark:text-gray-400">Monitor and manage your smart garden ecosystem</p>
         </div>
-        <div className="stats-card animate-fade-in hover-lift" style={{ animationDelay: '0.2s' }}>
-          <h3 className="stats-label">Active Sensors</h3>
-          <p className="stats-number">
-            {sensors.filter(s => s.status === 'online').length}
-          </p>
-        </div>
-        <div className="stats-card animate-fade-in hover-lift" style={{ animationDelay: '0.3s' }}>
-          <h3 className="stats-label">Average Health</h3>
-          <p className="stats-number">
-            {Math.round(plants.reduce((acc, plant) => acc + plant.health, 0) / plants.length)}%
-          </p>
-        </div>
-        <div className="stats-card animate-fade-in hover-lift" style={{ animationDelay: '0.4s' }}>
-          <h3 className="stats-label">Water Needed</h3>
-          <p className="stats-number">
-            {plants.filter(p => p.status === 'needs-water').length}
-          </p>
-        </div>
-      </div>
-
-      {/* Plants Overview */}
-      <div className="card mb-6 animate-fade-in" style={{ animationDelay: '0.5s' }}>
-        <h2 className="card-title mb-4">Your Plants</h2>
-        <div className="grid grid-3">
-          {plants.map((plant, index) => (
-            <div 
-              key={plant.id} 
-              className="plant-card animate-fade-in hover-lift"
-              style={{ animationDelay: `${0.6 + index * 0.1}s` }}
-            >
-              <div className="plant-header">
-                <h3 className="plant-name">{plant.name}</h3>
-                <span className="plant-status">{getStatusIcon(plant.status)}</span>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="bg-gray-50 dark:bg-gray-800 rounded-lg shadow-lg p-6 border border-gray-200 dark:border-gray-700">
+            <h2 className="text-xl font-semibold mb-4 text-gray-900 dark:text-white">Garden Status</h2>
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <span className="text-gray-600 dark:text-gray-300">🌱 Active Plants</span>
+                <span className="text-green-600 dark:text-green-400 font-semibold">12</span>
               </div>
-              
-              <div className="card-content">
-                <div className="plant-info">
-                  <div className="plant-info-item">
-                    <p className="plant-info-label">Type</p>
-                    <p className="plant-info-value">{plant.type}</p>
-                  </div>
-                  <div className="plant-info-item">
-                    <p className="plant-info-label">Health</p>
-                    <p className={`plant-info-value ${getHealthColor(plant.health)}`}>{plant.health}%</p>
-                  </div>
-                  <div className="plant-info-item">
-                    <p className="plant-info-label">Moisture</p>
-                    <p className="plant-info-value">{plant.moisture}%</p>
-                  </div>
-                  <div className="plant-info-item">
-                    <p className="plant-info-label">Temp</p>
-                    <p className="plant-info-value">{plant.temperature}°C</p>
-                  </div>
-                </div>
-                <div className="plant-schedule">
-                  <p className="plant-schedule-item">
-                    Last Watered: <span className="text-primary">{plant.lastWatered}</span>
-                  </p>
-                </div>
+              <div className="flex items-center justify-between">
+                <span className="text-gray-600 dark:text-gray-300">📡 Sensors Online</span>
+                <span className="text-blue-600 dark:text-blue-400 font-semibold">8</span>
               </div>
-              <div className="card-actions">
-                <button className="btn btn-primary btn-sm">Water</button>
-                <button className="btn btn-secondary btn-sm">Details</button>
+              <div className="flex items-center justify-between">
+                <span className="text-gray-600 dark:text-gray-300">🌤️ Current Weather</span>
+                <span className="text-yellow-600 dark:text-yellow-400 font-semibold">72°F Sunny</span>
               </div>
             </div>
-          ))}
-        </div>
-      </div>
+          </div>
 
-      {/* Sensor Status */}
-      <div className="card mb-6 animate-fade-in" style={{ animationDelay: '0.7s' }}>
-        <h2 className="card-title mb-4">Sensor Status</h2>
-        <div className="grid grid-4">
-          {sensors.map((sensor, index) => (
-            <div 
-              key={sensor.id} 
-              className="sensor-card animate-fade-in hover-lift"
-              style={{ animationDelay: `${0.8 + index * 0.1}s` }}
-            >
-              <div className="sensor-header">
-                <span className="sensor-status">{getStatusIcon(sensor.status)}</span>
-                <span className={sensor.status === 'online' ? 'status-online' : 'status-offline'}>
-                  {sensor.status}
-                </span>
-              </div>
-              <h4 className="sensor-name">{sensor.name}</h4>
-              <p className="text-secondary text-small mb-2">
-                Value: <span className="text-primary">{sensor.value}</span>
-              </p>
-              <p className="text-secondary text-xs">
-                {sensor.location}
-              </p>
+          <div className="bg-gray-50 dark:bg-gray-800 rounded-lg shadow-lg p-6 border border-gray-200 dark:border-gray-700">
+            <h2 className="text-xl font-semibold mb-4 text-gray-900 dark:text-white">Quick Actions</h2>
+            <div className="space-y-3">
+              <button className="w-full bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700 transition-colors">
+                💧 Water Plants
+              </button>
+              <button className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors">
+                📊 View Analytics
+              </button>
+              <button className="w-full bg-purple-600 text-white py-2 px-4 rounded-lg hover:bg-purple-700 transition-colors">
+                ⚙️ Settings
+              </button>
             </div>
-          ))}
-        </div>
-      </div>
+          </div>
 
-      {/* Quick Actions */}
-      <div className="card animate-fade-in" style={{ animationDelay: '0.9s' }}>
-        <h2 className="card-title mb-4">Quick Actions</h2>
-        <div className="card-actions">
-          <button className="btn btn-primary hover-glow">Water All Plants</button>
-          <button className="btn btn-secondary hover-lift">Check Sensors</button>
-          <button className="btn btn-secondary hover-lift">View Analytics</button>
-          <button className="btn btn-secondary hover-lift">Add Plant</button>
+          <div className="bg-gray-50 dark:bg-gray-800 rounded-lg shadow-lg p-6 border border-gray-200 dark:border-gray-700">
+            <h2 className="text-xl font-semibold mb-4 text-gray-900 dark:text-white">Recent Activity</h2>
+            <div className="space-y-3">
+              <div className="flex items-center space-x-3">
+                <span className="text-green-500">🌱</span>
+                <div>
+                  <p className="text-sm text-gray-900 dark:text-white">Tomatoes watered</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">2 hours ago</p>
+                </div>
+              </div>
+              <div className="flex items-center space-x-3">
+                <span className="text-blue-500">📡</span>
+                <div>
+                  <p className="text-sm text-gray-900 dark:text-white">Temperature alert</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">4 hours ago</p>
+                </div>
+              </div>
+              <div className="flex items-center space-x-3">
+                <span className="text-yellow-500">🌤️</span>
+                <div>
+                  <p className="text-sm text-gray-900 dark:text-white">Weather update</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">6 hours ago</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-gray-50 dark:bg-gray-800 rounded-lg shadow-lg p-6 border border-gray-200 dark:border-gray-700">
+            <h2 className="text-xl font-semibold mb-4 text-gray-900 dark:text-white">Plant Health Overview</h2>
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <span className="text-gray-600 dark:text-gray-300">Excellent</span>
+                <span className="text-green-600 dark:text-green-400 font-semibold">8 plants</span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-gray-600 dark:text-gray-300">Good</span>
+                <span className="text-blue-600 dark:text-blue-400 font-semibold">3 plants</span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-gray-600 dark:text-gray-300">Needs Attention</span>
+                <span className="text-yellow-600 dark:text-yellow-400 font-semibold">1 plant</span>
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-gray-50 dark:bg-gray-800 rounded-lg shadow-lg p-6 border border-gray-200 dark:border-gray-700">
+            <h2 className="text-xl font-semibold mb-4 text-gray-900 dark:text-white">System Status</h2>
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <span className="text-gray-600 dark:text-gray-300">Watering System</span>
+                <span className="text-green-600 dark:text-green-400">● Online</span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-gray-600 dark:text-gray-300">Lighting System</span>
+                <span className="text-green-600 dark:text-green-400">● Online</span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-gray-600 dark:text-gray-300">Climate Control</span>
+                <span className="text-green-600 dark:text-green-400">● Online</span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-gray-600 dark:text-gray-300">Security</span>
+                <span className="text-green-600 dark:text-green-400">● Online</span>
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-gray-50 dark:bg-gray-800 rounded-lg shadow-lg p-6 border border-gray-200 dark:border-gray-700">
+            <h2 className="text-xl font-semibold mb-4 text-gray-900 dark:text-white">Weather Forecast</h2>
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <span className="text-gray-600 dark:text-gray-300">Today</span>
+                <span className="text-gray-900 dark:text-white">72°F Sunny</span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-gray-600 dark:text-gray-300">Tomorrow</span>
+                <span className="text-gray-900 dark:text-white">68°F Partly Cloudy</span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-gray-600 dark:text-gray-300">Wednesday</span>
+                <span className="text-gray-900 dark:text-white">75°F Sunny</span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-gray-600 dark:text-gray-300">Thursday</span>
+                <span className="text-gray-900 dark:text-white">70°F Rain</span>
+              </div>
+            </div>
+          </div>
         </div>
-      </div>
+      </main>
     </div>
-  )
-}
+  );
+} 

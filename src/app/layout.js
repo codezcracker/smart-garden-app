@@ -1,19 +1,35 @@
-import './globals.css'
-import { ThemeProvider } from './theme-context'
+import { Geist, Geist_Mono } from "next/font/google";
+import "./globals.css";
+import { ThemeProvider } from "@/components/ThemeProvider";
+import { NotificationProvider } from "@/components/NotificationProvider";
+
+const geistSans = Geist({
+  variable: "--font-geist-sans",
+  subsets: ["latin"],
+});
+
+const geistMono = Geist_Mono({
+  variable: "--font-geist-mono",
+  subsets: ["latin"],
+});
 
 export const metadata = {
-  title: 'Smart Garden IoT System',
-  description: 'Monitor and manage your garden with IoT sensors and automation',
-}
+  title: "Smart Garden",
+  description: "Smart Garden Management System",
+};
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en">
-      <body>
+    <html lang="en" suppressHydrationWarning>
+      <body
+        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+      >
         <ThemeProvider>
-        {children}
+          <NotificationProvider>
+            {children}
+          </NotificationProvider>
         </ThemeProvider>
       </body>
     </html>
-  )
-}
+  );
+} 
