@@ -12,9 +12,26 @@
   gap: 0;
 }
 
+/* Main Content Area */
+.main-content-area {
+  padding: 2rem;
+  overflow-y: auto;
+}
+
+.plant-section {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
 /* Header Section */
 .plant-header {
-  margin-bottom: 2rem;
+  margin-bottom: 1.5rem;
+  width: 100%;
+  max-width: 600px;
 }
 
 .plant-title {
@@ -33,12 +50,15 @@
 /* Search Section */
 .search-section {
   margin-bottom: 2rem;
+  width: 100%;
+  max-width: 600px;
+  display: flex;
+  justify-content: center;
 }
 
 .search-container {
   position: relative;
   width: 100%;
-  max-width: 400px;
 }
 
 .search-input {
@@ -84,12 +104,18 @@
 /* Plants Overview */
 .plants-overview {
   width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .plants-stats {
   display: flex;
   gap: 1.5rem;
   margin-bottom: 2rem;
+  justify-content: center;
+  width: 100%;
+  max-width: 600px;
 }
 
 .stat-card {
@@ -99,7 +125,7 @@
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
   border: 1px solid #e8eaed;
   text-align: center;
-  min-width: 120px;
+  flex: 1;
 }
 
 .stat-number {
@@ -121,6 +147,8 @@
   grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
   gap: 1rem;
   margin-bottom: 2rem;
+  width: 100%;
+  max-width: 1200px;
 }
 
 .modern-plant-card {
@@ -432,6 +460,10 @@
   .right-sidebar {
     padding: 1.5rem 1rem;
   }
+  
+  .plant-section {
+    max-width: 900px;
+  }
 }
 
 @media (max-width: 992px) {
@@ -443,22 +475,38 @@
     display: none;
   }
   
-  .search-container {
-    width: 100%;
-    max-width: 400px;
+  .plant-section {
+    max-width: 700px;
   }
   
   .plants-stats {
-    justify-content: center;
     flex-wrap: wrap;
   }
   
+  .stat-card {
+    min-width: 150px;
+  }
+  
   .plants-grid-modern {
-    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
   }
 }
 
 @media (max-width: 768px) {
+  .main-content-area {
+    padding: 1rem;
+  }
+  
+  .plant-section {
+    max-width: 100%;
+  }
+  
+  .plant-header,
+  .search-section,
+  .plants-stats {
+    max-width: 100%;
+  }
+  
   .plants-stats {
     gap: 1rem;
   }
@@ -475,16 +523,6 @@
   .plants-grid-modern {
     grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
     gap: 0.75rem;
-  }
-  
-  .modern-plant-card {
-    padding: 1rem;
-  }
-  
-  .plant-emoji {
-    font-size: 2rem;
-    width: 50px;
-    height: 50px;
   }
   
   .plant-title {

@@ -94,13 +94,13 @@ export default function PlantsPage() {
       {/* Main Content Area */}
       <div className="main-content-area">
         <div className="plant-section">
-          {/* Header Section */}
+          {/* 1. Header Section */}
           <div className="plant-header">
             <h1 className="plant-title">My Garden Collection</h1>
             <p className="plant-subtitle">Monitor and manage all your plants in one place.</p>
           </div>
           
-          {/* Search Bar Section */}
+          {/* 2. Search Bar Section */}
           <div className="search-section">
             <div className="search-container">
               <input 
@@ -119,8 +119,9 @@ export default function PlantsPage() {
             </div>
           </div>
           
-          {/* Plants Overview Section */}
+          {/* 3. Plants Overview Section */}
           <div className="plants-overview">
+            {/* Statistics */}
             <div className="plants-stats">
               <div className="stat-card">
                 <div className="stat-number">{filteredPlants.length}</div>
@@ -138,6 +139,7 @@ export default function PlantsPage() {
               </div>
             </div>
             
+            {/* Plants Grid */}
             <div className="plants-grid-modern">
               {filteredPlants.map((plant) => (
                 <div 
