@@ -4,8 +4,8 @@ import { useState, useRef, useEffect } from 'react';
 import { useNotifications } from './NotificationProvider';
 
 export default function NotificationDropdown() {
-  const { notifications, unreadCount, markAsRead, markAllAsRead, clearAll } = useNotifications();
   const [isOpen, setIsOpen] = useState(false);
+  const { notifications, unreadCount, markAsRead, markAllAsRead, clearAll } = useNotifications();
   const dropdownRef = useRef(null);
 
   useEffect(() => {
@@ -16,148 +16,307 @@ export default function NotificationDropdown() {
     }
 
     document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
   }, []);
 
-  const getNotificationIcon = (type) => {
-    switch (type) {
-      case 'success':
-        return '✅';
-      case 'warning':
-        return '⚠️';
-      case 'error':
-        return '❌';
-      case 'info':
-        return 'ℹ️';
-      default:
-        return '🔔';
-    }
-  };
-
-  const getNotificationColor = (type) => {
-    switch (type) {
-      case 'success':
-        return 'text-green-400';
-      case 'warning':
-        return 'text-yellow-400';
-      case 'error':
-        return 'text-red-400';
-      case 'info':
-        return 'text-blue-400';
-      default:
-        return 'text-gray-400';
-    }
-  };
-
-  const formatTimeAgo = (timestamp) => {
+  const getTimeAgo = (timestamp) => {
     const now = new Date();
-    const diffInMinutes = Math.floor((now.getTime() - timestamp.getTime()) / (1000 * 60));
+    const diff = now - timestamp;
+    const hours = Math.floor(diff / (1000 * 60 * 60));
     
-    if (diffInMinutes < 1) return 'Just now';
-    if (diffInMinutes < 60) return `${diffInMinutes}m ago`;
-    
-    const diffInHours = Math.floor(diffInMinutes / 60);
-    if (diffInHours < 24) return `${diffInHours}h ago`;
-    
-    const diffInDays = Math.floor(diffInHours / 24);
-    return `${diffInDays}d ago`;
+    if (hours < 1) {
+      const minutes = Math.floor(diff / (1000 * 60));
+      return minutes < 1 ? 'Just now' : `${minutes}m ago`;
+    }
+    return hours < 24 ? `${hours}h ago` : `${Math.floor(hours / 24)}d ago`;
+  };
+
+  const getNotificationColorClass = (type) => {
+    const colors = {
+      success: 'text-green-600',
+      warning: 'text-yellow-600',
+      error: 'text-red-600',
+      info: 'text-blue-600'
+    };
+    return colors[type] || 'text-gray-600';
   };
 
   return (
-    <div className="relative" ref={dropdownRef}>
+    <div className="notification-dropdown" ref={dropdownRef}>
       <button
+        className="notification-button"
         onClick={() => setIsOpen(!isOpen)}
-        className="text-yellow-400 relative hover:text-yellow-300 transition-colors"
+        aria-label="Notifications"
       >
-        <span className="text-xl">🔔</span>
+        {/* Bell Icon */}
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+          <path d="m13.73 21a2 2 0 0 1-3.46 0"></path>
+        </svg>
+        
+        {/* Notification Badge */}
         {unreadCount > 0 && (
-          <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-medium">
+          <span className="notification-badge">
             {unreadCount > 9 ? '9+' : unreadCount}
           </span>
         )}
       </button>
 
+      {/* Dropdown Content */}
       {isOpen && (
-        <div className="absolute right-0 mt-2 w-80 bg-gray-800 border border-gray-700 rounded-lg shadow-xl z-50">
-          <div className="flex items-center justify-between p-4 border-b border-gray-700">
-            <h3 className="text-white font-semibold">Notifications</h3>
-            <div className="flex items-center space-x-2">
-              {unreadCount > 0 && (
+        <div className="notification-dropdown-content">
+          {/* Header */}
+          <div className="dropdown-header">
+            <h3 className="dropdown-title">Notifications</h3>
+            {notifications.length > 0 && (
+              <div className="dropdown-actions">
                 <button
                   onClick={markAllAsRead}
-                  className="text-xs text-blue-400 hover:text-blue-300 transition-colors"
+                  className="dropdown-action-btn"
                 >
                   Mark all read
                 </button>
-              )}
-              <button
-                onClick={clearAll}
-                className="text-xs text-red-400 hover:text-red-300 transition-colors"
-              >
-                Clear all
-              </button>
-            </div>
+                <button
+                  onClick={clearAll}
+                  className="dropdown-action-btn"
+                >
+                  Clear all
+                </button>
+              </div>
+            )}
           </div>
 
-          <div className="max-h-96 overflow-y-auto">
+          {/* Content */}
+          <div className="dropdown-content">
             {notifications.length === 0 ? (
-              <div className="p-4 text-center text-gray-400">
-                <span className="text-2xl">🔔</span>
-                <p className="mt-2 text-sm">No notifications</p>
+              <div className="empty-state">
+                <div className="empty-icon">🔔</div>
+                <div className="empty-title">No notifications</div>
+                <div className="empty-subtitle">You&apos;re all caught up!</div>
               </div>
             ) : (
-              <div className="divide-y divide-gray-700">
+              <div>
                 {notifications.map((notification) => (
                   <div
                     key={notification.id}
-                    className={`p-4 hover:bg-gray-700 transition-colors cursor-pointer ${
-                      !notification.read ? 'bg-gray-700/50' : ''
-                    }`}
+                    className={`notification-item ${!notification.read ? 'unread' : ''}`}
                     onClick={() => markAsRead(notification.id)}
                   >
-                    <div className="flex items-start space-x-3">
-                      <span className={`text-lg ${getNotificationColor(notification.type)}`}>
-                        {getNotificationIcon(notification.type)}
-                      </span>
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center justify-between">
-                          <h4 className={`text-sm font-medium ${
-                            notification.read ? 'text-gray-300' : 'text-white'
-                          }`}>
-                            {notification.title}
-                          </h4>
-                          <span className="text-xs text-gray-500">
-                            {formatTimeAgo(notification.timestamp)}
-                          </span>
-                        </div>
-                        <p className={`text-sm mt-1 ${
-                          notification.read ? 'text-gray-400' : 'text-gray-300'
-                        }`}>
-                          {notification.message}
-                        </p>
-                        {!notification.read && (
-                          <div className="w-2 h-2 bg-blue-400 rounded-full mt-2"></div>
-                        )}
+                    <div className="notification-content">
+                      <div className="notification-header">
+                        <h4 className="notification-title">{notification.title}</h4>
+                        <span className="notification-time">
+                          {getTimeAgo(notification.timestamp)}
+                        </span>
+                      </div>
+                      <p className="notification-message">{notification.message}</p>
+                      <div className={`notification-type ${notification.type}`}>
+                        {notification.type}
                       </div>
                     </div>
+                    {!notification.read && <div className="unread-indicator"></div>}
                   </div>
                 ))}
               </div>
             )}
           </div>
-
-          {notifications.length > 0 && (
-            <div className="p-3 border-t border-gray-700 bg-gray-800/50">
-              <button
-                onClick={() => setIsOpen(false)}
-                className="w-full text-center text-sm text-gray-400 hover:text-white transition-colors"
-              >
-                View all notifications
-              </button>
-            </div>
-          )}
         </div>
       )}
+
+      {/* Notification Dropdown Styles */}
+      <style jsx>{`
+        .notification-dropdown {
+          position: relative;
+        }
+
+        .notification-button {
+          width: 40px;
+          height: 40px;
+          border-radius: 50%;
+          border: none;
+          background: none;
+          color: #5f6368;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          position: relative;
+          transition: background-color 0.2s ease;
+        }
+
+        .notification-button:hover {
+          background-color: #f1f3f4;
+        }
+
+        .notification-badge {
+          position: absolute;
+          top: 8px;
+          right: 8px;
+          background: #ea4335;
+          color: white;
+          border-radius: 10px;
+          padding: 2px 6px;
+          font-size: 0.75rem;
+          font-weight: 600;
+          min-width: 18px;
+          height: 18px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          border: 2px solid white;
+        }
+
+        .notification-dropdown-content {
+          position: absolute;
+          top: 100%;
+          right: 0;
+          margin-top: 8px;
+          width: 360px;
+          max-height: 480px;
+          background: white;
+          border-radius: 16px;
+          box-shadow: 0 4px 24px rgba(0, 0, 0, 0.15);
+          border: 1px solid #e8eaed;
+          overflow: hidden;
+          z-index: 200;
+        }
+
+        .dropdown-header {
+          padding: 1.5rem 1.5rem 1rem;
+          border-bottom: 1px solid #e8eaed;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+        }
+
+        .dropdown-title {
+          font-size: 1.125rem;
+          font-weight: 600;
+          color: #202124;
+        }
+
+        .dropdown-actions {
+          display: flex;
+          gap: 0.5rem;
+        }
+
+        .dropdown-action-btn {
+          padding: 0.25rem 0.75rem;
+          background: none;
+          border: 1px solid #dadce0;
+          border-radius: 20px;
+          font-size: 0.75rem;
+          color: #5f6368;
+          cursor: pointer;
+          transition: all 0.2s ease;
+        }
+
+        .dropdown-action-btn:hover {
+          background: #f8f9fa;
+          border-color: #5f6368;
+        }
+
+        .dropdown-content {
+          max-height: 24rem;
+          overflow-y: auto;
+        }
+
+        .empty-state {
+          text-align: center;
+          padding: 2rem;
+        }
+
+        .empty-icon {
+          font-size: 2.5rem;
+          margin-bottom: 1rem;
+        }
+
+        .empty-title {
+          color: #202124;
+          font-weight: 500;
+          margin-bottom: 0.25rem;
+        }
+
+        .empty-subtitle {
+          color: #5f6368;
+          font-size: 0.875rem;
+        }
+
+        .notification-item {
+          padding: 1rem 1.5rem;
+          border-bottom: 1px solid #f1f3f4;
+          cursor: pointer;
+          position: relative;
+          transition: background-color 0.2s ease;
+        }
+
+        .notification-item:hover {
+          background: #f8f9fa;
+        }
+
+        .notification-item.unread {
+          background: #f8f9ff;
+        }
+
+        .notification-item:last-child {
+          border-bottom: none;
+        }
+
+        .notification-content {
+          display: flex;
+          flex-direction: column;
+          gap: 0.5rem;
+        }
+
+        .notification-header {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+        }
+
+        .notification-title {
+          font-size: 0.875rem;
+          font-weight: 600;
+          color: #202124;
+        }
+
+        .notification-time {
+          font-size: 0.75rem;
+          color: #5f6368;
+        }
+
+        .notification-message {
+          font-size: 0.875rem;
+          color: #5f6368;
+          line-height: 1.4;
+          margin: 0;
+        }
+
+        .notification-type {
+          font-size: 0.75rem;
+          font-weight: 500;
+          text-transform: uppercase;
+          letter-spacing: 0.5px;
+        }
+
+        .notification-type.success { color: #137333; }
+        .notification-type.warning { color: #f29900; }
+        .notification-type.error { color: #d93025; }
+        .notification-type.info { color: #1a73e8; }
+
+        .unread-indicator {
+          position: absolute;
+          top: 50%;
+          right: 1rem;
+          transform: translateY(-50%);
+          width: 8px;
+          height: 8px;
+          background: #1a73e8;
+          border-radius: 50%;
+        }
+      `}</style>
     </div>
   );
 } 

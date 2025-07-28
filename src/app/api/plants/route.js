@@ -16,7 +16,7 @@ const commonNameMappings = {
   'cabbage': ['Brassica', 'oleracea', 'cabbage'],
   'broccoli': ['Brassica', 'oleracea', 'broccoli'],
   'cauliflower': ['Brassica', 'oleracea', 'cauliflower'],
-  'pepper': ['Capsicum', 'annuum', 'pepper', 'peppers'],
+  'pepper': ['Capsicum', 'annuum', 'pepper', 'peppers', 'bell pepper', 'chili'],
   'cucumber': ['Cucumis', 'sativus', 'cucumber', 'cucumbers'],
   'pumpkin': ['Cucurbita', 'pepo', 'pumpkin', 'pumpkins'],
   'squash': ['Cucurbita', 'squash'],
@@ -32,7 +32,7 @@ const commonNameMappings = {
   'okra': ['Abelmoschus', 'esculentus', 'okra'],
   'corn': ['Zea', 'mays', 'corn', 'maize'],
   'peas': ['Pisum', 'sativum', 'pea', 'peas'],
-  'beans': ['Phaseolus', 'vulgaris', 'bean', 'beans'],
+  'beans': ['Phaseolus', 'vulgaris', 'bean', 'beans', 'green beans'],
   'lentils': ['Lens', 'culinaris', 'lentil', 'lentils'],
   'chickpeas': ['Cicer', 'arietinum', 'chickpea', 'chickpeas', 'garbanzo'],
   
@@ -112,7 +112,18 @@ const commonNameMappings = {
   'succulent': ['succulent', 'succulents'],
   'annual': ['annual'],
   'perennial': ['perennial'],
-  'biennial': ['biennial']
+  'biennial': ['biennial'],
+  
+  // Additional common names and variations
+  'bell pepper': ['Capsicum', 'annuum', 'bell pepper', 'bell peppers'],
+  'chili': ['Capsicum', 'annuum', 'chili', 'chilies', 'chile', 'chiles'],
+  'green beans': ['Phaseolus', 'vulgaris', 'green beans', 'string beans'],
+  'string beans': ['Phaseolus', 'vulgaris', 'green beans', 'string beans'],
+  'garbanzo': ['Cicer', 'arietinum', 'chickpea', 'chickpeas', 'garbanzo'],
+  'bay leaf': ['Laurus', 'nobilis', 'bay', 'bay leaf'],
+  'coriander': ['Coriandrum', 'sativum', 'cilantro', 'coriander'],
+  'maize': ['Zea', 'mays', 'corn', 'maize'],
+  'aubergine': ['Solanum', 'melongena', 'eggplant', 'aubergine']
 };
 
 // Cache for plant data with search index
@@ -121,17 +132,18 @@ let searchIndex = null;
 let lastCacheTime = 0;
 const CACHE_DURATION = 30 * 60 * 1000; // 30 minutes
 
-// Create search index for faster lookups
+// Enhanced search index creation with better tokenization
 function createSearchIndex(plants) {
   const index = new Map();
   
   plants.forEach((plant, idx) => {
-    // Include common name in searchable text if available
+    // Create comprehensive searchable text including common names
     const searchableText = plant.commonName 
       ? `${plant.name} ${plant.commonName} ${plant.family} ${plant.category} ${plant.climate}`.toLowerCase()
       : `${plant.name} ${plant.family} ${plant.category} ${plant.climate}`.toLowerCase();
     
-    const words = searchableText.split(/\s+/);
+    // Better tokenization - split on spaces and special characters
+    const words = searchableText.split(/[\s\-_.,;:()]+/).filter(word => word.length > 0);
     
     words.forEach(word => {
       if (word.length >= 2) { // Only index words with 2+ characters
@@ -139,6 +151,17 @@ function createSearchIndex(plants) {
           index.set(word, new Set());
         }
         index.get(word).add(idx);
+      }
+      
+      // Also index partial matches for better search
+      if (word.length >= 3) {
+        for (let i = 3; i <= word.length; i++) {
+          const partial = word.substring(0, i);
+          if (!index.has(partial)) {
+            index.set(partial, new Set());
+          }
+          index.get(partial).add(idx);
+        }
       }
     });
   });
@@ -153,47 +176,81 @@ async function loadPlants() {
   }
 
   try {
-    // Use the full database with 2.5 million plants
-    const csvPath = path.join(process.cwd(), 'data', 'plant-database.csv');
+    // First try to load the common names database
+    const commonNamesPath = path.join(process.cwd(), 'data', 'plant-database-common-names.csv');
+    const fullDatabasePath = path.join(process.cwd(), 'data', 'plant-database.csv');
     
-    return new Promise((resolve) => {
-      const plants = [];
-      fs.createReadStream(csvPath)
-        .pipe(csv())
-        .on('data', (row) => {
-          // Handle the full database format
-          if (row.name && row.emoji && row.category && row.family && row.climate && row.difficulty && row.growthTime) {
-            const plant = {
-              id: row.id || Math.random().toString(36).substr(2, 9),
-              name: row.name.trim(),
-              commonName: null, // Full database doesn't have common names
-              emoji: row.emoji.trim(),
-              category: row.category.trim(),
-              family: row.family.trim(),
-              climate: row.climate.trim(),
-              difficulty: row.difficulty.trim(),
-              growthTime: row.growthTime.trim()
-            };
-            plants.push(plant);
-          }
-        })
-        .on('end', () => {
-          plantCache = plants;
-          searchIndex = createSearchIndex(plants);
-          lastCacheTime = now;
-          console.log(`Loaded ${plants.length} plants from database and created search index`);
-          console.log(`Database includes common names: ${plants.some(p => p.commonName) ? 'Yes' : 'No'}`);
-          resolve({ plants, searchIndex });
-        })
-        .on('error', (error) => {
-          console.error('Error reading CSV:', error);
-          resolve({ plants: [], searchIndex: new Map() });
-        });
-    });
+    let plants = [];
+    
+    // Try to load common names database first
+    if (fs.existsSync(commonNamesPath)) {
+      console.log('Loading common names database...');
+      plants = await loadFromCSV(commonNamesPath, true);
+    }
+    
+    // If common names database is small, also load some from the full database
+    if (plants.length < 100 && fs.existsSync(fullDatabasePath)) {
+      console.log('Loading additional plants from full database...');
+      const additionalPlants = await loadFromCSV(fullDatabasePath, false, 1000); // Load first 1000
+      plants = [...plants, ...additionalPlants];
+    }
+    
+    // If still no plants, use the sample database
+    if (plants.length === 0) {
+      const samplePath = path.join(process.cwd(), 'data', 'plant-database-sample.csv');
+      if (fs.existsSync(samplePath)) {
+        console.log('Loading sample database...');
+        plants = await loadFromCSV(samplePath, false);
+      }
+    }
+    
+    plantCache = plants;
+    searchIndex = createSearchIndex(plants);
+    lastCacheTime = now;
+    console.log(`Loaded ${plants.length} plants and created search index`);
+    console.log(`Plants with common names: ${plants.filter(p => p.commonName).length}`);
+    
+    return { plants, searchIndex };
   } catch (error) {
     console.error('Error loading plants:', error);
     return { plants: [], searchIndex: new Map() };
   }
+}
+
+async function loadFromCSV(filePath, hasCommonNames = false, limit = null) {
+  return new Promise((resolve) => {
+    const plants = [];
+    let count = 0;
+    
+    fs.createReadStream(filePath)
+      .pipe(csv())
+      .on('data', (row) => {
+        if (limit && count >= limit) return;
+        
+        if (row.name && row.emoji && row.category && row.family && row.climate && row.difficulty && row.growthTime) {
+          const plant = {
+            id: row.id || Math.random().toString(36).substr(2, 9),
+            name: row.name.trim(),
+            commonName: hasCommonNames ? (row.commonName || null) : null,
+            emoji: row.emoji.trim(),
+            category: row.category.trim(),
+            family: row.family.trim(),
+            climate: row.climate.trim(),
+            difficulty: row.difficulty.trim(),
+            growthTime: row.growthTime.trim()
+          };
+          plants.push(plant);
+          count++;
+        }
+      })
+      .on('end', () => {
+        resolve(plants);
+      })
+      .on('error', (error) => {
+        console.error('Error reading CSV:', error);
+        resolve([]);
+      });
+  });
 }
 
 function expandSearchTerms(searchTerm) {
@@ -207,11 +264,18 @@ function expandSearchTerms(searchTerm) {
     }
   }
   
+  // Add partial matches for better search
+  if (searchLower.length >= 3) {
+    for (let i = 3; i <= searchLower.length; i++) {
+      expandedTerms.push(searchLower.substring(0, i));
+    }
+  }
+  
   return [...new Set(expandedTerms)]; // Remove duplicates
 }
 
-// Fast search using index
-function fastSearch(plants, searchIndex, searchTerm) {
+// Enhanced search function with relevance scoring
+function enhancedSearch(plants, searchIndex, searchTerm) {
   if (!searchTerm || searchTerm.length < 2) {
     return plants;
   }
@@ -220,37 +284,66 @@ function fastSearch(plants, searchIndex, searchTerm) {
   const words = searchLower.split(/\s+/);
   const expandedTerms = expandSearchTerms(searchTerm);
   
-  // Get matching indices for each word
-  const matchingIndices = new Set();
+  // Get matching indices for each word with relevance scoring
+  const matchScores = new Map();
   
   // First, try exact matches in the index
   words.forEach(word => {
     if (searchIndex.has(word)) {
-      searchIndex.get(word).forEach(idx => matchingIndices.add(idx));
+      searchIndex.get(word).forEach(idx => {
+        const currentScore = matchScores.get(idx) || 0;
+        matchScores.set(idx, currentScore + 10); // Exact word match gets high score
+      });
     }
   });
   
   // Also check expanded terms
   expandedTerms.forEach(term => {
     if (searchIndex.has(term)) {
-      searchIndex.get(term).forEach(idx => matchingIndices.add(idx));
+      searchIndex.get(term).forEach(idx => {
+        const currentScore = matchScores.get(idx) || 0;
+        matchScores.set(idx, currentScore + 5); // Expanded term match gets medium score
+      });
     }
   });
   
   // If no results from index, fall back to full text search
-  if (matchingIndices.size === 0) {
-    return plants.filter(plant => {
+  if (matchScores.size === 0) {
+    const fallbackResults = plants.filter(plant => {
       const searchableText = plant.commonName 
         ? `${plant.name} ${plant.commonName} ${plant.family} ${plant.category} ${plant.climate}`.toLowerCase()
         : `${plant.name} ${plant.family} ${plant.category} ${plant.climate}`.toLowerCase();
       
+      // Check for partial matches
       return expandedTerms.some(term => searchableText.includes(term)) ||
-             words.some(word => searchableText.includes(word));
+             words.some(word => searchableText.includes(word)) ||
+             searchableText.includes(searchLower);
     });
+    
+    // Score fallback results
+    return fallbackResults.map(plant => {
+      const searchableText = plant.commonName 
+        ? `${plant.name} ${plant.commonName} ${plant.family} ${plant.category} ${plant.climate}`.toLowerCase()
+        : `${plant.name} ${plant.family} ${plant.category} ${plant.climate}`.toLowerCase();
+      
+      let score = 0;
+      if (plant.name.toLowerCase().includes(searchLower)) score += 20;
+      if (plant.commonName && plant.commonName.toLowerCase().includes(searchLower)) score += 15;
+      if (plant.family.toLowerCase().includes(searchLower)) score += 8;
+      if (plant.category.toLowerCase().includes(searchLower)) score += 6;
+      if (plant.climate.toLowerCase().includes(searchLower)) score += 4;
+      
+      return { plant, score };
+    }).sort((a, b) => b.score - a.score).map(item => item.plant);
   }
   
-  // Convert back to plants
-  return Array.from(matchingIndices).map(idx => plants[idx]).filter(Boolean);
+  // Convert back to plants with scoring
+  const scoredResults = Array.from(matchScores.entries()).map(([idx, score]) => ({
+    plant: plants[idx],
+    score
+  })).filter(item => item.plant).sort((a, b) => b.score - a.score);
+  
+  return scoredResults.map(item => item.plant);
 }
 
 export async function GET(request) {
@@ -263,19 +356,34 @@ export async function GET(request) {
     const climate = searchParams.get('climate') || '';
     const category = searchParams.get('category') || '';
 
+    console.log(`API Request - Search: "${search}", Family: "${family}", Climate: "${climate}", Category: "${category}", Page: ${page}`);
+
     // Get all plants and search index
     const { plants: allPlants, searchIndex } = await loadPlants();
     
-    // Apply filters with optimized search
+    if (!allPlants || allPlants.length === 0) {
+      console.error('No plants loaded from database');
+      return NextResponse.json({ 
+        error: 'No plants available in database',
+        plants: [],
+        pagination: { page: 1, limit, totalPlants: 0, totalPages: 0, hasNext: false, hasPrev: false },
+        filters: { families: [], climates: [], categories: [] }
+      }, { status: 404 });
+    }
+    
+    // Apply filters with enhanced search
     let filteredPlants = allPlants;
     
-    // Use fast search if search term is provided
-    if (search) {
-      filteredPlants = fastSearch(allPlants, searchIndex, search);
+    // Use enhanced search if search term is provided
+    if (search && search.trim().length > 0) {
+      console.log(`Performing search for: "${search}"`);
+      filteredPlants = enhancedSearch(allPlants, searchIndex, search);
+      console.log(`Search returned ${filteredPlants.length} results`);
     }
     
     // Apply additional filters
     if (family || climate || category) {
+      const initialCount = filteredPlants.length;
       filteredPlants = filteredPlants.filter(plant => {
         if (family && plant.family !== family) {
           return false;
@@ -288,6 +396,7 @@ export async function GET(request) {
         }
         return true;
       });
+      console.log(`Filters applied: ${initialCount} -> ${filteredPlants.length} results`);
     }
 
     // Calculate pagination
@@ -303,7 +412,7 @@ export async function GET(request) {
     const climates = [...new Set(samplePlants.map(p => p.climate))].sort();
     const categories = [...new Set(samplePlants.map(p => p.category))].sort();
 
-    return NextResponse.json({
+    const response = {
       plants: paginatedPlants,
       pagination: {
         page,
@@ -318,20 +427,30 @@ export async function GET(request) {
         climates,
         categories
       },
-      database: 'full',
+      database: 'enhanced',
       searchInfo: {
         searchTerm: search,
         resultsFound: totalPlants,
         totalInDatabase: allPlants.length,
-        expandedTerms: search ? expandSearchTerms(search) : []
+        expandedTerms: search ? expandSearchTerms(search) : [],
+        hasCommonNames: allPlants.some(p => p.commonName)
       },
       cacheInfo: {
         cached: !!plantCache,
         lastUpdated: new Date(lastCacheTime).toISOString()
       }
-    });
+    };
+
+    console.log(`API Response - Returning ${paginatedPlants.length} plants (${totalPlants} total, page ${page}/${totalPages})`);
+    return NextResponse.json(response);
   } catch (error) {
     console.error('API Error:', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    return NextResponse.json({ 
+      error: 'Internal server error',
+      message: error.message,
+      plants: [],
+      pagination: { page: 1, limit: 20, totalPlants: 0, totalPages: 0, hasNext: false, hasPrev: false },
+      filters: { families: [], climates: [], categories: [] }
+    }, { status: 500 });
   }
 } 
