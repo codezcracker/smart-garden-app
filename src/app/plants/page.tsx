@@ -1,93 +1,135 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import '../plants.css';
+
+interface Plant {
+  id: string;
+  name: string;
+  emoji: string;
+  category: string;
+  family: string;
+  climate: string;
+  difficulty: string;
+  growthTime: string;
+}
+
+interface PlantData {
+  plants: Plant[];
+  pagination: {
+    page: number;
+    limit: number;
+    totalPlants: number;
+    totalPages: number;
+    hasNext: boolean;
+    hasPrev: boolean;
+  };
+  filters: {
+    families: string[];
+    climates: string[];
+    categories: string[];
+  };
+}
+
+interface SearchInfo {
+  searchTerm: string;
+  resultsFound: number;
+  totalInDatabase: number;
+  hasSearchIndex: boolean;
+  expandedTerms: string[];
+}
 
 export default function PlantsPage() {
   const [selectedPlant, setSelectedPlant] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
+  const [plantData, setPlantData] = useState<PlantData | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [searchInfo, setSearchInfo] = useState<SearchInfo | null>(null);
 
-  const plants = [
-    {
-      id: 1,
-      name: 'Bird of Paradise',
-      type: 'Tropical',
-      health: 'Excellent',
-      lastWatered: '2 hours ago',
-      image: '🌿',
-      status: 'Growing well',
-      temperature: '22°C',
-      humidity: '65%',
-      light: 'Bright indirect'
-    },
-    {
-      id: 2,
-      name: 'Monstera Deliciosa',
-      type: 'Tropical',
-      health: 'Good',
-      lastWatered: '1 day ago',
-      image: '🌱',
-      status: 'Needs attention',
-      temperature: '21°C',
-      humidity: '70%',
-      light: 'Medium'
-    },
-    {
-      id: 3,
-      name: 'Snake Plant',
-      type: 'Succulent',
-      health: 'Excellent',
-      lastWatered: '3 days ago',
-      image: '🌵',
-      status: 'Thriving',
-      temperature: '20°C',
-      humidity: '45%',
-      light: 'Low'
-    },
-    {
-      id: 4,
-      name: 'Peace Lily',
-      type: 'Flowering',
-      health: 'Good',
-      lastWatered: '1 day ago',
-      image: '🌸',
-      status: 'Blooming',
-      temperature: '23°C',
-      humidity: '75%',
-      light: 'Bright indirect'
-    },
-    {
-      id: 5,
-      name: 'ZZ Plant',
-      type: 'Tropical',
-      health: 'Excellent',
-      lastWatered: '5 days ago',
-      image: '🌿',
-      status: 'Low maintenance',
-      temperature: '21°C',
-      humidity: '50%',
-      light: 'Low to medium'
-    },
-    {
-      id: 6,
-      name: 'Pothos',
-      type: 'Vining',
-      health: 'Good',
-      lastWatered: '2 days ago',
-      image: '🌱',
-      status: 'Growing fast',
-      temperature: '22°C',
-      humidity: '60%',
-      light: 'Medium'
-    }
-  ];
+  // Fetch plants from the API
+  useEffect(() => {
+    const fetchPlants = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        
+        const params = new URLSearchParams({
+          page: currentPage.toString(),
+          limit: '50',
+          ...(searchTerm && { search: searchTerm })
+        });
+
+        const response = await fetch(`/api/plants-ultimate?${params}`);
+        
+        if (!response.ok) {
+          throw new Error(`Failed to fetch plants: ${response.statusText}`);
+        }
+        
+        const data = await response.json();
+        
+        if (data.error) {
+          throw new Error(data.error);
+        }
+        
+        setPlantData(data);
+        setSearchInfo(data.searchInfo);
+      } catch (err) {
+        console.error('Error fetching plants:', err);
+        setError(err instanceof Error ? err.message : 'Failed to load plants');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchPlants();
+  }, [currentPage, searchTerm]);
 
   // Filter plants based on search term
-  const filteredPlants = plants.filter(plant =>
-    plant.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    plant.type.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    plant.status.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredPlants = plantData?.plants || [];
+  const totalPlants = plantData?.pagination?.totalPlants || 0;
+  const healthyPlants = filteredPlants.filter(p => p.difficulty === 'Easy').length;
+  const needAttentionPlants = filteredPlants.filter(p => p.difficulty === 'Hard').length;
+
+  if (loading && !plantData) {
+    return (
+      <div className="plants-page-layout">
+        <div className="main-content-area">
+          <div className="plant-section">
+            <div className="plant-header">
+              <h1 className="plant-title">My Garden Collection</h1>
+              <p className="plant-subtitle">Monitor and manage all your plants in one place.</p>
+            </div>
+            <div className="loading-state">
+              <div className="loading-message">Loading your garden collection...</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="plants-page-layout">
+        <div className="main-content-area">
+          <div className="plant-section">
+            <div className="plant-header">
+              <h1 className="plant-title">My Garden Collection</h1>
+              <p className="plant-subtitle">Monitor and manage all your plants in one place.</p>
+            </div>
+            <div className="error-state">
+              <div className="error-message">Error: {error}</div>
+              <button onClick={() => window.location.reload()} className="retry-button">
+                Try Again
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="plants-page-layout">
@@ -124,17 +166,17 @@ export default function PlantsPage() {
             {/* Statistics */}
             <div className="plants-stats">
               <div className="stat-card">
-                <div className="stat-number">{filteredPlants.length}</div>
+                <div className="stat-number">{totalPlants.toLocaleString()}</div>
                 <div className="stat-label">Total Plants</div>
               </div>
               
               <div className="stat-card">
-                <div className="stat-number">{filteredPlants.filter(p => p.health === 'Excellent').length}</div>
+                <div className="stat-number">{healthyPlants}</div>
                 <div className="stat-label">Healthy</div>
               </div>
               
               <div className="stat-card">
-                <div className="stat-number">{filteredPlants.filter(p => p.status.includes('attention')).length}</div>
+                <div className="stat-number">{needAttentionPlants}</div>
                 <div className="stat-label">Need Attention</div>
               </div>
             </div>
@@ -148,16 +190,16 @@ export default function PlantsPage() {
                   onClick={() => setSelectedPlant(plant)}
                 >
                   <div className="plant-card-image">
-                    <span className="plant-emoji">{plant.image}</span>
+                    <span className="plant-emoji">{plant.emoji}</span>
                   </div>
                   
                   <div className="plant-card-content">
                     <h3 className="plant-name">{plant.name}</h3>
-                    <p className="plant-type">{plant.type}</p>
+                    <p className="plant-type">{plant.category}</p>
                     
                     <div className="plant-status-row">
-                      <span className={`health-indicator health-${plant.health.toLowerCase()}`}></span>
-                      <span className="plant-status">{plant.status}</span>
+                      <span className={`health-indicator health-${plant.difficulty.toLowerCase()}`}></span>
+                      <span className="plant-status">{plant.difficulty}</span>
                     </div>
                   </div>
                 </div>
@@ -174,6 +216,29 @@ export default function PlantsPage() {
                 </div>
               </div>
             </div>
+
+            {/* Pagination */}
+            {plantData && plantData.pagination.totalPages > 1 && (
+              <div className="pagination">
+                <button
+                  onClick={() => setCurrentPage(currentPage - 1)}
+                  disabled={!plantData.pagination.hasPrev}
+                  className="pagination-button prev"
+                >
+                  Previous
+                </button>
+                <span className="pagination-info">
+                  Page {plantData.pagination.page} of {plantData.pagination.totalPages}
+                </span>
+                <button
+                  onClick={() => setCurrentPage(currentPage + 1)}
+                  disabled={!plantData.pagination.hasNext}
+                  className="pagination-button next"
+                >
+                  Next
+                </button>
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -187,33 +252,33 @@ export default function PlantsPage() {
               <div className="card-header">
                 <div>
                   <h3 className="card-title">{selectedPlant.name}</h3>
-                  <p className="card-subtitle">{selectedPlant.type} • Last watered {selectedPlant.lastWatered}</p>
+                  <p className="card-subtitle">{selectedPlant.category} • {selectedPlant.family}</p>
                 </div>
-                <div className="plant-detail-emoji">{selectedPlant.image}</div>
+                <div className="plant-detail-emoji">{selectedPlant.emoji}</div>
               </div>
               
               <div className="plant-conditions">
                 <div className="condition-item">
                   <div className="condition-icon">🌡️</div>
                   <div className="condition-info">
-                    <div className="condition-label">Temperature</div>
-                    <div className="condition-value">{selectedPlant.temperature}</div>
+                    <div className="condition-label">Climate</div>
+                    <div className="condition-value">{selectedPlant.climate}</div>
                   </div>
                 </div>
                 
                 <div className="condition-item">
-                  <div className="condition-icon">💧</div>
+                  <div className="condition-icon">⏳</div>
                   <div className="condition-info">
-                    <div className="condition-label">Humidity</div>
-                    <div className="condition-value">{selectedPlant.humidity}</div>
+                    <div className="condition-label">Growth Time</div>
+                    <div className="condition-value">{selectedPlant.growthTime}</div>
                   </div>
                 </div>
                 
                 <div className="condition-item">
-                  <div className="condition-icon">☀️</div>
+                  <div className="condition-icon">📊</div>
                   <div className="condition-info">
-                    <div className="condition-label">Light</div>
-                    <div className="condition-value">{selectedPlant.light}</div>
+                    <div className="condition-label">Difficulty</div>
+                    <div className="condition-value">{selectedPlant.difficulty}</div>
                   </div>
                 </div>
               </div>
@@ -286,15 +351,15 @@ export default function PlantsPage() {
               
               <div className="quick-stats">
                 <div className="quick-stat">
-                  <span className="quick-stat-number">{filteredPlants.length}</span>
+                  <span className="quick-stat-number">{totalPlants.toLocaleString()}</span>
                   <span className="quick-stat-label">Plants</span>
                 </div>
                 <div className="quick-stat">
-                  <span className="quick-stat-number">{filteredPlants.filter(p => p.health === 'Excellent').length}</span>
+                  <span className="quick-stat-number">{healthyPlants}</span>
                   <span className="quick-stat-label">Healthy</span>
                 </div>
                 <div className="quick-stat">
-                  <span className="quick-stat-number">{new Set(filteredPlants.map(p => p.type)).size}</span>
+                  <span className="quick-stat-number">{new Set(filteredPlants.map(p => p.category)).size}</span>
                   <span className="quick-stat-label">Types</span>
                 </div>
               </div>
