@@ -94,32 +94,32 @@ export default function PlantsPage() {
       {/* Main Content Area */}
       <div className="main-content-area">
         <div className="plant-section">
+          {/* Header Section */}
           <div className="plant-header">
-            <div className="header-content">
-              <div>
-                <h1 className="plant-title">My Garden Collection</h1>
-                <p className="plant-subtitle">Monitor and manage all your plants in one place.</p>
-              </div>
-              
-              {/* Search Bar */}
-              <div className="search-container">
-                <input 
-                  type="text" 
-                  placeholder="Search plants..." 
-                  className="search-input"
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                />
-                <button className="search-button">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <circle cx="11" cy="11" r="8"></circle>
-                    <path d="m21 21-4.35-4.35"></path>
-                  </svg>
-                </button>
-              </div>
+            <h1 className="plant-title">My Garden Collection</h1>
+            <p className="plant-subtitle">Monitor and manage all your plants in one place.</p>
+          </div>
+          
+          {/* Search Bar Section */}
+          <div className="search-section">
+            <div className="search-container">
+              <input 
+                type="text" 
+                placeholder="Search plants..." 
+                className="search-input"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+              <button className="search-button">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <circle cx="11" cy="11" r="8"></circle>
+                  <path d="m21 21-4.35-4.35"></path>
+                </svg>
+              </button>
             </div>
           </div>
           
+          {/* Plants Overview Section */}
           <div className="plants-overview">
             <div className="plants-stats">
               <div className="stat-card">
