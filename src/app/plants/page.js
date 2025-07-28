@@ -5,6 +5,7 @@ import '../plants.css';
 
 export default function PlantsPage() {
   const [selectedPlant, setSelectedPlant] = useState(null);
+  const [searchTerm, setSearchTerm] = useState('');
 
   const plants = [
     {
@@ -81,59 +82,64 @@ export default function PlantsPage() {
     }
   ];
 
-  return (
-    <div className="dashboard-layout">
-      {/* Left Sidebar Navigation */}
-      <div className="left-sidebar">
-        <div className="sidebar-nav">
-          <div className="nav-icon">
-            <span>🏠</span>
-          </div>
-          <div className="nav-icon active">
-            <span>🌱</span>
-          </div>
-          <div className="nav-icon">
-            <span>📊</span>
-          </div>
-          <div className="nav-icon">
-            <span>⚙️</span>
-          </div>
-        </div>
-        <div className="sidebar-bottom">
-          <div className="nav-icon">
-            <span>↗️</span>
-          </div>
-        </div>
-      </div>
+  // Filter plants based on search term
+  const filteredPlants = plants.filter(plant =>
+    plant.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    plant.type.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    plant.status.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
+  return (
+    <div className="plants-page-layout">
       {/* Main Content Area */}
       <div className="main-content-area">
         <div className="plant-section">
           <div className="plant-header">
-            <h1 className="plant-title">My Garden Collection</h1>
-            <p className="plant-subtitle">Monitor and manage all your plants in one place.</p>
+            <div className="header-content">
+              <div>
+                <h1 className="plant-title">My Garden Collection</h1>
+                <p className="plant-subtitle">Monitor and manage all your plants in one place.</p>
+              </div>
+              
+              {/* Search Bar */}
+              <div className="search-container">
+                <input 
+                  type="text" 
+                  placeholder="Search plants..." 
+                  className="search-input"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                />
+                <button className="search-button">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <path d="m21 21-4.35-4.35"></path>
+                  </svg>
+                </button>
+              </div>
+            </div>
           </div>
           
           <div className="plants-overview">
             <div className="plants-stats">
               <div className="stat-card">
-                <div className="stat-number">{plants.length}</div>
+                <div className="stat-number">{filteredPlants.length}</div>
                 <div className="stat-label">Total Plants</div>
               </div>
               
               <div className="stat-card">
-                <div className="stat-number">{plants.filter(p => p.health === 'Excellent').length}</div>
+                <div className="stat-number">{filteredPlants.filter(p => p.health === 'Excellent').length}</div>
                 <div className="stat-label">Healthy</div>
               </div>
               
               <div className="stat-card">
-                <div className="stat-number">{plants.filter(p => p.status.includes('attention')).length}</div>
+                <div className="stat-number">{filteredPlants.filter(p => p.status.includes('attention')).length}</div>
                 <div className="stat-label">Need Attention</div>
               </div>
             </div>
             
             <div className="plants-grid-modern">
-              {plants.map((plant) => (
+              {filteredPlants.map((plant) => (
                 <div 
                   key={plant.id} 
                   className={`modern-plant-card ${selectedPlant?.id === plant.id ? 'selected' : ''}`}
@@ -278,15 +284,15 @@ export default function PlantsPage() {
               
               <div className="quick-stats">
                 <div className="quick-stat">
-                  <span className="quick-stat-number">{plants.length}</span>
+                  <span className="quick-stat-number">{filteredPlants.length}</span>
                   <span className="quick-stat-label">Plants</span>
                 </div>
                 <div className="quick-stat">
-                  <span className="quick-stat-number">{plants.filter(p => p.health === 'Excellent').length}</span>
+                  <span className="quick-stat-number">{filteredPlants.filter(p => p.health === 'Excellent').length}</span>
                   <span className="quick-stat-label">Healthy</span>
                 </div>
                 <div className="quick-stat">
-                  <span className="quick-stat-number">{new Set(plants.map(p => p.type)).size}</span>
+                  <span className="quick-stat-number">{new Set(filteredPlants.map(p => p.type)).size}</span>
                   <span className="quick-stat-label">Types</span>
                 </div>
               </div>

@@ -14,44 +14,42 @@ export default function Navigation({ children = null }) {
   return (
     <div className="navigation-wrapper">
       <header className="top-navigation">
-        {/* Left - Logo and Navigation Tabs */}
+        {/* Left - Logo and Navigation Links */}
         <div className="nav-left">
           <div className="logo-container">
             <div className="logo">P</div>
           </div>
           
-          <nav className="nav-tabs">
-            <Link 
-              href="/analytics" 
-              className={`nav-tab ${pathname === '/analytics' ? 'active' : ''}`}
-            >
-              Analytics
-            </Link>
+          <nav className="nav-links">
             <Link 
               href="/" 
-              className={`nav-tab ${pathname === '/' ? 'active' : ''}`}
+              className={`nav-link ${pathname === '/' ? 'active' : ''}`}
             >
-              <span className="status-dot"></span>
-              My Plant
+              <span>🏠</span>
+              <span>Dashboard</span>
+            </Link>
+            <Link 
+              href="/plants" 
+              className={`nav-link ${pathname === '/plants' ? 'active' : ''}`}
+            >
+              <span>🌱</span>
+              <span>Plants</span>
+            </Link>
+            <Link 
+              href="/analytics" 
+              className={`nav-link ${pathname === '/analytics' ? 'active' : ''}`}
+            >
+              <span>📊</span>
+              <span>Analytics</span>
+            </Link>
+            <Link 
+              href="/automation" 
+              className={`nav-link ${pathname === '/automation' ? 'active' : ''}`}
+            >
+              <span>⚙️</span>
+              <span>Settings</span>
             </Link>
           </nav>
-        </div>
-
-        {/* Center - Search Bar */}
-        <div className="nav-center">
-          <div className="search-container">
-            <input 
-              type="text" 
-              placeholder="Search..." 
-              className="search-input"
-            />
-            <button className="search-button">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <circle cx="11" cy="11" r="8"></circle>
-                <path d="m21 21-4.35-4.35"></path>
-              </svg>
-            </button>
-          </div>
         </div>
 
         {/* Right - Notifications and User */}
