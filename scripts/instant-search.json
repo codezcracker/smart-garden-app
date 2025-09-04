@@ -1,0 +1,618 @@
+{
+  "commonNames": {
+    "carrot": {
+      "id": "1",
+      "scientificName": "Daucus carota",
+      "commonName": "Carrot",
+      "emoji": "🥕",
+      "category": "Vegetable",
+      "family": "Apiaceae"
+    },
+    "tomato": {
+      "id": "2",
+      "scientificName": "Solanum lycopersicum",
+      "commonName": "Tomato",
+      "emoji": "🍅",
+      "category": "Vegetable",
+      "family": "Solanaceae"
+    },
+    "bell pepper": {
+      "id": "3",
+      "scientificName": "Capsicum annuum",
+      "commonName": "Bell Pepper",
+      "emoji": "🫑",
+      "category": "Vegetable",
+      "family": "Solanaceae"
+    },
+    "broccoli": {
+      "id": "4",
+      "scientificName": "Brassica oleracea",
+      "commonName": "Broccoli",
+      "emoji": "🥦",
+      "category": "Vegetable",
+      "family": "Brassicaceae"
+    },
+    "lettuce": {
+      "id": "5",
+      "scientificName": "Lactuca sativa",
+      "commonName": "Lettuce",
+      "emoji": "🥬",
+      "category": "Vegetable",
+      "family": "Asteraceae"
+    },
+    "onion": {
+      "id": "6",
+      "scientificName": "Allium cepa",
+      "commonName": "Onion",
+      "emoji": "🧅",
+      "category": "Vegetable",
+      "family": "Amaryllidaceae"
+    },
+    "potato": {
+      "id": "7",
+      "scientificName": "Solanum tuberosum",
+      "commonName": "Potato",
+      "emoji": "🥔",
+      "category": "Vegetable",
+      "family": "Solanaceae"
+    },
+    "cucumber": {
+      "id": "8",
+      "scientificName": "Cucumis sativus",
+      "commonName": "Cucumber",
+      "emoji": "🥒",
+      "category": "Vegetable",
+      "family": "Cucurbitaceae"
+    },
+    "spinach": {
+      "id": "9",
+      "scientificName": "Spinacia oleracea",
+      "commonName": "Spinach",
+      "emoji": "🥬",
+      "category": "Leafy Green",
+      "family": "Amaranthaceae"
+    },
+    "radish": {
+      "id": "10",
+      "scientificName": "Raphanus sativus",
+      "commonName": "Radish",
+      "emoji": "🟢",
+      "category": "Root Vegetable",
+      "family": "Brassicaceae"
+    },
+    "apple": {
+      "id": "11",
+      "scientificName": "Malus domestica",
+      "commonName": "Apple",
+      "emoji": "🍎",
+      "category": "Fruit",
+      "family": "Rosaceae"
+    },
+    "orange": {
+      "id": "12",
+      "scientificName": "Citrus sinensis",
+      "commonName": "Orange",
+      "emoji": "🍊",
+      "category": "Fruit",
+      "family": "Rutaceae"
+    },
+    "banana": {
+      "id": "13",
+      "scientificName": "Musa acuminata",
+      "commonName": "Banana",
+      "emoji": "🍌",
+      "category": "Fruit",
+      "family": "Musaceae"
+    },
+    "strawberry": {
+      "id": "14",
+      "scientificName": "Fragaria × ananassa",
+      "commonName": "Strawberry",
+      "emoji": "🍓",
+      "category": "Berry",
+      "family": "Rosaceae"
+    },
+    "grape": {
+      "id": "15",
+      "scientificName": "Vitis vinifera",
+      "commonName": "Grape",
+      "emoji": "🍇",
+      "category": "Fruit",
+      "family": "Vitaceae"
+    },
+    "peach": {
+      "id": "16",
+      "scientificName": "Prunus persica",
+      "commonName": "Peach",
+      "emoji": "🍑",
+      "category": "Stone Fruit",
+      "family": "Rosaceae"
+    },
+    "lemon": {
+      "id": "17",
+      "scientificName": "Citrus limon",
+      "commonName": "Lemon",
+      "emoji": "🍋",
+      "category": "Citrus",
+      "family": "Rutaceae"
+    },
+    "pineapple": {
+      "id": "18",
+      "scientificName": "Ananas comosus",
+      "commonName": "Pineapple",
+      "emoji": "🍍",
+      "category": "Tropical Fruit",
+      "family": "Bromeliaceae"
+    },
+    "basil": {
+      "id": "19",
+      "scientificName": "Ocimum basilicum",
+      "commonName": "Basil",
+      "emoji": "🌿",
+      "category": "Herb",
+      "family": "Lamiaceae"
+    },
+    "parsley": {
+      "id": "20",
+      "scientificName": "Petroselinum crispum",
+      "commonName": "Parsley",
+      "emoji": "🌿",
+      "category": "Herb",
+      "family": "Apiaceae"
+    },
+    "mint": {
+      "id": "21",
+      "scientificName": "Mentha spicata",
+      "commonName": "Mint",
+      "emoji": "🌿",
+      "category": "Herb",
+      "family": "Lamiaceae"
+    },
+    "rosemary": {
+      "id": "22",
+      "scientificName": "Rosmarinus officinalis",
+      "commonName": "Rosemary",
+      "emoji": "🌿",
+      "category": "Herb",
+      "family": "Lamiaceae"
+    },
+    "thyme": {
+      "id": "23",
+      "scientificName": "Thymus vulgaris",
+      "commonName": "Thyme",
+      "emoji": "🌿",
+      "category": "Herb",
+      "family": "Lamiaceae"
+    },
+    "oregano": {
+      "id": "24",
+      "scientificName": "Origanum vulgare",
+      "commonName": "Oregano",
+      "emoji": "🌿",
+      "category": "Herb",
+      "family": "Lamiaceae"
+    },
+    "lavender": {
+      "id": "25",
+      "scientificName": "Lavandula angustifolia",
+      "commonName": "Lavender",
+      "emoji": "💜",
+      "category": "Herb",
+      "family": "Lamiaceae"
+    },
+    "sage": {
+      "id": "26",
+      "scientificName": "Salvia officinalis",
+      "commonName": "Sage",
+      "emoji": "🌿",
+      "category": "Herb",
+      "family": "Lamiaceae"
+    },
+    "cilantro": {
+      "id": "27",
+      "scientificName": "Coriandrum sativum",
+      "commonName": "Cilantro",
+      "emoji": "🌿",
+      "category": "Herb",
+      "family": "Apiaceae"
+    },
+    "dill": {
+      "id": "28",
+      "scientificName": "Anethum graveolens",
+      "commonName": "Dill",
+      "emoji": "🌿",
+      "category": "Herb",
+      "family": "Apiaceae"
+    },
+    "rose": {
+      "id": "29",
+      "scientificName": "Rosa rubiginosa",
+      "commonName": "Rose",
+      "emoji": "🌹",
+      "category": "Flower",
+      "family": "Rosaceae"
+    },
+    "sunflower": {
+      "id": "30",
+      "scientificName": "Helianthus annuus",
+      "commonName": "Sunflower",
+      "emoji": "🌻",
+      "category": "Flower",
+      "family": "Asteraceae"
+    },
+    "tulip": {
+      "id": "31",
+      "scientificName": "Tulipa gesneriana",
+      "commonName": "Tulip",
+      "emoji": "🌷",
+      "category": "Flower",
+      "family": "Liliaceae"
+    },
+    "daffodil": {
+      "id": "32",
+      "scientificName": "Narcissus pseudonarcissus",
+      "commonName": "Daffodil",
+      "emoji": "💐",
+      "category": "Flower",
+      "family": "Amaryllidaceae"
+    },
+    "pansy": {
+      "id": "33",
+      "scientificName": "Viola tricolor",
+      "commonName": "Pansy",
+      "emoji": "🌸",
+      "category": "Flower",
+      "family": "Violaceae"
+    },
+    "oak tree": {
+      "id": "34",
+      "scientificName": "Quercus alba",
+      "commonName": "Oak Tree",
+      "emoji": "🌳",
+      "category": "Tree",
+      "family": "Fagaceae"
+    },
+    "maple tree": {
+      "id": "35",
+      "scientificName": "Acer saccharum",
+      "commonName": "Maple Tree",
+      "emoji": "🍁",
+      "category": "Tree",
+      "family": "Sapindaceae"
+    },
+    "pine tree": {
+      "id": "36",
+      "scientificName": "Pinus strobus",
+      "commonName": "Pine Tree",
+      "emoji": "🌲",
+      "category": "Evergreen",
+      "family": "Pinaceae"
+    },
+    "birch tree": {
+      "id": "37",
+      "scientificName": "Betula pendula",
+      "commonName": "Birch Tree",
+      "emoji": "🌳",
+      "category": "Tree",
+      "family": "Betulaceae"
+    },
+    "willow tree": {
+      "id": "38",
+      "scientificName": "Salix babylonica",
+      "commonName": "Willow Tree",
+      "emoji": "🌳",
+      "category": "Tree",
+      "family": "Salicaceae"
+    }
+  },
+  "scientificNames": {
+    "daucus carota": {
+      "id": "1",
+      "scientificName": "Daucus carota",
+      "commonName": "Carrot",
+      "emoji": "🥕",
+      "category": "Vegetable",
+      "family": "Apiaceae"
+    },
+    "solanum lycopersicum": {
+      "id": "2",
+      "scientificName": "Solanum lycopersicum",
+      "commonName": "Tomato",
+      "emoji": "🍅",
+      "category": "Vegetable",
+      "family": "Solanaceae"
+    },
+    "capsicum annuum": {
+      "id": "3",
+      "scientificName": "Capsicum annuum",
+      "commonName": "Bell Pepper",
+      "emoji": "🫑",
+      "category": "Vegetable",
+      "family": "Solanaceae"
+    },
+    "brassica oleracea": {
+      "id": "4",
+      "scientificName": "Brassica oleracea",
+      "commonName": "Broccoli",
+      "emoji": "🥦",
+      "category": "Vegetable",
+      "family": "Brassicaceae"
+    },
+    "lactuca sativa": {
+      "id": "5",
+      "scientificName": "Lactuca sativa",
+      "commonName": "Lettuce",
+      "emoji": "🥬",
+      "category": "Vegetable",
+      "family": "Asteraceae"
+    },
+    "allium cepa": {
+      "id": "6",
+      "scientificName": "Allium cepa",
+      "commonName": "Onion",
+      "emoji": "🧅",
+      "category": "Vegetable",
+      "family": "Amaryllidaceae"
+    },
+    "solanum tuberosum": {
+      "id": "7",
+      "scientificName": "Solanum tuberosum",
+      "commonName": "Potato",
+      "emoji": "🥔",
+      "category": "Vegetable",
+      "family": "Solanaceae"
+    },
+    "cucumis sativus": {
+      "id": "8",
+      "scientificName": "Cucumis sativus",
+      "commonName": "Cucumber",
+      "emoji": "🥒",
+      "category": "Vegetable",
+      "family": "Cucurbitaceae"
+    },
+    "spinacia oleracea": {
+      "id": "9",
+      "scientificName": "Spinacia oleracea",
+      "commonName": "Spinach",
+      "emoji": "🥬",
+      "category": "Leafy Green",
+      "family": "Amaranthaceae"
+    },
+    "raphanus sativus": {
+      "id": "10",
+      "scientificName": "Raphanus sativus",
+      "commonName": "Radish",
+      "emoji": "🟢",
+      "category": "Root Vegetable",
+      "family": "Brassicaceae"
+    },
+    "malus domestica": {
+      "id": "11",
+      "scientificName": "Malus domestica",
+      "commonName": "Apple",
+      "emoji": "🍎",
+      "category": "Fruit",
+      "family": "Rosaceae"
+    },
+    "citrus sinensis": {
+      "id": "12",
+      "scientificName": "Citrus sinensis",
+      "commonName": "Orange",
+      "emoji": "🍊",
+      "category": "Fruit",
+      "family": "Rutaceae"
+    },
+    "musa acuminata": {
+      "id": "13",
+      "scientificName": "Musa acuminata",
+      "commonName": "Banana",
+      "emoji": "🍌",
+      "category": "Fruit",
+      "family": "Musaceae"
+    },
+    "fragaria × ananassa": {
+      "id": "14",
+      "scientificName": "Fragaria × ananassa",
+      "commonName": "Strawberry",
+      "emoji": "🍓",
+      "category": "Berry",
+      "family": "Rosaceae"
+    },
+    "vitis vinifera": {
+      "id": "15",
+      "scientificName": "Vitis vinifera",
+      "commonName": "Grape",
+      "emoji": "🍇",
+      "category": "Fruit",
+      "family": "Vitaceae"
+    },
+    "prunus persica": {
+      "id": "16",
+      "scientificName": "Prunus persica",
+      "commonName": "Peach",
+      "emoji": "🍑",
+      "category": "Stone Fruit",
+      "family": "Rosaceae"
+    },
+    "citrus limon": {
+      "id": "17",
+      "scientificName": "Citrus limon",
+      "commonName": "Lemon",
+      "emoji": "🍋",
+      "category": "Citrus",
+      "family": "Rutaceae"
+    },
+    "ananas comosus": {
+      "id": "18",
+      "scientificName": "Ananas comosus",
+      "commonName": "Pineapple",
+      "emoji": "🍍",
+      "category": "Tropical Fruit",
+      "family": "Bromeliaceae"
+    },
+    "ocimum basilicum": {
+      "id": "19",
+      "scientificName": "Ocimum basilicum",
+      "commonName": "Basil",
+      "emoji": "🌿",
+      "category": "Herb",
+      "family": "Lamiaceae"
+    },
+    "petroselinum crispum": {
+      "id": "20",
+      "scientificName": "Petroselinum crispum",
+      "commonName": "Parsley",
+      "emoji": "🌿",
+      "category": "Herb",
+      "family": "Apiaceae"
+    },
+    "mentha spicata": {
+      "id": "21",
+      "scientificName": "Mentha spicata",
+      "commonName": "Mint",
+      "emoji": "🌿",
+      "category": "Herb",
+      "family": "Lamiaceae"
+    },
+    "rosmarinus officinalis": {
+      "id": "22",
+      "scientificName": "Rosmarinus officinalis",
+      "commonName": "Rosemary",
+      "emoji": "🌿",
+      "category": "Herb",
+      "family": "Lamiaceae"
+    },
+    "thymus vulgaris": {
+      "id": "23",
+      "scientificName": "Thymus vulgaris",
+      "commonName": "Thyme",
+      "emoji": "🌿",
+      "category": "Herb",
+      "family": "Lamiaceae"
+    },
+    "origanum vulgare": {
+      "id": "24",
+      "scientificName": "Origanum vulgare",
+      "commonName": "Oregano",
+      "emoji": "🌿",
+      "category": "Herb",
+      "family": "Lamiaceae"
+    },
+    "lavandula angustifolia": {
+      "id": "25",
+      "scientificName": "Lavandula angustifolia",
+      "commonName": "Lavender",
+      "emoji": "💜",
+      "category": "Herb",
+      "family": "Lamiaceae"
+    },
+    "salvia officinalis": {
+      "id": "26",
+      "scientificName": "Salvia officinalis",
+      "commonName": "Sage",
+      "emoji": "🌿",
+      "category": "Herb",
+      "family": "Lamiaceae"
+    },
+    "coriandrum sativum": {
+      "id": "27",
+      "scientificName": "Coriandrum sativum",
+      "commonName": "Cilantro",
+      "emoji": "🌿",
+      "category": "Herb",
+      "family": "Apiaceae"
+    },
+    "anethum graveolens": {
+      "id": "28",
+      "scientificName": "Anethum graveolens",
+      "commonName": "Dill",
+      "emoji": "🌿",
+      "category": "Herb",
+      "family": "Apiaceae"
+    },
+    "rosa rubiginosa": {
+      "id": "29",
+      "scientificName": "Rosa rubiginosa",
+      "commonName": "Rose",
+      "emoji": "🌹",
+      "category": "Flower",
+      "family": "Rosaceae"
+    },
+    "helianthus annuus": {
+      "id": "30",
+      "scientificName": "Helianthus annuus",
+      "commonName": "Sunflower",
+      "emoji": "🌻",
+      "category": "Flower",
+      "family": "Asteraceae"
+    },
+    "tulipa gesneriana": {
+      "id": "31",
+      "scientificName": "Tulipa gesneriana",
+      "commonName": "Tulip",
+      "emoji": "🌷",
+      "category": "Flower",
+      "family": "Liliaceae"
+    },
+    "narcissus pseudonarcissus": {
+      "id": "32",
+      "scientificName": "Narcissus pseudonarcissus",
+      "commonName": "Daffodil",
+      "emoji": "💐",
+      "category": "Flower",
+      "family": "Amaryllidaceae"
+    },
+    "viola tricolor": {
+      "id": "33",
+      "scientificName": "Viola tricolor",
+      "commonName": "Pansy",
+      "emoji": "🌸",
+      "category": "Flower",
+      "family": "Violaceae"
+    },
+    "quercus alba": {
+      "id": "34",
+      "scientificName": "Quercus alba",
+      "commonName": "Oak Tree",
+      "emoji": "🌳",
+      "category": "Tree",
+      "family": "Fagaceae"
+    },
+    "acer saccharum": {
+      "id": "35",
+      "scientificName": "Acer saccharum",
+      "commonName": "Maple Tree",
+      "emoji": "🍁",
+      "category": "Tree",
+      "family": "Sapindaceae"
+    },
+    "pinus strobus": {
+      "id": "36",
+      "scientificName": "Pinus strobus",
+      "commonName": "Pine Tree",
+      "emoji": "🌲",
+      "category": "Evergreen",
+      "family": "Pinaceae"
+    },
+    "betula pendula": {
+      "id": "37",
+      "scientificName": "Betula pendula",
+      "commonName": "Birch Tree",
+      "emoji": "🌳",
+      "category": "Tree",
+      "family": "Betulaceae"
+    },
+    "salix babylonica": {
+      "id": "38",
+      "scientificName": "Salix babylonica",
+      "commonName": "Willow Tree",
+      "emoji": "🌳",
+      "category": "Tree",
+      "family": "Salicaceae"
+    }
+  },
+  "metadata": {
+    "totalPlants": 390000,
+    "created": "2025-08-31T20:54:44.348Z"
+  }
+}

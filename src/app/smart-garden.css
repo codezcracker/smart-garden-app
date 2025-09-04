@@ -1,0 +1,868 @@
+/* Smart Garden Dashboard Styles */
+
+.smart-garden-dashboard {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  padding: 2rem;
+}
+
+/* Dashboard Header */
+.dashboard-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.dashboard-header h1 {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #2c3e50;
+  margin-bottom: 0.5rem;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.dashboard-header p {
+  font-size: 1.2rem;
+  color: #34495e;
+  margin-bottom: 2rem;
+}
+
+/* Smart Statistics Grid */
+.smart-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.smart-stat-card {
+  background: white;
+  border-radius: 16px;
+  padding: 1.5rem;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  transition: all 0.3s ease;
+  border: 2px solid transparent;
+}
+
+.smart-stat-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 40px rgba(0,0,0,0.15);
+}
+
+.smart-stat-card.iot-stat {
+  border-color: #4caf50;
+}
+
+.smart-stat-card.automation-stat {
+  border-color: #ff9800;
+}
+
+.smart-stat-card.sensor-stat {
+  border-color: #2196f3;
+}
+
+.smart-stat-card.watering-stat {
+  border-color: #00bcd4;
+}
+
+.stat-icon {
+  font-size: 3rem;
+  opacity: 0.8;
+}
+
+.stat-content h3 {
+  margin: 0 0 0.5rem 0;
+  font-size: 1.1rem;
+  color: #2c3e50;
+  font-weight: 600;
+}
+
+.stat-number {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #2c3e50;
+  margin: 0;
+}
+
+.stat-label {
+  font-size: 0.9rem;
+  color: #7f8c8d;
+  font-weight: 500;
+}
+
+/* Smart Filters Section */
+.smart-filters-section {
+  background: white;
+  border-radius: 16px;
+  padding: 2rem;
+  margin-bottom: 2rem;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.smart-filters-section h2 {
+  margin: 0 0 1.5rem 0;
+  color: #2c3e50;
+  font-weight: 600;
+}
+
+.smart-filters-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  align-items: end;
+}
+
+.smart-filter-select {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 2px solid #e9ecef;
+  border-radius: 12px;
+  font-size: 1rem;
+  background: white;
+  color: #2c3e50;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.smart-filter-select:hover {
+  border-color: #4285f4;
+  box-shadow: 0 2px 8px rgba(66, 133, 244, 0.15);
+}
+
+.smart-filter-select:focus {
+  outline: none;
+  border-color: #4285f4;
+  box-shadow: 0 0 0 3px rgba(66, 133, 244, 0.1);
+}
+
+.clear-smart-filters-btn {
+  padding: 0.75rem 1.5rem;
+  background: linear-gradient(135deg, #e74c3c, #c0392b);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 16px rgba(231, 76, 60, 0.3);
+}
+
+.clear-smart-filters-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(231, 76, 60, 0.4);
+}
+
+/* Smart Plants Section */
+.smart-plants-section {
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.smart-plants-section h2 {
+  color: #2c3e50;
+  font-weight: 600;
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+/* Smart Plants Grid */
+.smart-plants-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+  gap: 2rem;
+  margin-bottom: 2rem;
+}
+
+.smart-plant-card {
+  background: white;
+  border-radius: 20px;
+  padding: 1.5rem;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+  transition: all 0.3s ease;
+  border: 2px solid transparent;
+}
+
+.smart-plant-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 16px 48px rgba(0,0,0,0.15);
+  border-color: #4285f4;
+}
+
+/* Plant Header */
+.smart-plant-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 2px solid #f8f9fa;
+}
+
+.plant-emoji-large {
+  font-size: 3rem;
+}
+
+.plant-names {
+  flex: 1;
+}
+
+.plant-common-name {
+  margin: 0 0 0.25rem 0;
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: #2c3e50;
+}
+
+.plant-scientific-name {
+  margin: 0;
+  font-size: 1rem;
+  color: #7f8c8d;
+  font-style: italic;
+}
+
+/* IoT Section */
+.iot-section {
+  margin-bottom: 1.5rem;
+}
+
+.iot-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.iot-header h4 {
+  margin: 0;
+  color: #2c3e50;
+  font-weight: 600;
+}
+
+.iot-badge {
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  color: white;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+/* Smart Features Grid */
+.smart-features-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.75rem;
+}
+
+.smart-feature {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem;
+  background: #f8f9fa;
+  border-radius: 8px;
+}
+
+.feature-icon {
+  font-size: 1.2rem;
+}
+
+.feature-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+}
+
+.feature-label {
+  font-size: 0.8rem;
+  color: #7f8c8d;
+  font-weight: 500;
+}
+
+.feature-value {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #2c3e50;
+}
+
+/* Care Requirements */
+.iot-care-section {
+  margin-bottom: 1.5rem;
+}
+
+.iot-care-section h4 {
+  margin: 0 0 1rem 0;
+  color: #2c3e50;
+  font-weight: 600;
+}
+
+.care-requirements-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.5rem;
+}
+
+.care-requirement {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem;
+  background: #f1f3f4;
+  border-radius: 8px;
+}
+
+.care-icon {
+  font-size: 1rem;
+}
+
+.care-label {
+  font-size: 0.8rem;
+  color: #5f6368;
+  font-weight: 500;
+  min-width: 60px;
+}
+
+.care-value {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #202124;
+}
+
+/* Smart Features Section */
+.smart-features-section h4 {
+  margin: 0 0 1rem 0;
+  color: #2c3e50;
+  font-weight: 600;
+}
+
+.smart-capabilities {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.capability-tag {
+  padding: 0.25rem 0.75rem;
+  border-radius: 16px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: white;
+  text-transform: uppercase;
+}
+
+.capability-tag.weather {
+  background: linear-gradient(135deg, #3498db, #2980b9);
+}
+
+.capability-tag.ai {
+  background: linear-gradient(135deg, #9b59b6, #8e44ad);
+}
+
+.capability-tag.voice {
+  background: linear-gradient(135deg, #1abc9c, #16a085);
+}
+
+.capability-tag.camera {
+  background: linear-gradient(135deg, #e67e22, #d35400);
+}
+
+.capability-tag.data {
+  background: linear-gradient(135deg, #34495e, #2c3e50);
+}
+
+/* Automation Recommendations */
+.automation-recommendation h4 {
+  margin: 0 0 1rem 0;
+  color: #2c3e50;
+  font-weight: 600;
+}
+
+.recommendation {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem;
+  border-radius: 12px;
+  border-left: 4px solid;
+}
+
+.recommendation.professional {
+  background: linear-gradient(135deg, #f8f5ff, #e8e0ff);
+  border-left-color: #9c27b0;
+}
+
+.recommendation.high {
+  background: linear-gradient(135deg, #fff5f5, #ffe0e0);
+  border-left-color: #f44336;
+}
+
+.recommendation.medium {
+  background: linear-gradient(135deg, #fff8e1, #ffe0b2);
+  border-left-color: #ff9800;
+}
+
+.recommendation.low {
+  background: linear-gradient(135deg, #f1f8e9, #dcedc8);
+  border-left-color: #4caf50;
+}
+
+.rec-icon {
+  font-size: 1.5rem;
+}
+
+.rec-text {
+  font-size: 0.9rem;
+  color: #2c3e50;
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .smart-garden-dashboard {
+    padding: 1rem;
+  }
+  
+  .smart-stats-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .smart-plants-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .smart-filters-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .smart-features-grid,
+  .care-requirements-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Loading and Error States */
+.loading-state,
+.error-state {
+  text-align: center;
+  padding: 3rem;
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+  max-width: 600px;
+  margin: 2rem auto;
+}
+
+.loading-message {
+  font-size: 1.2rem;
+  color: #2c3e50;
+  margin: 0;
+}
+
+.error-message {
+  font-size: 1.1rem;
+  color: #e74c3c;
+  margin: 0 0 1rem 0;
+}
+
+.retry-button {
+  padding: 0.75rem 1.5rem;
+  background: linear-gradient(135deg, #3498db, #2980b9);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.retry-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(52, 152, 219, 0.4);
+}
+
+/* Smart Garden Zones Styling */
+.smart-garden-zones {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 2rem;
+}
+
+.zones-header {
+  text-align: center;
+  margin-bottom: 3rem;
+  color: white;
+}
+
+.zones-header h1 {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+}
+
+.zones-header p {
+  font-size: 1.2rem;
+  opacity: 0.9;
+}
+
+/* Zone Configuration */
+.zone-config-section {
+  background: white;
+  border-radius: 20px;
+  padding: 2rem;
+  margin-bottom: 2rem;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+}
+
+.zone-config-section h2 {
+  margin: 0 0 2rem 0;
+  color: #2c3e50;
+  font-weight: 600;
+}
+
+.config-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.config-group label {
+  display: block;
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #2c3e50;
+  margin-bottom: 1rem;
+}
+
+/* Zone Type Cards */
+.zone-type-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1rem;
+}
+
+.zone-type-card {
+  padding: 1.5rem;
+  border: 2px solid #e9ecef;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background: #f8f9fa;
+}
+
+.zone-type-card:hover {
+  border-color: #4285f4;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(66, 133, 244, 0.15);
+}
+
+.zone-type-card.selected {
+  border-color: #4285f4;
+  background: linear-gradient(135deg, #e3f2fd, #bbdefb);
+  box-shadow: 0 4px 16px rgba(66, 133, 244, 0.2);
+}
+
+.zone-type-card h3 {
+  margin: 0 0 0.5rem 0;
+  color: #2c3e50;
+  font-size: 1.1rem;
+}
+
+.zone-type-card p {
+  margin: 0;
+  color: #5f6368;
+  font-size: 0.9rem;
+}
+
+/* Size, Budget, Experience Options */
+.size-options, .budget-options, .experience-options {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+}
+
+.size-option, .budget-option, .experience-option {
+  padding: 1rem;
+  border: 2px solid #e9ecef;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: center;
+}
+
+.size-option:hover, .budget-option:hover, .experience-option:hover {
+  border-color: #4285f4;
+  transform: translateY(-1px);
+}
+
+.size-option.selected, .budget-option.selected, .experience-option.selected {
+  border-color: #4285f4;
+  background: #e3f2fd;
+}
+
+.size-option h4, .budget-option h4, .experience-option h4 {
+  margin: 0 0 0.5rem 0;
+  color: #2c3e50;
+  font-size: 1rem;
+}
+
+.size-option p, .budget-option p, .experience-option p {
+  margin: 0;
+  color: #5f6368;
+  font-size: 0.8rem;
+}
+
+/* Zone Recommendations */
+.zone-recommendations-section {
+  margin-bottom: 2rem;
+}
+
+.zone-recommendations-section h2 {
+  color: white;
+  text-align: center;
+  margin-bottom: 2rem;
+  font-weight: 600;
+}
+
+.zone-recommendations-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+  gap: 2rem;
+}
+
+.zone-recommendation-card {
+  background: white;
+  border-radius: 20px;
+  padding: 2rem;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+  transition: all 0.3s ease;
+}
+
+.zone-recommendation-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 15px 50px rgba(0,0,0,0.2);
+}
+
+.zone-header {
+  margin-bottom: 1.5rem;
+}
+
+.zone-header h3 {
+  margin: 0 0 1rem 0;
+  color: #2c3e50;
+  font-size: 1.3rem;
+  font-weight: 600;
+}
+
+.zone-badges {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.automation-badge, .iot-badge {
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  color: white;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+/* Zone Statistics */
+.zone-stats {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.zone-stat {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem;
+  background: #f8f9fa;
+  border-radius: 8px;
+}
+
+.zone-stat .stat-icon {
+  font-size: 1.5rem;
+}
+
+.zone-stat .stat-label {
+  font-size: 0.8rem;
+  color: #5f6368;
+  display: block;
+}
+
+.zone-stat .stat-value {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #2c3e50;
+  display: block;
+}
+
+/* Sensor and Plant Lists */
+.sensor-requirements, .recommended-plants {
+  margin-bottom: 1.5rem;
+}
+
+.sensor-requirements h4, .recommended-plants h4 {
+  margin: 0 0 0.75rem 0;
+  color: #2c3e50;
+  font-weight: 600;
+}
+
+.sensor-list, .plants-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.sensor-tag, .plant-tag {
+  padding: 0.25rem 0.75rem;
+  border-radius: 16px;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.sensor-tag {
+  background: linear-gradient(135deg, #2196f3, #1976d2);
+  color: white;
+}
+
+.plant-tag {
+  background: linear-gradient(135deg, #4caf50, #388e3c);
+  color: white;
+}
+
+/* Zone Actions */
+.zone-actions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.create-zone-btn, .view-plants-btn {
+  flex: 1;
+  padding: 0.75rem 1rem;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.create-zone-btn {
+  background: linear-gradient(135deg, #4caf50, #388e3c);
+  color: white;
+}
+
+.view-plants-btn {
+  background: linear-gradient(135deg, #2196f3, #1976d2);
+  color: white;
+}
+
+.create-zone-btn:hover, .view-plants-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+/* Quick Start Templates */
+.quick-start-section {
+  margin-bottom: 2rem;
+}
+
+.quick-start-section h2 {
+  color: white;
+  text-align: center;
+  margin-bottom: 2rem;
+  font-weight: 600;
+}
+
+.templates-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 2rem;
+}
+
+.template-card {
+  background: white;
+  border-radius: 16px;
+  padding: 2rem;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+  transition: all 0.3s ease;
+  border-left: 4px solid;
+}
+
+.template-card.beginner {
+  border-left-color: #4caf50;
+}
+
+.template-card.intermediate {
+  border-left-color: #ff9800;
+}
+
+.template-card.professional {
+  border-left-color: #9c27b0;
+}
+
+.template-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 40px rgba(0,0,0,0.15);
+}
+
+.template-card h3 {
+  margin: 0 0 1rem 0;
+  color: #2c3e50;
+  font-weight: 600;
+}
+
+.template-features {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.template-features span {
+  font-size: 0.9rem;
+  color: #5f6368;
+}
+
+.template-specs {
+  margin-bottom: 1.5rem;
+}
+
+.template-specs p {
+  margin: 0.25rem 0;
+  font-size: 0.9rem;
+  color: #2c3e50;
+}
+
+.template-btn {
+  width: 100%;
+  padding: 0.75rem;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.template-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+} 

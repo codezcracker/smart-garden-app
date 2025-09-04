@@ -1,0 +1,9 @@
+data/plant-database.csv
+data/plant-database-sample.csv
+data/plant-database-common-names.csv
+data/common-names-mapping.json
+scripts/
+.git/
+.gitignore
+README.md
+LICENSE 
