@@ -49,21 +49,22 @@ export default function Navigation({ children = null }) {
       href: '/plants',
       icon: '🌱',
       gradient: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
-      description: 'Plant Database'
+      description: 'Browse Plants'
     },
     {
       name: 'Compare',
       href: '/plants/comparison',
       icon: '⚖️',
       gradient: 'linear-gradient(135deg, #a8edea 0%, #fed6e3 100%)',
-      description: 'Plant Comparison'
+      description: 'Compare Plants'
     },
+    // Row 2 - Analytics
     {
       name: 'Analytics',
       href: '/analytics',
       icon: '📊',
       gradient: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-      description: 'Data Analytics'
+      description: 'Data Insights'
     }
   ];
 
@@ -74,12 +75,20 @@ export default function Navigation({ children = null }) {
 
   return (
     <div className="navigation-wrapper">
+      {/* Modern Header */}
       <header className="modern-header">
         <div className="header-left">
           <Link href="/" className="app-logo">
             <div className="logo-icon">🌱</div>
             <span className="logo-text">Smart Garden</span>
           </Link>
+        </div>
+        
+        <div className="header-center">
+          <div className="page-info">
+            <h1 className="page-title">{getCurrentPageTitle()}</h1>
+            <span className="page-subtitle">Smart Garden Management</span>
+          </div>
         </div>
         
         <div className="header-right">
@@ -89,9 +98,9 @@ export default function Navigation({ children = null }) {
           <button 
             className="theme-toggle"
             onClick={toggleTheme}
-            title={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
+            title={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
           >
-            {theme === 'dark' ? '☀️' : '🌙'}
+            {theme === 'light' ? '🌙' : '☀️'}
           </button>
           
           <button 
@@ -114,36 +123,38 @@ export default function Navigation({ children = null }) {
         </div>
       </header>
 
-      {/* Navigation Menu */}
+      {/* iPad-Style Menu Overlay with Glassmorphism */}
       {isMenuOpen && (
-        <div className="nav-menu-overlay">
+        <div className="menu-overlay">
+          <div className="menu-backdrop" onClick={() => setIsMenuOpen(false)}></div>
           <div className="nav-menu-container">
-            <div className="nav-menu-header">
-              <h2>Smart Garden</h2>
-              <button 
-                className="close-menu"
-                onClick={() => setIsMenuOpen(false)}
-                title="Close menu"
-              >
-                ✕
-              </button>
-            </div>
-            
-            <div className="nav-menu-content">
-              <div className="nav-apps-grid">
+            <div className="menu-content">
+              <div className="menu-header">
+                <h2 className="menu-title">Apps</h2>
+                <button 
+                  className="close-menu-btn"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  ✕
+                </button>
+              </div>
+              
+              <div className="apps-grid">
                 {apps.map((app, index) => (
                   <Link
-                    key={index}
+                    key={app.href}
                     href={app.href}
-                    className="nav-app-card"
-                    style={{ '--gradient': app.gradient }}
+                    className={`app-icon ${pathname === app.href ? 'active' : ''}`}
                     onClick={() => setIsMenuOpen(false)}
+                    style={{ '--delay': `${index * 0.03}s` }}
                   >
-                    <div className="app-icon">{app.icon}</div>
-                    <div className="app-info">
-                      <h3 className="app-name">{app.name}</h3>
-                      <p className="app-description">{app.description}</p>
+                    <div 
+                      className="app-icon-bg"
+                      style={{ background: app.gradient }}
+                    >
+                      <span className="app-emoji">{app.icon}</span>
                     </div>
+                    <span className="app-name">{app.name}</span>
                   </Link>
                 ))}
               </div>
@@ -152,6 +163,7 @@ export default function Navigation({ children = null }) {
         </div>
       )}
 
+      {/* Main Content */}
       <main className="main-content">
         {children}
       </main>
