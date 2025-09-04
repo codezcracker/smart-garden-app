@@ -1,5 +1,6 @@
 import { MongoClient } from 'mongodb';
 
+// Use hardcoded connection string as fallback for Vercel deployment
 const MONGODB_URI = process.env.MONGODB_URI || 'mongodb+srv://codezcracker:Ars%401234@atlascluster.fs3ipnn.mongodb.net/?retryWrites=true&w=majority&appName=AtlasCluster';
 const MONGODB_DB = process.env.MONGODB_DB || 'smartGardenDB';
 
