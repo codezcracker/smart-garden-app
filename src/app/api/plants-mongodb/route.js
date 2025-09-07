@@ -19,7 +19,7 @@ export async function GET(request) {
     // Connect to MongoDB
     const { db } = await connectToDatabase();
     // Use the correct collection name that contains 390k records
-    const collection = db.collection('smartGardenDB');
+    const collection = db.collection('plants_collection');
 
     // Build query
     let query = {};
@@ -90,7 +90,7 @@ export async function GET(request) {
         apiType: 'mongodb-atlas',
         dataSource: 'MongoDB Atlas Database',
         database: 'smartGardenDB',
-        collection: 'smartGardenDB'
+        collection: 'plants_collection'
       }
     });
 
