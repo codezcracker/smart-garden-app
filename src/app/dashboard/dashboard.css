@@ -5,78 +5,12 @@
   background: #f8fafc;
 }
 
-.dashboard-header {
-  background: white;
-  border-bottom: 1px solid #e2e8f0;
-  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
-}
-
-.dashboard-header-content {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 0 16px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  height: 64px;
-}
-
-.dashboard-logo {
-  display: flex;
-  align-items: center;
-  text-decoration: none;
-  color: inherit;
-}
-
-.dashboard-logo-icon {
-  width: 32px;
-  height: 32px;
-  background: linear-gradient(135deg, #4caf50 0%, #388e3c 100%);
-  border-radius: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-right: 8px;
-  font-size: 16px;
-}
-
-.dashboard-logo-text {
-  font-size: 20px;
-  font-weight: 700;
-  color: #1f2937;
-}
-
-.dashboard-user-section {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-}
-
-.dashboard-welcome {
-  color: #374151;
-  font-size: 14px;
-}
-
-.logout-button {
-  background: #ef4444;
-  color: white;
-  border: none;
-  padding: 8px 16px;
-  border-radius: 8px;
-  font-size: 14px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background-color 0.2s ease;
-}
-
-.logout-button:hover {
-  background: #dc2626;
-}
+/* Dashboard Header - Removed extra header styles */
 
 .dashboard-main {
   max-width: 1280px;
   margin: 0 auto;
-  padding: 32px 16px;
+  padding: 2rem 1rem;
 }
 
 .dashboard-title {

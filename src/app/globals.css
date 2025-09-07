@@ -912,6 +912,62 @@ body {
   min-width: 250px;
 }
 
+/* Main Navigation Links */
+.main-nav {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.nav-link {
+  color: #374151;
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 0.95rem;
+  padding: 0.5rem 1rem;
+  position: relative;
+  transition: all 0.3s ease;
+  border-radius: 8px;
+  background: transparent;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.nav-link:hover {
+  color: #4caf50;
+  background: rgba(76, 175, 80, 0.1);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(76, 175, 80, 0.2);
+}
+
+.nav-link.active {
+  color: #4caf50;
+  font-weight: 600;
+  background: rgba(76, 175, 80, 0.15);
+}
+
+/* Active state - no dot indicator */
+
+/* Dark theme nav links */
+.dark .nav-link {
+  color: #e5e7eb;
+}
+
+.dark .nav-link:hover {
+  color: #4caf50;
+  background: rgba(76, 175, 80, 0.15);
+}
+
+.dark .nav-link.active {
+  color: #4caf50;
+  background: rgba(76, 175, 80, 0.2);
+}
+
 .app-logo {
   display: flex;
   align-items: center;
@@ -1010,6 +1066,40 @@ body {
   gap: 1.2rem;
   min-width: 250px;
   justify-content: flex-end;
+}
+
+/* Theme Toggle Button */
+.theme-toggle-button {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: none;
+  background: #f3f4f6;
+  color: #6b7280;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  transition: all 0.3s ease;
+  margin-right: 0.75rem;
+}
+
+.theme-toggle-button:hover {
+  background: #e5e7eb;
+  color: #4caf50;
+  transform: scale(1.05);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.dark .theme-toggle-button {
+  background: #374151;
+  color: #9ca3af;
+}
+
+.dark .theme-toggle-button:hover {
+  background: #4b5563;
+  color: #4caf50;
 }
 
 .theme-toggle {
@@ -1644,6 +1734,11 @@ body {
   .header-right {
     min-width: auto;
   }
+  
+  .main-nav {
+    display: none;
+  }
+  
   
   .logo-text {
     display: none;

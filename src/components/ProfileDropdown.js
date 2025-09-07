@@ -1,11 +1,11 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
+import Link from 'next/link';
 import { useTheme } from './ThemeProvider';
 
-export default function ProfileDropdown() {
+export default function ProfileDropdown({ user, isLoggedIn, theme, toggleTheme }) {
   const [isOpen, setIsOpen] = useState(false);
-  const { theme, toggleTheme } = useTheme();
   const dropdownRef = useRef(null);
 
   useEffect(() => {
@@ -21,61 +21,58 @@ export default function ProfileDropdown() {
     };
   }, []);
 
-  const profileMenuItems = [
-    {
-      label: 'My Profile',
-      icon: '👤',
-      action: () => console.log('Navigate to profile'),
-      shortcut: 'Ctrl+P'
-    },
-    {
-      label: 'Account Settings',
-      icon: '⚙️',
-      action: () => console.log('Navigate to settings'),
-      shortcut: 'Ctrl+,'
-    },
-    {
-      label: 'My Garden',
-      icon: '🌱',
-      action: () => console.log('Navigate to my garden'),
-      shortcut: 'Ctrl+G'
-    },
-    {
-      label: 'Preferences',
-      icon: '🎛️',
-      action: () => console.log('Navigate to preferences')
-    },
-    {
-      label: 'Theme',
-      icon: theme === 'light' ? '🌙' : '☀️',
-      action: toggleTheme,
-      isThemeToggle: true
-    },
-    { type: 'divider' },
-    {
-      label: 'Help & Support',
-      icon: '❓',
-      action: () => console.log('Navigate to help')
-    },
-    {
-      label: 'Keyboard Shortcuts',
-      icon: '⌨️',
-      action: () => console.log('Show shortcuts'),
-      shortcut: 'Ctrl+/'
-    },
-    {
-      label: 'Send Feedback',
-      icon: '📝',
-      action: () => console.log('Send feedback')
-    },
-    { type: 'divider' },
-    {
-      label: 'Sign Out',
-      icon: '🚪',
-      action: () => console.log('Sign out'),
-      danger: true
+  const handleLogout = () => {
+    localStorage.removeItem('auth_token');
+    localStorage.removeItem('user_data');
+    window.location.href = '/auth/login';
+  };
+
+  const getProfileMenuItems = () => {
+    if (isLoggedIn && user) {
+      return [
+        {
+          label: 'My Profile',
+          icon: '👤',
+          action: () => console.log('Navigate to profile'),
+          shortcut: 'Ctrl+P'
+        },
+        {
+          label: 'Account Settings',
+          icon: '⚙️',
+          action: () => console.log('Navigate to account settings'),
+          shortcut: 'Ctrl+,'
+        },
+        { type: 'divider' },
+        {
+          label: 'Sign Out',
+          icon: '🚪',
+          action: handleLogout,
+          danger: true
+        }
+      ];
+    } else {
+      return [
+        {
+          label: 'Sign In',
+          icon: '🔐',
+          action: () => window.location.href = '/auth/login'
+        },
+        {
+          label: 'Sign Up',
+          icon: '📝',
+          action: () => window.location.href = '/auth/register'
+        },
+        { type: 'divider' },
+        {
+          label: 'Help & Support',
+          icon: '❓',
+          action: () => console.log('Navigate to help')
+        }
+      ];
     }
-  ];
+  };
+
+  const profileMenuItems = getProfileMenuItems();
 
   const handleItemClick = (item) => {
     if (item.action) {
@@ -88,39 +85,55 @@ export default function ProfileDropdown() {
 
   return (
     <div className="profile-dropdown" ref={dropdownRef}>
-      <button
-        className="profile-button"
-        onClick={() => setIsOpen(!isOpen)}
-        aria-label="Profile menu"
-        title="Profile & Settings"
-      >
-        <div className="profile-avatar">
-          <div className="avatar-inner">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-              <circle cx="12" cy="7" r="4"></circle>
-            </svg>
+      {isLoggedIn ? (
+        <button
+          className="profile-button"
+          onClick={() => setIsOpen(!isOpen)}
+          aria-label="Profile menu"
+          title="Profile & Settings"
+        >
+          <div className="profile-avatar">
+            <div className="avatar-inner">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                <circle cx="12" cy="7" r="4"></circle>
+              </svg>
+            </div>
+            <div className="status-indicator"></div>
           </div>
-          <div className="status-indicator"></div>
-        </div>
-      </button>
+        </button>
+      ) : (
+        <button
+          className="user-account-button"
+          onClick={() => setIsOpen(!isOpen)}
+          title="User Account"
+        >
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+            <circle cx="12" cy="7" r="4"></circle>
+          </svg>
+          <span>User Account</span>
+        </button>
+      )}
 
       {isOpen && (
         <div className="profile-dropdown-content">
-          <div className="dropdown-header">
-            <div className="user-info">
-              <div className="user-avatar">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                  <circle cx="12" cy="7" r="4"></circle>
-                </svg>
-              </div>
-              <div className="user-details">
-                <div className="user-name">Garden Master</div>
-                <div className="user-email">gardener@smartgarden.com</div>
+          {isLoggedIn && user && (
+            <div className="dropdown-header">
+              <div className="user-info">
+                <div className="user-avatar">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="12" cy="7" r="4"></circle>
+                  </svg>
+                </div>
+                <div className="user-details">
+                  <div className="user-name">{user.firstName} {user.lastName}</div>
+                  <div className="user-email">{user.email}</div>
+                </div>
               </div>
             </div>
-          </div>
+          )}
 
           <div className="dropdown-content">
             {profileMenuItems.map((item, index) => {
@@ -153,6 +166,53 @@ export default function ProfileDropdown() {
           position: relative;
         }
 
+        .user-account-button {
+          display: flex;
+          align-items: center;
+          gap: 0.6rem;
+          background: linear-gradient(135deg, #4caf50 0%, #388e3c 100%);
+          color: white;
+          border: none;
+          padding: 0.6rem 1.2rem;
+          border-radius: 12px;
+          font-weight: 600;
+          font-size: 0.95rem;
+          cursor: pointer;
+          transition: all 0.3s ease;
+          box-shadow: 0 3px 12px rgba(76, 175, 80, 0.3);
+          border: 1px solid rgba(255, 255, 255, 0.1);
+          position: relative;
+          overflow: hidden;
+        }
+
+        .user-account-button::before {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: -100%;
+          width: 100%;
+          height: 100%;
+          background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+          transition: left 0.5s ease;
+        }
+
+        .user-account-button:hover::before {
+          left: 100%;
+        }
+
+        .user-account-button:hover {
+          background: linear-gradient(135deg, #388e3c 0%, #2e7d32 100%);
+          transform: translateY(-2px);
+          box-shadow: 0 6px 20px rgba(76, 175, 80, 0.4);
+          color: white;
+          border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .user-account-button:active {
+          transform: translateY(-1px);
+          box-shadow: 0 3px 12px rgba(76, 175, 80, 0.3);
+        }
+
         .profile-button {
           width: 36px;
           height: 36px;
@@ -179,7 +239,10 @@ export default function ProfileDropdown() {
           width: 32px;
           height: 32px;
           border-radius: 50%;
-          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          background: ${isLoggedIn 
+            ? 'linear-gradient(135deg, #4caf50 0%, #388e3c 100%)' 
+            : 'linear-gradient(135deg, #6b7280 0%, #4b5563 100%)'
+          };
           display: flex;
           align-items: center;
           justify-content: center;
@@ -252,7 +315,7 @@ export default function ProfileDropdown() {
           width: 40px;
           height: 40px;
           border-radius: 50%;
-          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          background: linear-gradient(135deg, #4caf50 0%, #388e3c 100%);
           display: flex;
           align-items: center;
           justify-content: center;
@@ -368,6 +431,24 @@ export default function ProfileDropdown() {
 
         .dropdown-content::-webkit-scrollbar-thumb:hover {
           background: #bdc1c6;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+          .user-account-button {
+            padding: 0.5rem 0.8rem;
+            font-size: 0.85rem;
+            border-radius: 10px;
+          }
+          
+          .user-account-button span {
+            display: none;
+          }
+          
+          .user-account-button svg {
+            width: 16px;
+            height: 16px;
+          }
         }
       `}</style>
     </div>

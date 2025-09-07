@@ -205,22 +205,6 @@ export default function UserDashboard() {
 
   return (
     <div className="dashboard-container">
-      {/* Header */}
-      <header className="dashboard-header">
-        <div className="dashboard-header-content">
-          <Link href="/" className="dashboard-logo">
-            <div className="dashboard-logo-icon">🌱</div>
-            <span className="dashboard-logo-text">Smart Garden IoT</span>
-          </Link>
-          <div className="dashboard-user-section">
-            <span className="dashboard-welcome">Welcome, {user?.firstName}</span>
-            <button onClick={logout} className="logout-button">
-              Logout
-            </button>
-          </div>
-        </div>
-      </header>
-
       {/* Main Content */}
       <main className="dashboard-main">
         {/* Dashboard Header */}
