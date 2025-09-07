@@ -34,36 +34,65 @@ export default function Navigation({ children = null }) {
     };
   }, [isMenuOpen]);
 
-  // Minimal app definitions - only core features
+  // Complete app definitions - IoT Smart Garden System
   const apps = [
     // Row 1 - Core Features
     {
-      name: 'Dashboard',
+      name: 'Home',
       href: '/',
       icon: '🏠',
-      gradient: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-      description: 'Home'
+      gradient: 'linear-gradient(135deg, #4caf50 0%, #388e3c 100%)',
+      description: 'Smart Garden Demo'
     },
+    {
+      name: 'Dashboard',
+      href: '/dashboard',
+      icon: '📱',
+      gradient: 'linear-gradient(135deg, #4caf50 0%, #388e3c 100%)',
+      description: 'IoT Dashboard'
+    },
+    {
+      name: 'Login',
+      href: '/auth/login',
+      icon: '🔐',
+      gradient: 'linear-gradient(135deg, #2196f3 0%, #1976d2 100%)',
+      description: 'User Login'
+    },
+    {
+      name: 'Register',
+      href: '/auth/register',
+      icon: '📝',
+      gradient: 'linear-gradient(135deg, #ff9800 0%, #f57c00 100%)',
+      description: 'Sign Up'
+    },
+    // Row 2 - Plant Features
     {
       name: 'Plants',
       href: '/plants',
       icon: '🌱',
-      gradient: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
+      gradient: 'linear-gradient(135deg, #4caf50 0%, #388e3c 100%)',
       description: 'Plant Database'
     },
     {
       name: 'Compare',
       href: '/plants/comparison',
       icon: '⚖️',
-      gradient: 'linear-gradient(135deg, #a8edea 0%, #fed6e3 100%)',
+      gradient: 'linear-gradient(135deg, #9c27b0 0%, #7b1fa2 100%)',
       description: 'Plant Comparison'
     },
     {
       name: 'Analytics',
       href: '/analytics',
       icon: '📊',
-      gradient: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+      gradient: 'linear-gradient(135deg, #607d8b 0%, #455a64 100%)',
       description: 'Data Analytics'
+    },
+    {
+      name: 'Settings',
+      href: '/settings',
+      icon: '⚙️',
+      gradient: 'linear-gradient(135deg, #795548 0%, #5d4037 100%)',
+      description: 'System Settings'
     }
   ];
 

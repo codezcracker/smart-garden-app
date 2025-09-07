@@ -1,0 +1,382 @@
+/* Animated Chart Styles */
+.animated-chart {
+  position: relative;
+  overflow: hidden;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.chart-line-animate {
+  stroke-dasharray: 1000;
+  stroke-dashoffset: 1000;
+  animation: drawLine 2s ease-in-out forwards;
+}
+
+.chart-point-animate {
+  opacity: 0;
+  animation: fadeInScale 0.5s ease-out forwards;
+}
+
+.chart-area-animate {
+  opacity: 0;
+  animation: fadeIn 1s ease-out 0.5s forwards;
+}
+
+@keyframes drawLine {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes fadeInScale {
+  from {
+    opacity: 0;
+    transform: scale(0);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* Bar Chart Styles */
+.bar-chart .bar-container {
+  display: flex;
+  align-items: end;
+  height: 100%;
+  gap: 4px;
+  padding: 8px;
+}
+
+.bar-item {
+  flex: 1;
+  position: relative;
+  border-radius: 4px 4px 0 0;
+  animation: growUp 0.8s ease-out forwards;
+  transform-origin: bottom;
+  transform: scaleY(0);
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding-top: 4px;
+}
+
+.bar-value {
+  font-size: 10px;
+  font-weight: 600;
+  color: white;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+@keyframes growUp {
+  to {
+    transform: scaleY(1);
+  }
+}
+
+/* Animated Progress Bar Styles */
+.animated-progress-container {
+  width: 100%;
+  margin: 8px 0;
+}
+
+.progress-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.progress-label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #374151;
+}
+
+.progress-value {
+  font-size: 14px;
+  font-weight: 700;
+  color: #1f2937;
+}
+
+.progress-bar-container {
+  position: relative;
+  height: 12px;
+  background: #e5e7eb;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.progress-bar {
+  height: 100%;
+  border-radius: 6px;
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+.progress-fill {
+  height: 100%;
+  border-radius: 6px;
+  position: relative;
+  transition: width 0.3s ease;
+}
+
+.progress-glow {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+.progress-dots {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  transform: translateY(-50%);
+  display: flex;
+  justify-content: center;
+  gap: 4px;
+}
+
+.progress-dot {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  animation: bounce 1s infinite;
+}
+
+@keyframes bounce {
+  0%, 20%, 50%, 80%, 100% {
+    transform: translateY(0);
+  }
+  40% {
+    transform: translateY(-8px);
+  }
+  60% {
+    transform: translateY(-4px);
+  }
+}
+
+.progress-status {
+  margin-top: 4px;
+  text-align: right;
+}
+
+.status-high {
+  color: #ef4444;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.status-low {
+  color: #f59e0b;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.status-normal {
+  color: #4caf50;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+/* Animated Gauge Styles */
+.animated-gauge {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.gauge-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.gauge-progress-animate {
+  stroke-dasharray: 283; /* 2 * π * 45 */
+  stroke-dashoffset: 283;
+  animation: drawGauge 2s ease-in-out forwards;
+}
+
+@keyframes drawGauge {
+  to {
+    stroke-dashoffset: var(--stroke-dashoffset);
+  }
+}
+
+.gauge-value {
+  font-size: 24px;
+  font-weight: 800;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.gauge-unit {
+  font-size: 12px;
+  font-weight: 600;
+  color: #6b7280;
+}
+
+.gauge-label {
+  margin-top: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #374151;
+  text-align: center;
+}
+
+.gauge-particles {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+}
+
+.gauge-particle {
+  position: absolute;
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  animation: float 2s infinite ease-in-out;
+}
+
+.gauge-particle:nth-child(1) { top: 20%; left: 30%; }
+.gauge-particle:nth-child(2) { top: 40%; left: 20%; }
+.gauge-particle:nth-child(3) { top: 60%; left: 25%; }
+.gauge-particle:nth-child(4) { top: 30%; right: 20%; }
+.gauge-particle:nth-child(5) { top: 50%; right: 25%; }
+.gauge-particle:nth-child(6) { top: 70%; right: 30%; }
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0) scale(1);
+    opacity: 0.7;
+  }
+  50% {
+    transform: translateY(-10px) scale(1.2);
+    opacity: 1;
+  }
+}
+
+/* Enhanced Sensor Cards */
+.sensor-card-enhanced {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.7));
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+.sensor-card-enhanced::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+  transition: left 0.6s ease;
+}
+
+.sensor-card-enhanced:hover::before {
+  left: 100%;
+}
+
+.sensor-card-enhanced:hover {
+  transform: translateY(-5px) scale(1.02);
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+}
+
+.sensor-value-animated {
+  font-size: 28px;
+  font-weight: 800;
+  margin: 0 0 8px 0;
+  background: linear-gradient(135deg, currentColor, rgba(255, 255, 255, 0.8));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: valuePulse 2s ease-in-out infinite;
+}
+
+@keyframes valuePulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+}
+
+/* Data Visualization Container */
+.data-viz-container {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
+  backdrop-filter: blur(15px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 16px;
+  padding: 20px;
+  margin: 16px 0;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+.data-viz-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: #1f2937;
+  margin: 0 0 16px 0;
+  text-align: center;
+}
+
+/* Real-time indicator */
+.realtime-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #4caf50;
+  background: rgba(76, 175, 80, 0.1);
+  padding: 4px 8px;
+  border-radius: 12px;
+  border: 1px solid rgba(76, 175, 80, 0.2);
+}
+
+.realtime-dot {
+  width: 6px;
+  height: 6px;
+  background: #4caf50;
+  border-radius: 50%;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(76, 175, 80, 0.7);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(76, 175, 80, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(76, 175, 80, 0);
+  }
+}

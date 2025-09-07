@@ -1,5 +1,9 @@
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import "./parallax/parallax.css";
+import "./auth/auth.css";
+import "./dashboard/dashboard.css";
+import "../components/AnimatedComponents.css";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { NotificationProvider } from "@/components/NotificationProvider";
 import Navigation from "@/components/Navigation";
