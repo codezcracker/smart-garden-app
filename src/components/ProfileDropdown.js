@@ -29,7 +29,7 @@ export default function ProfileDropdown({ user, isLoggedIn, theme, toggleTheme }
 
   const getProfileMenuItems = () => {
     if (isLoggedIn && user) {
-      return [
+      const baseMenuItems = [
         {
           label: 'My Profile',
           icon: '👤',
@@ -41,7 +41,63 @@ export default function ProfileDropdown({ user, isLoggedIn, theme, toggleTheme }
           icon: '⚙️',
           action: () => console.log('Navigate to account settings'),
           shortcut: 'Ctrl+,'
-        },
+        }
+      ];
+
+      // Add role-specific menu items
+      if (user.role === 'super_admin') {
+        baseMenuItems.push(
+          { type: 'divider' },
+          {
+            label: 'Admin Panel',
+            icon: '👑',
+            action: () => window.location.href = '/admin',
+            shortcut: 'Ctrl+A'
+          },
+          {
+            label: 'User Management',
+            icon: '👥',
+            action: () => window.location.href = '/admin/users',
+            shortcut: 'Ctrl+U'
+          },
+          {
+            label: 'Manager Control',
+            icon: '👨‍💼',
+            action: () => window.location.href = '/admin/managers',
+            shortcut: 'Ctrl+M'
+          },
+          {
+            label: 'System Analytics',
+            icon: '📈',
+            action: () => window.location.href = '/admin/analytics',
+            shortcut: 'Ctrl+S'
+          }
+        );
+      } else if (user.role === 'manager') {
+        baseMenuItems.push(
+          { type: 'divider' },
+          {
+            label: 'Manager Panel',
+            icon: '👨‍💼',
+            action: () => window.location.href = '/manager',
+            shortcut: 'Ctrl+M'
+          },
+          {
+            label: 'My Clients',
+            icon: '👥',
+            action: () => window.location.href = '/manager/clients',
+            shortcut: 'Ctrl+C'
+          },
+          {
+            label: 'Client Analytics',
+            icon: '📊',
+            action: () => window.location.href = '/manager/analytics',
+            shortcut: 'Ctrl+A'
+          }
+        );
+      }
+
+      baseMenuItems.push(
         { type: 'divider' },
         {
           label: 'Sign Out',
@@ -49,7 +105,9 @@ export default function ProfileDropdown({ user, isLoggedIn, theme, toggleTheme }
           action: handleLogout,
           danger: true
         }
-      ];
+      );
+
+      return baseMenuItems;
     } else {
       return [
         {

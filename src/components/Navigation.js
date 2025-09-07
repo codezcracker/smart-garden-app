@@ -71,8 +71,8 @@ export default function Navigation({ children = null }) {
   // Dynamic app definitions based on login status
   const getApps = () => {
     if (isLoggedIn) {
-      // Apps for logged-in users - user-specific features
-      return [
+      // Base apps for all logged-in users
+      const baseApps = [
         {
           name: 'Dashboard',
           href: '/dashboard',
@@ -109,6 +109,66 @@ export default function Navigation({ children = null }) {
           description: 'My Garden'
         }
       ];
+
+      // Add role-specific apps
+      if (user && user.role === 'super_admin') {
+        baseApps.push(
+          {
+            name: 'Admin Panel',
+            href: '/admin',
+            icon: '👑',
+            gradient: 'linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%)',
+            description: 'Super Admin Panel'
+          },
+          {
+            name: 'User Management',
+            href: '/admin/users',
+            icon: '👥',
+            gradient: 'linear-gradient(135deg, #a55eea 0%, #8b5cf6 100%)',
+            description: 'Manage All Users'
+          },
+          {
+            name: 'Manager Control',
+            href: '/admin/managers',
+            icon: '👨‍💼',
+            gradient: 'linear-gradient(135deg, #ff9a56 0%, #ff6b6b 100%)',
+            description: 'Manage Managers'
+          },
+          {
+            name: 'System Analytics',
+            href: '/admin/analytics',
+            icon: '📈',
+            gradient: 'linear-gradient(135deg, #26de81 0%, #20bf6b 100%)',
+            description: 'System-wide Analytics'
+          }
+        );
+      } else if (user && user.role === 'manager') {
+        baseApps.push(
+          {
+            name: 'Manager Panel',
+            href: '/manager',
+            icon: '👨‍💼',
+            gradient: 'linear-gradient(135deg, #ff9a56 0%, #ff6b6b 100%)',
+            description: 'Manager Dashboard'
+          },
+          {
+            name: 'My Clients',
+            href: '/manager/clients',
+            icon: '👥',
+            gradient: 'linear-gradient(135deg, #a55eea 0%, #8b5cf6 100%)',
+            description: 'Manage Assigned Clients'
+          },
+          {
+            name: 'Client Analytics',
+            href: '/manager/analytics',
+            icon: '📊',
+            gradient: 'linear-gradient(135deg, #26de81 0%, #20bf6b 100%)',
+            description: 'Client Analytics'
+          }
+        );
+      }
+
+      return baseApps;
     } else {
       // Apps for non-logged-in users - public features
       return [

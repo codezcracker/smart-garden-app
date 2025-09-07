@@ -8,37 +8,14 @@ const client = new MongoClient(uri);
 
 export async function POST(request) {
   try {
-    const { email, password, homeAddress, firstName, lastName, role = 'user' } = await request.json();
+    const { email, password, firstName, lastName, homeAddress } = await request.json();
 
     // Validate input
-    if (!email || !password || !homeAddress || !firstName || !lastName) {
+    if (!email || !password || !firstName || !lastName || !homeAddress) {
       return NextResponse.json(
         { error: 'All fields are required' },
         { status: 400 }
       );
-    }
-
-    // Validate role
-    if (!['user', 'manager', 'super_admin'].includes(role)) {
-      return NextResponse.json(
-        { error: 'Invalid role. Must be "user", "manager", or "super_admin"' },
-        { status: 400 }
-      );
-    }
-
-    // Check if trying to create super_admin (only allow if no super_admin exists)
-    if (role === 'super_admin') {
-      await client.connect();
-      const db = client.db('smart_garden_iot');
-      const usersCollection = db.collection('users');
-      
-      const existingSuperAdmin = await usersCollection.findOne({ role: 'super_admin' });
-      if (existingSuperAdmin) {
-        return NextResponse.json(
-          { error: 'Super admin already exists. Only one super admin is allowed.' },
-          { status: 403 }
-        );
-      }
     }
 
     // Validate email format
@@ -62,6 +39,15 @@ export async function POST(request) {
     const db = client.db('smart_garden_iot');
     const usersCollection = db.collection('users');
 
+    // Check if super admin already exists
+    const existingSuperAdmin = await usersCollection.findOne({ role: 'super_admin' });
+    if (existingSuperAdmin) {
+      return NextResponse.json(
+        { error: 'Super admin already exists. Only one super admin is allowed.' },
+        { status: 403 }
+      );
+    }
+
     // Check if user already exists
     const existingUser = await usersCollection.findOne({ email });
     if (existingUser) {
@@ -75,31 +61,31 @@ export async function POST(request) {
     const saltRounds = 12;
     const passwordHash = await bcrypt.hash(password, saltRounds);
 
-    // Create user
-    const newUser = {
+    // Create super admin user
+    const superAdmin = {
       email,
       passwordHash,
       firstName,
       lastName,
       homeAddress,
-      subscriptionPlan: role === 'super_admin' ? 'premium' : (role === 'manager' ? 'premium' : 'basic'),
-      role: role,
-      isVerified: role === 'super_admin' ? true : false, // Auto-verify super admin
-      managedUsers: role === 'manager' ? [] : undefined, // Managers can have assigned users
-      assignedBy: role === 'manager' ? null : undefined, // Track who assigned this manager
+      subscriptionPlan: 'premium',
+      role: 'super_admin',
+      isVerified: true,
+      managedUsers: [],
+      assignedBy: null,
       devices: [],
       createdAt: new Date(),
       updatedAt: new Date()
     };
 
-    const result = await usersCollection.insertOne(newUser);
+    const result = await usersCollection.insertOne(superAdmin);
 
     // Generate JWT token
     const token = jwt.sign(
       { 
         userId: result.insertedId,
         email: email,
-        role: role
+        role: 'super_admin'
       },
       process.env.JWT_SECRET || 'your-secret-key',
       { expiresIn: '24h' }
@@ -112,20 +98,20 @@ export async function POST(request) {
       firstName,
       lastName,
       homeAddress,
-      subscriptionPlan: role === 'super_admin' ? 'premium' : (role === 'manager' ? 'premium' : 'basic'),
-      role: role,
-      managedUsers: role === 'manager' ? [] : undefined,
-      assignedBy: role === 'manager' ? null : undefined
+      subscriptionPlan: 'premium',
+      role: 'super_admin',
+      managedUsers: [],
+      assignedBy: null
     };
 
     return NextResponse.json({
-      message: 'User registered successfully',
+      message: 'Super admin created successfully',
       user: userResponse,
       token
     }, { status: 201 });
 
   } catch (error) {
-    console.error('Registration error:', error);
+    console.error('Super admin setup error:', error);
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
