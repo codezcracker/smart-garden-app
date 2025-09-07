@@ -47,7 +47,7 @@ export async function POST(request) {
     }
 
     await client.connect();
-    const db = client.db('smart_garden_iot');
+    const db = client.db('smartGardenDB');
     const usersCollection = db.collection('users');
 
     // Verify user exists and is a regular user
@@ -167,7 +167,7 @@ export async function DELETE(request) {
     }
 
     await client.connect();
-    const db = client.db('smart_garden_iot');
+    const db = client.db('smartGardenDB');
     const usersCollection = db.collection('users');
 
     // Remove user from manager's managedUsers array

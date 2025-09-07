@@ -45,7 +45,7 @@ export async function POST(request) {
     }
 
     await client.connect();
-    const db = client.db('smart_garden_iot');
+    const db = client.db('smartGardenDB');
     const devicesCollection = db.collection('devices');
     const commandsCollection = db.collection('control_commands');
 
@@ -177,7 +177,7 @@ export async function GET(request) {
     const limit = parseInt(url.searchParams.get('limit')) || 50;
 
     await client.connect();
-    const db = client.db('smart_garden_iot');
+    const db = client.db('smartGardenDB');
     const devicesCollection = db.collection('devices');
     const commandsCollection = db.collection('control_commands');
 
@@ -245,7 +245,7 @@ export async function PATCH(request) {
     }
 
     await client.connect();
-    const db = client.db('smart_garden_iot');
+    const db = client.db('smartGardenDB');
     const devicesCollection = db.collection('devices');
     const commandsCollection = db.collection('control_commands');
 

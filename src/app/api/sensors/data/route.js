@@ -54,7 +54,7 @@ export async function POST(request) {
     }
 
     await client.connect();
-    const db = client.db('smart_garden_iot');
+    const db = client.db('smartGardenDB');
     const devicesCollection = db.collection('devices');
     const sensorDataCollection = db.collection('sensor_readings');
 
@@ -189,7 +189,7 @@ export async function GET(request) {
     const limit = parseInt(url.searchParams.get('limit')) || 100;
 
     await client.connect();
-    const db = client.db('smart_garden_iot');
+    const db = client.db('smartGardenDB');
     const devicesCollection = db.collection('devices');
     const sensorDataCollection = db.collection('sensor_readings');
 

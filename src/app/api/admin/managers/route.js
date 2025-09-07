@@ -38,7 +38,7 @@ export async function GET(request) {
     }
 
     await client.connect();
-    const db = client.db('smart_garden_iot');
+    const db = client.db('smartGardenDB');
     const usersCollection = db.collection('users');
 
     // Fetch all managers (excluding password hashes)

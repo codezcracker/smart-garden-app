@@ -46,7 +46,7 @@ export async function POST(request) {
     }
 
     await client.connect();
-    const db = client.db('smart_garden_iot');
+    const db = client.db('smartGardenDB');
     const devicesCollection = db.collection('devices');
     const usersCollection = db.collection('users');
 
@@ -136,7 +136,7 @@ export async function GET(request) {
     const userId = decoded.userId;
 
     await client.connect();
-    const db = client.db('smart_garden_iot');
+    const db = client.db('smartGardenDB');
     const devicesCollection = db.collection('devices');
 
     // Get user's devices
