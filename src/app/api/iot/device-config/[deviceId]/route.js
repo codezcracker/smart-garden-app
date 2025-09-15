@@ -50,8 +50,24 @@ export async function GET(request, { params }) {
         reconnectAttempts: 3,
         timeout: 5000
       },
-      lastUpdated: device.updatedAt || device.createdAt
+      lastUpdated: device.updatedAt || device.createdAt,
+      configUpdateRequested: device.configUpdateRequested || false,
+      lastConfigUpdateRequest: device.lastConfigUpdateRequest || null
     };
+    
+    // Clear the config update requested flag since we're sending the config
+    if (device.configUpdateRequested) {
+      await db.collection('devices').updateOne(
+        { deviceId },
+        { 
+          $unset: { 
+            configUpdateRequested: "",
+            lastConfigUpdateRequest: ""
+          }
+        }
+      );
+      console.log('🔄 Device Config API: Cleared force update flag for', deviceId);
+    }
     
     console.log('📱 Device Config API: Sending config for', deviceId);
     

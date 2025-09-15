@@ -64,6 +64,13 @@ void loop() {
     lastConfigFetch = currentTime;
   }
   
+  // Check for force update signal (every 30 seconds)
+  static unsigned long lastForceCheck = 0;
+  if (currentTime - lastForceCheck > 30000) {
+    checkForForceUpdate();
+    lastForceCheck = currentTime;
+  }
+  
   // Send data if interval has passed
   if (currentTime - lastSend > sendInterval) {
     if (serverConnected) {
@@ -151,6 +158,32 @@ void loadDeviceConfiguration() {
     serverURL = "http://192.168.68.58:3000";
     
     configLoaded = true;
+  }
+  
+  http.end();
+}
+
+void checkForForceUpdate() {
+  Serial.println("🔍 Checking for force update signal...");
+  
+  WiFiClient client;
+  HTTPClient http;
+  http.setTimeout(3000);
+  
+  String configURL = "http://192.168.68.58:3000/api/iot/device-config/" + String(currentDeviceID.isEmpty() ? DEFAULT_DEVICE_ID : currentDeviceID);
+  http.begin(client, configURL);
+  
+  int httpCode = http.GET();
+  
+  if (httpCode == HTTP_CODE_OK) {
+    String payload = http.getString();
+    DynamicJsonDocument doc(2048);
+    DeserializationError error = deserializeJson(doc, payload);
+    
+    if (!error && doc["configUpdateRequested"].as<bool>()) {
+      Serial.println("🚨 Force update signal received! Reloading configuration...");
+      loadDeviceConfiguration();
+    }
   }
   
   http.end();
