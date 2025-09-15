@@ -26,7 +26,7 @@ export default function RealtimeIoTDashboard() {
       const data = await response.json();
       
       if (data.success && data.devices) {
-        const device = data.devices.find(d => d.deviceId === 'DB1');
+              const device = data.devices.find(d => d.deviceId === 'DB007');
         
         if (device) {
           const isOnline = device.status === 'online';
@@ -91,10 +91,17 @@ export default function RealtimeIoTDashboard() {
       const data = await response.json();
       
       if (data.success && data.latestData.length > 0) {
-        setDeviceData(data.latestData[0]);
-        setLastUpdate(new Date());
-        setError(null);
-        console.log('📊 FetchDeviceData: Data received, NOT changing status (let checkDeviceStatus handle it)');
+        // Find data for DB007 device
+        const deviceData = data.latestData.find(d => d.deviceId === 'DB007');
+        if (deviceData) {
+          setDeviceData(deviceData);
+          setLastUpdate(new Date());
+          setError(null);
+          console.log('📊 FetchDeviceData: DB007 data received');
+        } else {
+          console.log('📊 FetchDeviceData: No DB007 data found');
+          setError('No DB007 device data available');
+        }
         // Don't set deviceStatus here - let checkDeviceStatus handle it
       } else {
         setError('No device data available');

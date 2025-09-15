@@ -16,7 +16,7 @@
 // Configuration - Change these for your network
 const char* ssid = "Qureshi Deco";           // ← Change this
 const char* password = "65327050";   // ← Change this
-const char* deviceID = "DB2";                  // ← Change this for each device
+const char* deviceID = "DB007";                  // ← Change this for each device
 
 // Server discovery settings
 String knownServerIPs[] = {
