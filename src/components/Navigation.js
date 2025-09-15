@@ -114,6 +114,13 @@ export default function Navigation({ children = null }) {
           icon: '🌱',
           gradient: 'linear-gradient(135deg, #4caf50 0%, #388e3c 100%)',
           description: 'My Garden'
+        },
+        {
+          name: 'Device Config',
+          href: '/profile/device-config',
+          icon: '🔧',
+          gradient: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+          description: 'Configure IoT Devices'
         }
       ];
 
