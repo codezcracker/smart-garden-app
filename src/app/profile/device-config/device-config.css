@@ -67,6 +67,12 @@
   border-bottom: 2px solid #e5e7eb;
 }
 
+.header-actions {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+
 .section-header h2 {
   font-size: 1.8rem;
   margin: 0;

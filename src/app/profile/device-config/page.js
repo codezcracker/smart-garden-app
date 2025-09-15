@@ -27,6 +27,7 @@ export default function DeviceConfigPage() {
   });
 
   useEffect(() => {
+    console.log('🔧 Device Config Page: Component mounted, fetching devices...');
     fetchDevices();
   }, []);
 
@@ -135,6 +136,28 @@ export default function DeviceConfigPage() {
         console.error('Error deleting device:', error);
         alert('Error deleting device');
       }
+    }
+  };
+
+  const testAPI = async () => {
+    try {
+      console.log('🔍 Testing API connection...');
+      
+      // Test devices API
+      const devicesResponse = await fetch('/api/iot/devices');
+      const devicesData = await devicesResponse.json();
+      console.log('📱 Devices API Response:', devicesData);
+      
+      // Test device config API
+      const configResponse = await fetch('/api/iot/device-config/DB007');
+      const configData = await configResponse.json();
+      console.log('⚙️ Config API Response:', configData);
+      
+      alert(`API Test Results:\n\nDevices API: ${devicesData.success ? '✅ Working' : '❌ Failed'}\nConfig API: ${configData.success ? '✅ Working' : '❌ Failed'}\n\nCheck console for details.`);
+      
+    } catch (error) {
+      console.error('❌ API Test Error:', error);
+      alert('API Test Failed: ' + error.message);
     }
   };
 
@@ -360,12 +383,28 @@ void sendData() {
       <div className="devices-section">
         <div className="section-header">
           <h2>Connected Devices ({devices.length})</h2>
-          <button 
-            className="btn btn-primary"
-            onClick={handleAddDevice}
-          >
-            ➕ Add Device
-          </button>
+          <div className="header-actions">
+            <button 
+              className="btn btn-secondary"
+              onClick={fetchDevices}
+              title="Refresh device list"
+            >
+              🔄 Refresh
+            </button>
+            <button 
+              className="btn btn-info"
+              onClick={testAPI}
+              title="Test API connection"
+            >
+              🔍 Test API
+            </button>
+            <button 
+              className="btn btn-primary"
+              onClick={handleAddDevice}
+            >
+              ➕ Add Device
+            </button>
+          </div>
         </div>
 
         {devices.length === 0 ? (
