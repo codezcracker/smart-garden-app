@@ -33,14 +33,19 @@ export default function DeviceConfigPage() {
   const fetchDevices = async () => {
     try {
       setLoading(true);
-      const response = await fetch('/api/iot/check-status');
+      const response = await fetch('/api/iot/devices');
       const data = await response.json();
       
       if (data.success && data.devices) {
         setDevices(data.devices);
+        console.log('📱 Fetched devices:', data.devices);
+      } else {
+        console.log('📱 No devices found or API error:', data);
+        setDevices([]);
       }
     } catch (error) {
-      console.error('Error fetching devices:', error);
+      console.error('❌ Error fetching devices:', error);
+      setDevices([]);
     } finally {
       setLoading(false);
     }
@@ -86,6 +91,8 @@ export default function DeviceConfigPage() {
 
   const handleSaveDevice = async () => {
     try {
+      console.log('💾 Saving device data:', formData);
+      
       const response = await fetch('/api/iot/devices', {
         method: 'POST',
         headers: {
@@ -94,16 +101,20 @@ export default function DeviceConfigPage() {
         body: JSON.stringify(formData),
       });
 
-      if (response.ok) {
+      const responseData = await response.json();
+      console.log('📡 API Response:', responseData);
+
+      if (response.ok && responseData.success) {
         setShowAddForm(false);
         fetchDevices();
         alert('Device configuration saved successfully!');
       } else {
-        alert('Error saving device configuration');
+        console.error('❌ Save failed:', responseData);
+        alert(`Error saving device configuration: ${responseData.error || 'Unknown error'}`);
       }
     } catch (error) {
-      console.error('Error saving device:', error);
-      alert('Error saving device configuration');
+      console.error('❌ Error saving device:', error);
+      alert('Error saving device configuration: ' + error.message);
     }
   };
 
