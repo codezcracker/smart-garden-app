@@ -138,6 +138,29 @@ export default function DeviceConfigPage() {
     }
   };
 
+  const forceConfigUpdate = async (deviceId) => {
+    try {
+      console.log('🔄 Forcing config update for device:', deviceId);
+      
+      // Send a special signal to the device to fetch new config
+      const response = await fetch(`/api/iot/device-config/${deviceId}/force-update`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (response.ok) {
+        alert('Configuration update signal sent to device! Device will fetch new config within 5 minutes.');
+      } else {
+        alert('Failed to send config update signal to device.');
+      }
+    } catch (error) {
+      console.error('❌ Error forcing config update:', error);
+      alert('Error sending config update signal: ' + error.message);
+    }
+  };
+
   const generateDeviceCode = (device) => {
     const code = `/*
  * Smart Garden IoT - Device: ${device.deviceName || device.deviceId}
@@ -391,6 +414,12 @@ void sendData() {
                     <span className="label">WiFi RSSI:</span>
                     <span className="value">{device.wifiRSSI || 'N/A'} dBm</span>
                   </div>
+                  <div className="detail-item">
+                    <span className="label">Config Status:</span>
+                    <span className="value" style={{ color: device.configLoaded ? '#10b981' : '#ef4444' }}>
+                      {device.configLoaded ? '✅ Loaded' : '❌ Not Loaded'}
+                    </span>
+                  </div>
                 </div>
 
                 <div className="device-actions">
@@ -405,6 +434,12 @@ void sendData() {
                     onClick={() => generateDeviceCode(device)}
                   >
                     📥 Download Code
+                  </button>
+                  <button 
+                    className="btn btn-info"
+                    onClick={() => forceConfigUpdate(device.deviceId)}
+                  >
+                    🔄 Force Update
                   </button>
                   <button 
                     className="btn btn-danger"
