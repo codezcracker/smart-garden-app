@@ -1,0 +1,59 @@
+[
+  {
+    "_id": "68bdef8d874e3bf487c84c04",
+    "userId": "68bdef8d874e3bf487c84c03",
+    "deviceName": "Demo Garden Controller",
+    "macAddress": "AA:BB:CC:DD:EE:FF",
+    "deviceType": "ESP32_CONTROLLER",
+    "location": "Backyard Garden",
+    "status": "online",
+    "firmwareVersion": "1.0.0",
+    "lastSeen": "2025-09-07T20:48:13.517Z",
+    "sensors": {
+      "soilMoisture": {
+        "enabled": true,
+        "calibration": {
+          "min": 0,
+          "max": 1024
+        }
+      },
+      "temperature": {
+        "enabled": true,
+        "calibration": {
+          "offset": 0
+        }
+      },
+      "humidity": {
+        "enabled": true,
+        "calibration": {
+          "offset": 0
+        }
+      },
+      "lightLevel": {
+        "enabled": true,
+        "calibration": {
+          "min": 0,
+          "max": 1024
+        }
+      }
+    },
+    "actuators": {
+      "waterPump": {
+        "enabled": true,
+        "settings": {
+          "maxDuration": 300
+        }
+      },
+      "ledLights": {
+        "enabled": true,
+        "settings": {
+          "brightness": 80
+        }
+      }
+    },
+    "automationRules": [],
+    "createdAt": "2025-09-07T20:48:13.517Z",
+    "updatedAt": "2025-09-07T20:48:13.517Z",
+    "migratedAt": "2025-09-07T22:47:44.497Z"
+  }
+]

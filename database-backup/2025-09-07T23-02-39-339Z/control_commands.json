@@ -1,0 +1,32 @@
+[
+  {
+    "_id": "68bdf183852437a93979e255",
+    "deviceId": "68bdef8d874e3bf487c84c04",
+    "userId": "68bdef8d874e3bf487c84c03",
+    "action": "water",
+    "parameters": {
+      "duration": 30
+    },
+    "status": "sent",
+    "createdAt": "2025-09-07T20:56:35.332Z",
+    "sentAt": "2025-09-07T20:56:35.541Z",
+    "completedAt": null,
+    "response": null,
+    "migratedAt": "2025-09-07T22:47:45.234Z"
+  },
+  {
+    "_id": "68bdf18b852437a93979e256",
+    "deviceId": "68bdef8d874e3bf487c84c04",
+    "userId": "68bdef8d874e3bf487c84c03",
+    "action": "light_on",
+    "parameters": {
+      "brightness": 80
+    },
+    "status": "sent",
+    "createdAt": "2025-09-07T20:56:43.219Z",
+    "sentAt": "2025-09-07T20:56:43.384Z",
+    "completedAt": null,
+    "response": null,
+    "migratedAt": "2025-09-07T22:47:45.234Z"
+  }
+]

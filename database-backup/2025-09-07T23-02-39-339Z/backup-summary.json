@@ -1,0 +1,32 @@
+{
+  "database": "smartGardenDB",
+  "timestamp": "2025-09-07T23:02:39.407Z",
+  "collections": {
+    "users": {
+      "count": 2,
+      "file": "users.json",
+      "size": "0.00"
+    },
+    "sensor_readings": {
+      "count": 5,
+      "file": "sensor_readings.json",
+      "size": "0.00"
+    },
+    "control_commands": {
+      "count": 2,
+      "file": "control_commands.json",
+      "size": "0.00"
+    },
+    "plants_collection": {
+      "count": 390000,
+      "file": "plants_collection-chunked",
+      "type": "chunked"
+    },
+    "devices": {
+      "count": 1,
+      "file": "devices.json",
+      "size": "0.00"
+    }
+  },
+  "totalDocuments": 390010
+}

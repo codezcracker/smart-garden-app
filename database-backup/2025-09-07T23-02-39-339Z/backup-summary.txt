@@ -1,0 +1,16 @@
+Smart Garden Database Backup Summary
+====================================
+Date: 2025-09-07T23:06:23.609Z
+Database: smartGardenDB
+Backup Directory: /Users/mano/Desktop/smart-garden-app/database-backup/2025-09-07T23-02-39-339Z
+Total Collections: 5
+Total Documents: 390,010
+
+Collections:
+users: 2 documents (users.json) - 0.00 MB
+sensor_readings: 5 documents (sensor_readings.json) - 0.00 MB
+control_commands: 2 documents (control_commands.json) - 0.00 MB
+plants_collection: 390,000 documents (plants_collection-chunked)
+devices: 1 documents (devices.json) - 0.00 MB
+
+Backup completed successfully!

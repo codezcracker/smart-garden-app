@@ -1,0 +1,35 @@
+[
+  {
+    "_id": "68bdef8d874e3bf487c84c03",
+    "email": "demo@smartgarden.com",
+    "passwordHash": "$2b$12$U6BKyQYwLy8kR6GjsIxsn.qSOjT7d8ABiUI28prXUVxAat.I7oOC2",
+    "firstName": "Demo",
+    "lastName": "User",
+    "homeAddress": "123 Smart Garden Street, IoT City, Tech State 12345",
+    "subscriptionPlan": "premium",
+    "role": "user",
+    "isVerified": true,
+    "devices": [
+      "68bdef8d874e3bf487c84c04"
+    ],
+    "createdAt": "2025-09-07T20:48:13.434Z",
+    "updatedAt": "2025-09-07T20:48:13.588Z",
+    "lastLogin": "2025-09-07T22:48:47.555Z",
+    "migratedAt": "2025-09-07T22:47:44.174Z"
+  },
+  {
+    "_id": "68be0216ba6062ac415ca363",
+    "email": "codez.cracker@gmail.com",
+    "passwordHash": "$2b$12$UVZqEO6vbztUkAhwzhAEy.ZBZDxWmCucdmsnXvVck370J01OluSAe",
+    "firstName": "Arshad",
+    "lastName": "Mehmood",
+    "homeAddress": "villa no 33, zinnia block, damac hills 2, dubai, UAE",
+    "subscriptionPlan": "premium",
+    "role": "super_admin",
+    "isVerified": true,
+    "devices": [],
+    "createdAt": "2025-09-07T22:07:18.744Z",
+    "updatedAt": "2025-09-07T22:07:18.744Z",
+    "migratedAt": "2025-09-07T22:47:44.237Z"
+  }
+]

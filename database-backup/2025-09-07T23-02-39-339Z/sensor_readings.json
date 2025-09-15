@@ -1,0 +1,52 @@
+[
+  {
+    "_id": "68bdef8d874e3bf487c84c05",
+    "deviceId": "68bdef8d874e3bf487c84c04",
+    "timestamp": "2025-09-07T20:48:13.632Z",
+    "sensorType": "soil_moisture",
+    "value": 65,
+    "unit": "percentage",
+    "rawValue": 650,
+    "migratedAt": "2025-09-07T22:47:44.786Z"
+  },
+  {
+    "_id": "68bdef8d874e3bf487c84c06",
+    "deviceId": "68bdef8d874e3bf487c84c04",
+    "timestamp": "2025-09-07T20:48:13.632Z",
+    "sensorType": "temperature",
+    "value": 24.5,
+    "unit": "celsius",
+    "rawValue": 24.5,
+    "migratedAt": "2025-09-07T22:47:44.786Z"
+  },
+  {
+    "_id": "68bdef8d874e3bf487c84c07",
+    "deviceId": "68bdef8d874e3bf487c84c04",
+    "timestamp": "2025-09-07T20:48:13.632Z",
+    "sensorType": "humidity",
+    "value": 60,
+    "unit": "percentage",
+    "rawValue": 60,
+    "migratedAt": "2025-09-07T22:47:44.786Z"
+  },
+  {
+    "_id": "68bdef8d874e3bf487c84c08",
+    "deviceId": "68bdef8d874e3bf487c84c04",
+    "timestamp": "2025-09-07T20:48:13.632Z",
+    "sensorType": "light_level",
+    "value": 75,
+    "unit": "percentage",
+    "rawValue": 750,
+    "migratedAt": "2025-09-07T22:47:44.786Z"
+  },
+  {
+    "_id": "68bdef8d874e3bf487c84c09",
+    "deviceId": "68bdef8d874e3bf487c84c04",
+    "timestamp": "2025-09-07T20:48:13.632Z",
+    "sensorType": "battery_level",
+    "value": 85,
+    "unit": "percentage",
+    "rawValue": 85,
+    "migratedAt": "2025-09-07T22:47:44.786Z"
+  }
+]

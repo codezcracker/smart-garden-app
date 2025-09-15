@@ -81,6 +81,13 @@ export default function Navigation({ children = null }) {
           description: 'IoT Dashboard'
         },
         {
+          name: 'IoT Device',
+          href: '/iot-device',
+          icon: '🔧',
+          gradient: 'linear-gradient(135deg, #ff9800 0%, #f57c00 100%)',
+          description: 'Device Design'
+        },
+        {
           name: 'Analytics',
           href: '/analytics',
           icon: '📊',
