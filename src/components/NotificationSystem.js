@@ -67,17 +67,7 @@ const NotificationSystem = () => {
   return (
     <div className="notification-container">
       {notifications.length > 0 && (
-        <div style={{
-          position: 'fixed',
-          top: '10px',
-          right: '10px',
-          background: '#4caf50',
-          color: 'white',
-          padding: '4px 8px',
-          borderRadius: '4px',
-          fontSize: '12px',
-          zIndex: 10000
-        }}>
+        <div className="notification-counter">
           🔔 {notifications.length} notification(s)
         </div>
       )}
@@ -85,52 +75,22 @@ const NotificationSystem = () => {
         <div
           key={notification.id}
           className="notification"
-          style={{ 
-            backgroundColor: getNotificationColor(notification.type),
-            color: 'white',
-            padding: '12px 16px',
-            margin: '8px 0',
-            borderRadius: '8px',
-            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '12px',
-            minWidth: '300px',
-            maxWidth: '500px',
-            animation: 'slideInRight 0.3s ease-out',
-            position: 'relative',
-            zIndex: 1000
-          }}
+          style={{ backgroundColor: getNotificationColor(notification.type) }}
         >
-          <span style={{ fontSize: '18px' }}>
+          <span className="notification-icon">
             {getNotificationIcon(notification.type)}
           </span>
-          <div style={{ flex: 1 }}>
-            <div style={{ fontWeight: '500', marginBottom: '4px' }}>
+          <div className="notification-content">
+            <div className="notification-message">
               {notification.message}
             </div>
-            <div style={{ 
-              fontSize: '12px', 
-              opacity: 0.8,
-              fontFamily: 'monospace'
-            }}>
+            <div className="notification-time">
               {notification.timestamp.toLocaleTimeString()}
             </div>
           </div>
           <button
+            className="notification-close"
             onClick={() => removeNotification(notification.id)}
-            style={{
-              background: 'none',
-              border: 'none',
-              color: 'white',
-              cursor: 'pointer',
-              fontSize: '18px',
-              padding: '4px',
-              opacity: 0.7,
-              transition: 'opacity 0.2s'
-            }}
-            onMouseOver={(e) => e.target.style.opacity = '1'}
-            onMouseOut={(e) => e.target.style.opacity = '0.7'}
           >
             ×
           </button>
@@ -144,10 +104,74 @@ const NotificationSystem = () => {
           right: 20px;
           z-index: 9999;
           pointer-events: none;
+          display: flex;
+          flex-direction: column;
+          align-items: flex-end;
+          gap: 8px;
+        }
+        
+        .notification-counter {
+          position: fixed;
+          top: 10px;
+          right: 10px;
+          background: #4caf50;
+          color: white;
+          padding: 4px 8px;
+          border-radius: 4px;
+          font-size: 12px;
+          z-index: 10000;
+          pointer-events: none;
         }
         
         .notification {
           pointer-events: auto;
+          color: white;
+          padding: 12px 16px;
+          border-radius: 8px;
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          min-width: 300px;
+          max-width: 500px;
+          animation: slideInRight 0.3s ease-out;
+          position: relative;
+        }
+        
+        .notification-icon {
+          font-size: 18px;
+          flex-shrink: 0;
+        }
+        
+        .notification-content {
+          flex: 1;
+        }
+        
+        .notification-message {
+          font-weight: 500;
+          margin-bottom: 4px;
+        }
+        
+        .notification-time {
+          font-size: 12px;
+          opacity: 0.8;
+          font-family: monospace;
+        }
+        
+        .notification-close {
+          background: none;
+          border: none;
+          color: white;
+          cursor: pointer;
+          font-size: 18px;
+          padding: 4px;
+          opacity: 0.7;
+          transition: opacity 0.2s;
+          flex-shrink: 0;
+        }
+        
+        .notification-close:hover {
+          opacity: 1;
         }
         
         @keyframes slideInRight {
