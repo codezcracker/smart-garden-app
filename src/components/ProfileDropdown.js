@@ -301,6 +301,7 @@ export default function ProfileDropdown({ user, isLoggedIn, theme, toggleTheme }
           justify-content: center;
           border: 2px solid #e8eaed;
           transition: all 0.2s ease;
+          overflow: visible;
         }
 
         .profile-button:hover .profile-avatar {
@@ -317,13 +318,28 @@ export default function ProfileDropdown({ user, isLoggedIn, theme, toggleTheme }
 
         .status-indicator {
           position: absolute;
-          bottom: 2px;
-          right: 2px;
-          width: 8px;
-          height: 8px;
+          bottom: -1px;
+          right: -1px;
+          width: 12px;
+          height: 12px;
           background: #34a853;
           border: 2px solid white;
           border-radius: 50%;
+          z-index: 10;
+          box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.1);
+          animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+          0% {
+            box-shadow: 0 0 0 0 rgba(52, 168, 83, 0.7);
+          }
+          70% {
+            box-shadow: 0 0 0 4px rgba(52, 168, 83, 0);
+          }
+          100% {
+            box-shadow: 0 0 0 0 rgba(52, 168, 83, 0);
+          }
         }
 
         .profile-dropdown-content {
