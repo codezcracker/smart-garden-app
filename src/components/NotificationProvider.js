@@ -5,6 +5,7 @@
 const NotificationContext = createContext(undefined);
 
         export function NotificationProvider({ children }) {
+          // Remove persistent notifications - only use toast notifications
           const [notifications, setNotifications] = useState([]);
           
           // Clear notifications on page load/refresh
@@ -13,30 +14,20 @@ const NotificationContext = createContext(undefined);
             setNotifications([]);
           }, []);
 
-  const unreadCount = notifications.filter(n => !n.read).length;
+  // Simplified notification management - no persistent storage
+  const unreadCount = 0; // Always 0 since we don't store notifications
 
   const markAsRead = (id) => {
-    setNotifications(prev => 
-      prev.map(notification => 
-        notification.id === id ? { ...notification, read: true } : notification
-      )
-    );
+    // No-op since we don't store notifications
   };
 
   const markAllAsRead = () => {
-    setNotifications(prev => 
-      prev.map(notification => ({ ...notification, read: true }))
-    );
+    // No-op since we don't store notifications
   };
 
   const addNotification = (notification) => {
-    const newNotification = {
-      ...notification,
-      id: Date.now().toString(),
-      timestamp: new Date(),
-      read: false,
-    };
-    setNotifications(prev => [newNotification, ...prev]);
+    // Don't store notifications - only show toast
+    console.log('🔔 NotificationProvider: Not storing notification, only showing toast');
   };
 
           // Add toast notification function

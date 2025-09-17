@@ -20,9 +20,29 @@ const NotificationSystem = () => {
 
             console.log('🔔 NotificationSystem setting up event listener');
             window.addEventListener('showToast', handleNotification);
+            
+            // Clear notifications on page visibility change (refresh)
+            const handleVisibilityChange = () => {
+              if (document.visibilityState === 'visible') {
+                console.log('🔔 Page became visible - clearing notifications');
+                setNotifications([]);
+              }
+            };
+            
+            // Clear notifications before page unload (refresh/close)
+            const handleBeforeUnload = () => {
+              console.log('🔔 Page unloading - clearing notifications');
+              setNotifications([]);
+            };
+            
+            document.addEventListener('visibilitychange', handleVisibilityChange);
+            window.addEventListener('beforeunload', handleBeforeUnload);
+            
             return () => {
               console.log('🔔 NotificationSystem cleaning up event listener');
               window.removeEventListener('showToast', handleNotification);
+              document.removeEventListener('visibilitychange', handleVisibilityChange);
+              window.removeEventListener('beforeunload', handleBeforeUnload);
             };
           }, []);
 
