@@ -65,10 +65,18 @@ export async function POST(request) {
       updateData.uptime = data.uptime;
     }
 
+    // Update both collections for compatibility
     await db.collection('iot_devices').updateOne(
       { deviceId: data.deviceId },
       { $set: updateData },
       { upsert: true }
+    );
+    
+    // Also update user_devices collection if device exists
+    await db.collection('user_devices').updateOne(
+      { deviceId: data.deviceId },
+      { $set: updateData },
+      { upsert: false } // Don't create if doesn't exist
     );
 
     return NextResponse.json({ 
