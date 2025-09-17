@@ -40,6 +40,9 @@ export default function RealtimeIoTDashboard() {
             lastSeen: device.lastSeen
           });
           
+          // Debug: Force status display
+          console.log('🎯 FORCING STATUS UPDATE:', device.status);
+          
           // Simple and reliable status update
           if (isOnline) {
             console.log('✅ Device ONLINE');
@@ -277,6 +280,12 @@ export default function RealtimeIoTDashboard() {
                 style={{ color: getConnectionColor() }}
               >
                 {isRealtime ? 'Real-time' : 'Manual'} ({connectionStatus})
+              </span>
+            </div>
+            <div className="info-item">
+              <span className="info-label">Debug Status:</span>
+              <span className="info-value" style={{ color: deviceStatus === 'online' ? '#10B981' : '#EF4444' }}>
+                {deviceStatus} - {stableStatus}
               </span>
             </div>
           </div>
