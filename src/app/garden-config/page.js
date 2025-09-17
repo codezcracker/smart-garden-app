@@ -12,6 +12,7 @@ export default function GardenConfigPage() {
   const [editingGarden, setEditingGarden] = useState(null);
   const [deviceStatuses, setDeviceStatuses] = useState({});
   const [previousDeviceStatuses, setPreviousDeviceStatuses] = useState({});
+  const [notificationCooldowns, setNotificationCooldowns] = useState({});
 
   // Form states
   const [formData, setFormData] = useState({
@@ -90,13 +91,22 @@ export default function GardenConfigPage() {
         Object.keys(statusMap).forEach(deviceId => {
           const currentStatus = statusMap[deviceId].status;
           const previousStatus = previousDeviceStatuses[deviceId]?.status;
+          const lastNotificationTime = notificationCooldowns[deviceId];
+          const now = Date.now();
           
-          console.log('🔍 Garden Status check:', { deviceId, currentStatus, previousStatus });
+          console.log('🔍 Garden Status check:', { deviceId, currentStatus, previousStatus, lastNotificationTime });
           
-          if (previousStatus !== currentStatus) {
+          if (previousStatus !== currentStatus && 
+              (!lastNotificationTime || (now - lastNotificationTime) > 5000)) {
             const deviceName = deviceId; // Use deviceId as name since we don't have device details here
             
             console.log('📢 Garden Status change detected:', { deviceId, from: previousStatus, to: currentStatus });
+            
+            // Update cooldown timestamp
+            setNotificationCooldowns(prev => ({
+              ...prev,
+              [deviceId]: now
+            }));
             
             if (currentStatus === 'online') {
               console.log('🔗 Garden: Showing connection notification');

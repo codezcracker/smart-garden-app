@@ -19,6 +19,7 @@ export default function MyDevicesPage() {
   const [editingDevice, setEditingDevice] = useState(null);
   const [deviceStatuses, setDeviceStatuses] = useState({});
   const [previousDeviceStatuses, setPreviousDeviceStatuses] = useState({});
+  const [notificationCooldowns, setNotificationCooldowns] = useState({});
 
   // Form states
   const [formData, setFormData] = useState({
@@ -119,11 +120,15 @@ export default function MyDevicesPage() {
         Object.keys(statusMap).forEach(deviceId => {
           const currentStatus = statusMap[deviceId].status;
           const previousStatus = previousDeviceStatuses[deviceId]?.status;
+          const lastNotificationTime = notificationCooldowns[deviceId];
+          const now = Date.now();
           
-          console.log('🔍 Status check:', { deviceId, currentStatus, previousStatus });
+          console.log('🔍 Status check:', { deviceId, currentStatus, previousStatus, lastNotificationTime });
           
-          // Show notification for status changes
-          if (previousStatus !== currentStatus) {
+          // Show notification for status changes (with 5 second cooldown)
+          if (previousStatus !== currentStatus && 
+              (!lastNotificationTime || (now - lastNotificationTime) > 5000)) {
+            
             const device = devices.find(d => d.deviceId === deviceId);
             const deviceName = device?.deviceName || deviceId;
             
@@ -135,6 +140,12 @@ export default function MyDevicesPage() {
               deviceFound: !!device,
               totalDevices: devices.length
             });
+            
+            // Update cooldown timestamp
+            setNotificationCooldowns(prev => ({
+              ...prev,
+              [deviceId]: now
+            }));
             
             if (currentStatus === 'online') {
               console.log('🔗 Showing connection notification');

@@ -18,6 +18,7 @@ export default function RealtimeIoTDashboard() {
   const [statusChangeTime, setStatusChangeTime] = useState(0);
   const [consecutiveOfflineCount, setConsecutiveOfflineCount] = useState(0);
   const [previousDeviceStatus, setPreviousDeviceStatus] = useState('offline');
+  const [lastNotificationTime, setLastNotificationTime] = useState(0);
   const eventSourceRef = useRef(null);
   const statusCheckIntervalRef = useRef(null);
   const { showToast } = useNotifications();
@@ -46,9 +47,13 @@ export default function RealtimeIoTDashboard() {
           // Debug: Force status display
           console.log('🎯 FORCING STATUS UPDATE:', device.status);
           
-          // Check for connection status changes and show notifications
-          if (previousDeviceStatus !== device.status) {
+          // Check for connection status changes and show notifications (with 5 second cooldown)
+          const now = Date.now();
+          if (previousDeviceStatus !== device.status && 
+              (now - lastNotificationTime) > 5000) {
             console.log('📢 Dashboard Status change detected:', { from: previousDeviceStatus, to: device.status });
+            
+            setLastNotificationTime(now);
             
             if (device.status === 'online') {
               console.log('🔗 Dashboard: Showing connection notification');
