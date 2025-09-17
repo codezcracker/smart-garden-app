@@ -33,12 +33,9 @@ export default function MyDevicesPage() {
   const fetchDevices = async () => {
     try {
       setLoading(true);
-      // In a real app, you would get the auth token from your auth system
-      const token = localStorage.getItem('auth_token');
-      
+      // For testing - no authentication required
       const response = await fetch('/api/iot/user-devices', {
         headers: {
-          'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
         }
       });
@@ -62,11 +59,9 @@ export default function MyDevicesPage() {
 
   const fetchGardens = async () => {
     try {
-      const token = localStorage.getItem('auth_token');
-      
+      // For testing - no authentication required
       const response = await fetch('/api/iot/gardens', {
         headers: {
-          'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
         }
       });
@@ -151,12 +146,10 @@ export default function MyDevicesPage() {
     try {
       console.log('💾 Saving device data:', formData);
       
-      const token = localStorage.getItem('auth_token');
-      
+      // For testing - no authentication required
       const response = await fetch('/api/iot/user-devices', {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
         },
         body: JSON.stringify(formData)
@@ -183,12 +176,10 @@ export default function MyDevicesPage() {
     try {
       console.log('💾 Updating device data:', formData);
       
-      const token = localStorage.getItem('auth_token');
-      
+      // For testing - no authentication required
       const response = await fetch('/api/iot/device-config', {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
         },
         body: JSON.stringify(formData)

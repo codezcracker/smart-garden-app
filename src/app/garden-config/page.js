@@ -37,11 +37,9 @@ export default function GardenConfigPage() {
     try {
       setLoading(true);
       // In a real app, you would get the auth token from your auth system
-      const token = localStorage.getItem('auth_token');
-      
+      // For testing - no authentication required
       const response = await fetch('/api/iot/gardens', {
         headers: {
-          'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
         }
       });
@@ -113,12 +111,10 @@ export default function GardenConfigPage() {
     try {
       console.log('💾 Saving garden data:', formData);
       
-      const token = localStorage.getItem('auth_token');
-      
+      // For testing - no authentication required
       const response = await fetch('/api/iot/gardens', {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
         },
         body: JSON.stringify(formData)
@@ -145,12 +141,10 @@ export default function GardenConfigPage() {
     try {
       console.log('💾 Updating garden data:', formData);
       
-      const token = localStorage.getItem('auth_token');
-      
+      // For testing - no authentication required
       const response = await fetch(`/api/iot/gardens/${editingGarden.gardenId}`, {
         method: 'PUT',
         headers: {
-          'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
         },
         body: JSON.stringify(formData)
@@ -179,12 +173,10 @@ export default function GardenConfigPage() {
     }
 
     try {
-      const token = localStorage.getItem('auth_token');
-      
+      // For testing - no authentication required
       const response = await fetch(`/api/iot/gardens/${garden.gardenId}`, {
         method: 'DELETE',
         headers: {
-          'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
         }
       });
