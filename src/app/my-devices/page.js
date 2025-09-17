@@ -1,11 +1,13 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useNotifications } from '@/components/NotificationProvider';
 import './my-devices.css';
 
 export default function MyDevicesPage() {
   const [devices, setDevices] = useState([]);
   const [loading, setLoading] = useState(true);
+  const { showToast } = useNotifications();
   const [showAddForm, setShowAddForm] = useState(false);
   const [editingDevice, setEditingDevice] = useState(null);
   const [deviceStatuses, setDeviceStatuses] = useState({});
@@ -52,13 +54,16 @@ export default function MyDevicesPage() {
         setDevices(data.devices);
         console.log('📱 Fetched devices:', data.devices);
         console.log('📱 Device IDs from user-devices API:', data.devices.map(d => d.deviceId));
+        showToast('success', `Loaded ${data.devices.length} device(s) successfully`);
       } else {
         console.log('📱 No devices found or API error:', data);
         setDevices([]);
+        showToast('info', 'No devices found. Click "Setup Sample Device" to get started.');
       }
     } catch (error) {
       console.error('❌ Error fetching devices:', error);
       setDevices([]);
+      showToast('error', 'Failed to load devices. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -78,13 +83,16 @@ export default function MyDevicesPage() {
       if (data.success && data.gardens) {
         setGardens(data.gardens);
         console.log('🌱 Fetched gardens:', data.gardens);
+        showToast('success', `Loaded ${data.gardens.length} garden(s)`);
       } else {
         console.log('🌱 No gardens found:', data);
         setGardens([]);
+        showToast('info', 'No gardens found. Create a garden first.');
       }
     } catch (error) {
       console.error('❌ Error fetching gardens:', error);
       setGardens([]);
+      showToast('error', 'Failed to load gardens. Please try again.');
     }
   };
 
@@ -106,6 +114,12 @@ export default function MyDevicesPage() {
         setDeviceStatuses(statusMap);
         console.log('📱 Device statuses updated:', statusMap);
         console.log('📱 Available devices in status data:', Object.keys(statusMap));
+        
+        // Show notification for status changes
+        const onlineDevices = Object.values(statusMap).filter(s => s.status === 'online').length;
+        if (onlineDevices > 0) {
+          showToast('success', `${onlineDevices} device(s) online`, 3000);
+        }
       }
     } catch (error) {
       console.error('❌ Error fetching device statuses:', error);
@@ -127,15 +141,15 @@ export default function MyDevicesPage() {
       console.log('📡 Setup API Response:', responseData);
 
       if (response.ok && responseData.success) {
-        alert('Sample device (DB007) created successfully! You can now download the ESP8266 code.');
+        showToast('success', 'Sample device (DB007) created successfully! You can now download the ESP8266 code.');
         fetchDevices(); // Refresh the device list
       } else {
         console.error('❌ Setup failed:', responseData);
-        alert(`Error setting up sample device: ${responseData.error || responseData.message || 'Unknown error'}`);
+        showToast('error', `Error setting up sample device: ${responseData.error || responseData.message || 'Unknown error'}`);
       }
     } catch (error) {
       console.error('❌ Error setting up sample device:', error);
-      alert('Error setting up sample device: ' + error.message);
+      showToast('error', 'Error setting up sample device: ' + error.message);
     }
   };
 
@@ -192,14 +206,14 @@ export default function MyDevicesPage() {
       if (response.ok && responseData.success) {
         setShowAddForm(false);
         fetchDevices();
-        alert('Device configuration saved successfully!');
+        showToast('success', 'Device configuration saved successfully!');
       } else {
         console.error('❌ Save failed:', responseData);
-        alert(`Error saving device configuration: ${responseData.error || 'Unknown error'}`);
+        showToast('error', `Error saving device configuration: ${responseData.error || 'Unknown error'}`);
       }
     } catch (error) {
       console.error('❌ Error saving device:', error);
-      alert('Error saving device configuration: ' + error.message);
+      showToast('error', 'Error saving device configuration: ' + error.message);
     }
   };
 
@@ -222,14 +236,14 @@ export default function MyDevicesPage() {
       if (response.ok && responseData.success) {
         setShowAddForm(false);
         fetchDevices();
-        alert('Device configuration updated successfully!');
+        showToast('success', 'Device configuration updated successfully!');
       } else {
         console.error('❌ Update failed:', responseData);
-        alert(`Error updating device configuration: ${responseData.error || 'Unknown error'}`);
+        showToast('error', `Error updating device configuration: ${responseData.error || 'Unknown error'}`);
       }
     } catch (error) {
       console.error('❌ Error updating device:', error);
-      alert('Error updating device configuration: ' + error.message);
+      showToast('error', 'Error updating device configuration: ' + error.message);
     }
   };
 

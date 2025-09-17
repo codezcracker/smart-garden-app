@@ -1,11 +1,13 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useNotifications } from '@/components/NotificationProvider';
 import './garden-config.css';
 
 export default function GardenConfigPage() {
   const [gardens, setGardens] = useState([]);
   const [loading, setLoading] = useState(true);
+  const { showToast } = useNotifications();
   const [showAddForm, setShowAddForm] = useState(false);
   const [editingGarden, setEditingGarden] = useState(null);
   const [deviceStatuses, setDeviceStatuses] = useState({});
@@ -55,13 +57,16 @@ export default function GardenConfigPage() {
       if (data.success && data.gardens) {
         setGardens(data.gardens);
         console.log('🌱 Fetched gardens:', data.gardens);
+        showToast('success', `Loaded ${data.gardens.length} garden(s)`);
       } else {
         console.log('🌱 No gardens found or API error:', data);
         setGardens([]);
+        showToast('info', 'No gardens found. Create your first garden to get started.');
       }
     } catch (error) {
       console.error('❌ Error fetching gardens:', error);
       setGardens([]);
+      showToast('error', 'Failed to load gardens. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -155,14 +160,14 @@ export default function GardenConfigPage() {
       if (response.ok && responseData.success) {
         setShowAddForm(false);
         fetchGardens();
-        alert('Garden created successfully! You can now add devices to this garden.');
+        showToast('success', 'Garden created successfully! You can now add devices to this garden.');
       } else {
         console.error('❌ Save failed:', responseData);
-        alert(`Error creating garden: ${responseData.error || 'Unknown error'}`);
+        showToast('error', `Error creating garden: ${responseData.error || 'Unknown error'}`);
       }
     } catch (error) {
       console.error('❌ Error saving garden:', error);
-      alert('Error saving garden: ' + error.message);
+      showToast('error', 'Error saving garden: ' + error.message);
     }
   };
 
@@ -185,14 +190,14 @@ export default function GardenConfigPage() {
       if (response.ok && responseData.success) {
         setShowAddForm(false);
         fetchGardens();
-        alert('Garden configuration updated successfully!');
+        showToast('success', 'Garden configuration updated successfully!');
       } else {
         console.error('❌ Update failed:', responseData);
-        alert(`Error updating garden: ${responseData.error || 'Unknown error'}`);
+        showToast('error', `Error updating garden: ${responseData.error || 'Unknown error'}`);
       }
     } catch (error) {
       console.error('❌ Error updating garden:', error);
-      alert('Error updating garden: ' + error.message);
+      showToast('error', 'Error updating garden: ' + error.message);
     }
   };
 
@@ -214,14 +219,14 @@ export default function GardenConfigPage() {
 
       if (response.ok && responseData.success) {
         fetchGardens();
-        alert('Garden deleted successfully!');
+        showToast('success', 'Garden deleted successfully!');
       } else {
         console.error('❌ Delete failed:', responseData);
-        alert(`Error deleting garden: ${responseData.error || 'Unknown error'}`);
+        showToast('error', `Error deleting garden: ${responseData.error || 'Unknown error'}`);
       }
     } catch (error) {
       console.error('❌ Error deleting garden:', error);
-      alert('Error deleting garden: ' + error.message);
+      showToast('error', 'Error deleting garden: ' + error.message);
     }
   };
 

@@ -66,6 +66,21 @@ export function NotificationProvider({ children }) {
     setNotifications(prev => [newNotification, ...prev]);
   };
 
+  // Add toast notification function
+  const showToast = (type, message, duration = 5000) => {
+    const event = new CustomEvent('showToast', {
+      detail: { type, message, duration }
+    });
+    window.dispatchEvent(event);
+    
+    // Also add to persistent notifications
+    addNotification({
+      title: type.charAt(0).toUpperCase() + type.slice(1),
+      message: message,
+      type: type,
+    });
+  };
+
   const clearAll = () => {
     setNotifications([]);
   };
@@ -77,6 +92,7 @@ export function NotificationProvider({ children }) {
       markAsRead,
       markAllAsRead,
       addNotification,
+      showToast,
       clearAll,
     }}>
       {children}

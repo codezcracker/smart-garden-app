@@ -6,6 +6,7 @@ import "./dashboard/dashboard.css";
 import "../components/AnimatedComponents.css";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { NotificationProvider } from "@/components/NotificationProvider";
+import NotificationSystem from "@/components/NotificationSystem";
 import Navigation from "@/components/Navigation";
 
 const geistSans = Geist({
@@ -34,6 +35,7 @@ export default function RootLayout({ children }) {
             <Navigation>
               {children}
             </Navigation>
+            <NotificationSystem />
           </NotificationProvider>
         </ThemeProvider>
       </body>
