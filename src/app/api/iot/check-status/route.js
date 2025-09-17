@@ -49,6 +49,11 @@ export async function GET(request) {
     );
     
     console.log(`🔄 Marked ${result1.modifiedCount + result2.modifiedCount} devices as offline`);
+    console.log('📊 Status update results:', {
+      iot_devices_modified: result1.modifiedCount,
+      user_devices_modified: result2.modifiedCount,
+      total_modified: result1.modifiedCount + result2.modifiedCount
+    });
     
     // Get current device statuses from both collections
     const devices1 = await db.collection('iot_devices').find({}).toArray();
@@ -63,6 +68,12 @@ export async function GET(request) {
     });
     
     const devices = allDevices;
+    
+    console.log('📱 Returning device statuses:', devices.map(d => ({
+      deviceId: d.deviceId,
+      status: d.status,
+      lastSeen: d.lastSeen
+    })));
     
     return NextResponse.json({
       success: true,
