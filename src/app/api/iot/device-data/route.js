@@ -73,11 +73,17 @@ export async function POST(request) {
     );
     
     // Also update user_devices collection if device exists
-    await db.collection('user_devices').updateOne(
+    const userDeviceUpdate = await db.collection('user_devices').updateOne(
       { deviceId: data.deviceId },
       { $set: updateData },
       { upsert: false } // Don't create if doesn't exist
     );
+    
+    if (userDeviceUpdate.modifiedCount > 0) {
+      console.log('✅ Updated user_devices collection for', data.deviceId);
+    } else {
+      console.log('⚠️ No user_devices record found for', data.deviceId);
+    }
 
     return NextResponse.json({ 
       success: true, 

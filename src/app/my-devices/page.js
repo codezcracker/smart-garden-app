@@ -51,6 +51,7 @@ export default function MyDevicesPage() {
       if (data.success && data.devices) {
         setDevices(data.devices);
         console.log('📱 Fetched devices:', data.devices);
+        console.log('📱 Device IDs from user-devices API:', data.devices.map(d => d.deviceId));
       } else {
         console.log('📱 No devices found or API error:', data);
         setDevices([]);
@@ -104,6 +105,7 @@ export default function MyDevicesPage() {
         });
         setDeviceStatuses(statusMap);
         console.log('📱 Device statuses updated:', statusMap);
+        console.log('📱 Available devices in status data:', Object.keys(statusMap));
       }
     } catch (error) {
       console.error('❌ Error fetching device statuses:', error);
@@ -306,7 +308,9 @@ void loop() {
 
   const getDeviceStatus = (deviceId) => {
     const deviceStatus = deviceStatuses[deviceId];
-    return deviceStatus?.status || 'unknown';
+    const status = deviceStatus?.status || 'unknown';
+    console.log('🔍 Device Status Check:', { deviceId, deviceStatus, status });
+    return status;
   };
 
   const getDeviceConnectionQuality = (deviceId) => {
