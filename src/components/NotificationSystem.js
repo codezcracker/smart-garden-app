@@ -6,6 +6,8 @@ const NotificationSystem = () => {
   const [notifications, setNotifications] = useState([]);
 
   useEffect(() => {
+    console.log('🔔 NotificationSystem component mounted!');
+    
     // Listen for custom notification events
     const handleNotification = (event) => {
       console.log('🔔 NotificationSystem received event:', event.detail);
@@ -64,6 +66,21 @@ const NotificationSystem = () => {
 
   return (
     <div className="notification-container">
+      {notifications.length > 0 && (
+        <div style={{
+          position: 'fixed',
+          top: '10px',
+          right: '10px',
+          background: '#4caf50',
+          color: 'white',
+          padding: '4px 8px',
+          borderRadius: '4px',
+          fontSize: '12px',
+          zIndex: 10000
+        }}>
+          🔔 {notifications.length} notification(s)
+        </div>
+      )}
       {notifications.map(notification => (
         <div
           key={notification.id}
@@ -125,7 +142,7 @@ const NotificationSystem = () => {
           position: fixed;
           top: 20px;
           right: 20px;
-          z-index: 1000;
+          z-index: 9999;
           pointer-events: none;
         }
         
