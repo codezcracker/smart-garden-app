@@ -14,6 +14,7 @@
 #include <ESP8266WiFi.h>
 #include <ESP8266HTTPClient.h>
 #include <ArduinoJson.h>
+#include <EEPROM.h>
 
 // Default fallback configuration (only used if server is unreachable)
 const char* FALLBACK_SSID = "Qureshi Deco";
@@ -53,6 +54,9 @@ const unsigned long CONFIG_RETRY_INTERVAL = 30000; // 30 seconds
 void setup() {
   Serial.begin(115200);
   delay(1000);
+  
+  // Initialize EEPROM
+  EEPROM.begin(512);
   
   Serial.println("🌱 Smart Garden IoT - Garden-Based Configuration");
   Serial.println("==============================================");
