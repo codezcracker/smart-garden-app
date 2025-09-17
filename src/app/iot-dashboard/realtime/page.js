@@ -48,12 +48,12 @@ export default function RealtimeIoTDashboard() {
           console.log('🎯 FORCING STATUS UPDATE:', device.status);
           
           // Check for connection status changes and show notifications (with 5 second cooldown)
-          const now = Date.now();
+          const notificationTime = Date.now();
           if (previousDeviceStatus !== device.status && 
-              (now - lastNotificationTime) > 5000) {
+              (notificationTime - lastNotificationTime) > 5000) {
             console.log('📢 Dashboard Status change detected:', { from: previousDeviceStatus, to: device.status });
             
-            setLastNotificationTime(now);
+            setLastNotificationTime(notificationTime);
             
             if (device.status === 'online') {
               console.log('🔗 Dashboard: Showing connection notification');
