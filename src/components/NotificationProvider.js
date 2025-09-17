@@ -68,9 +68,11 @@ export function NotificationProvider({ children }) {
 
   // Add toast notification function
   const showToast = (type, message, duration = 5000) => {
+    console.log('🔔 NotificationProvider showToast called:', { type, message, duration });
     const event = new CustomEvent('showToast', {
       detail: { type, message, duration }
     });
+    console.log('🔔 Dispatching showToast event:', event);
     window.dispatchEvent(event);
     
     // Also add to persistent notifications

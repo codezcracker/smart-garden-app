@@ -8,19 +8,29 @@ const NotificationSystem = () => {
   useEffect(() => {
     // Listen for custom notification events
     const handleNotification = (event) => {
+      console.log('🔔 NotificationSystem received event:', event.detail);
       const { type, message, duration = 5000 } = event.detail;
       addNotification(type, message, duration);
     };
 
+    console.log('🔔 NotificationSystem setting up event listener');
     window.addEventListener('showToast', handleNotification);
-    return () => window.removeEventListener('showToast', handleNotification);
+    return () => {
+      console.log('🔔 NotificationSystem cleaning up event listener');
+      window.removeEventListener('showToast', handleNotification);
+    };
   }, []);
 
   const addNotification = (type, message, duration = 5000) => {
+    console.log('🔔 Adding notification:', { type, message, duration });
     const id = Date.now() + Math.random();
     const notification = { id, type, message, timestamp: new Date() };
     
-    setNotifications(prev => [...prev, notification]);
+    setNotifications(prev => {
+      const newNotifications = [...prev, notification];
+      console.log('🔔 Notification state updated:', newNotifications);
+      return newNotifications;
+    });
 
     // Auto remove after duration
     setTimeout(() => {
