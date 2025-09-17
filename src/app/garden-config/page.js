@@ -8,6 +8,7 @@ export default function GardenConfigPage() {
   const [loading, setLoading] = useState(true);
   const [showAddForm, setShowAddForm] = useState(false);
   const [editingGarden, setEditingGarden] = useState(null);
+  const [deviceStatuses, setDeviceStatuses] = useState({});
 
   // Form states
   const [formData, setFormData] = useState({
@@ -31,6 +32,11 @@ export default function GardenConfigPage() {
 
   useEffect(() => {
     fetchGardens();
+    fetchDeviceStatuses();
+    
+    // Update device statuses every 5 seconds
+    const interval = setInterval(fetchDeviceStatuses, 5000);
+    return () => clearInterval(interval);
   }, []);
 
   const fetchGardens = async () => {
@@ -58,6 +64,29 @@ export default function GardenConfigPage() {
       setGardens([]);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchDeviceStatuses = async () => {
+    try {
+      const response = await fetch('/api/iot/check-status');
+      const data = await response.json();
+      
+      if (data.success && data.devices) {
+        const statusMap = {};
+        data.devices.forEach(device => {
+          statusMap[device.deviceId] = {
+            status: device.status,
+            lastSeen: device.lastSeen,
+            wifiRSSI: device.wifiRSSI,
+            connectionQuality: device.connectionQuality
+          };
+        });
+        setDeviceStatuses(statusMap);
+        console.log('📱 Device statuses updated:', statusMap);
+      }
+    } catch (error) {
+      console.error('❌ Error fetching device statuses:', error);
     }
   };
 
@@ -279,6 +308,28 @@ export default function GardenConfigPage() {
                     <span className="value">
                       {garden.deviceCount || 0} total 
                       ({garden.onlineDevices || 0} online)
+                    </span>
+                  </div>
+                  <div className="detail-item">
+                    <span className="label">Device Status:</span>
+                    <span className="value">
+                      {garden.devices && garden.devices.length > 0 ? (
+                        <div className="device-status-list">
+                          {garden.devices.map((device, index) => {
+                            const deviceStatus = deviceStatuses[device.deviceId];
+                            const status = deviceStatus?.status || 'unknown';
+                            const statusColor = status === 'online' ? '#10b981' : status === 'offline' ? '#ef4444' : '#6b7280';
+                            return (
+                              <span key={device.deviceId} className="device-status-item">
+                                <span className="status-dot" style={{ backgroundColor: statusColor }}></span>
+                                {device.deviceId}: {status.toUpperCase()}
+                              </span>
+                            );
+                          })}
+                        </div>
+                      ) : (
+                        'No devices'
+                      )}
                     </span>
                   </div>
                   <div className="detail-item">

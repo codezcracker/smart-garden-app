@@ -8,6 +8,7 @@ export default function MyDevicesPage() {
   const [loading, setLoading] = useState(true);
   const [showAddForm, setShowAddForm] = useState(false);
   const [editingDevice, setEditingDevice] = useState(null);
+  const [deviceStatuses, setDeviceStatuses] = useState({});
 
   // Form states
   const [formData, setFormData] = useState({
@@ -28,6 +29,11 @@ export default function MyDevicesPage() {
   useEffect(() => {
     fetchDevices();
     fetchGardens();
+    fetchDeviceStatuses();
+    
+    // Update device statuses every 3 seconds
+    const interval = setInterval(fetchDeviceStatuses, 3000);
+    return () => clearInterval(interval);
   }, []);
 
   const fetchDevices = async () => {
@@ -78,6 +84,29 @@ export default function MyDevicesPage() {
     } catch (error) {
       console.error('❌ Error fetching gardens:', error);
       setGardens([]);
+    }
+  };
+
+  const fetchDeviceStatuses = async () => {
+    try {
+      const response = await fetch('/api/iot/check-status');
+      const data = await response.json();
+      
+      if (data.success && data.devices) {
+        const statusMap = {};
+        data.devices.forEach(device => {
+          statusMap[device.deviceId] = {
+            status: device.status,
+            lastSeen: device.lastSeen,
+            wifiRSSI: device.wifiRSSI,
+            connectionQuality: device.connectionQuality
+          };
+        });
+        setDeviceStatuses(statusMap);
+        console.log('📱 Device statuses updated:', statusMap);
+      }
+    } catch (error) {
+      console.error('❌ Error fetching device statuses:', error);
     }
   };
 
@@ -275,6 +304,16 @@ void loop() {
     }
   };
 
+  const getDeviceStatus = (deviceId) => {
+    const deviceStatus = deviceStatuses[deviceId];
+    return deviceStatus?.status || 'unknown';
+  };
+
+  const getDeviceConnectionQuality = (deviceId) => {
+    const deviceStatus = deviceStatuses[deviceId];
+    return deviceStatus?.connectionQuality || 'unknown';
+  };
+
   if (loading) {
     return (
       <div className="my-devices-page">
@@ -336,9 +375,9 @@ void loop() {
                   <div className="device-status">
                     <span 
                       className="status-indicator"
-                      style={{ color: getStatusColor(device.status) }}
+                      style={{ color: getStatusColor(getDeviceStatus(device.deviceId)) }}
                     >
-                      {getStatusIcon(device.status)} {device.status?.toUpperCase() || 'UNKNOWN'}
+                      {getStatusIcon(getDeviceStatus(device.deviceId))} {getDeviceStatus(device.deviceId).toUpperCase()}
                     </span>
                   </div>
                 </div>
@@ -351,12 +390,24 @@ void loop() {
                   <div className="detail-item">
                     <span className="label">Last Seen:</span>
                     <span className="value">
-                      {device.lastSeen ? new Date(device.lastSeen).toLocaleString() : 'Never'}
+                      {deviceStatuses[device.deviceId]?.lastSeen ? 
+                        new Date(deviceStatuses[device.deviceId].lastSeen).toLocaleString() : 
+                        'Never'}
                     </span>
                   </div>
                   <div className="detail-item">
                     <span className="label">WiFi Signal:</span>
-                    <span className="value">{device.wifiRSSI || 'N/A'} dBm</span>
+                    <span className="value">{deviceStatuses[device.deviceId]?.wifiRSSI || 'N/A'} dBm</span>
+                  </div>
+                  <div className="detail-item">
+                    <span className="label">Connection:</span>
+                    <span className="value" style={{ 
+                      color: getDeviceConnectionQuality(device.deviceId) === 'excellent' ? '#10b981' : 
+                             getDeviceConnectionQuality(device.deviceId) === 'good' ? '#f59e0b' :
+                             getDeviceConnectionQuality(device.deviceId) === 'poor' ? '#f97316' : '#ef4444'
+                    }}>
+                      {getDeviceConnectionQuality(device.deviceId).toUpperCase()}
+                    </span>
                   </div>
                   <div className="detail-item">
                     <span className="label">Config Version:</span>
