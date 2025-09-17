@@ -81,10 +81,17 @@ export default function Navigation({ children = null }) {
           description: 'IoT Dashboard'
         },
         {
+          name: 'Garden Config',
+          href: '/garden-config',
+          icon: '🌱',
+          gradient: 'linear-gradient(135deg, #16a34a 0%, #15803d 100%)',
+          description: 'Configure Your Gardens'
+        },
+        {
           name: 'My Devices',
           href: '/my-devices',
           icon: '📱',
-          gradient: 'linear-gradient(135deg, #16a34a 0%, #15803d 100%)',
+          gradient: 'linear-gradient(135deg, #059669 0%, #047857 100%)',
           description: 'Manage Your IoT Devices'
         },
         {

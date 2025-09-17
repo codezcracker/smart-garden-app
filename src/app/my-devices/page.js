@@ -13,10 +13,9 @@ export default function MyDevicesPage() {
   const [formData, setFormData] = useState({
     deviceId: '',
     deviceName: '',
+    gardenId: '',
     location: '',
     description: '',
-    wifiSSID: 'Qureshi Deco',
-    wifiPassword: '65327050',
     temperatureEnabled: true,
     humidityEnabled: true,
     lightLevelEnabled: true,
@@ -24,8 +23,11 @@ export default function MyDevicesPage() {
     sendInterval: 1000
   });
 
+  const [gardens, setGardens] = useState([]);
+
   useEffect(() => {
     fetchDevices();
+    fetchGardens();
   }, []);
 
   const fetchDevices = async () => {
@@ -55,6 +57,32 @@ export default function MyDevicesPage() {
       setDevices([]);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchGardens = async () => {
+    try {
+      const token = localStorage.getItem('auth_token');
+      
+      const response = await fetch('/api/iot/gardens', {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+      
+      const data = await response.json();
+      
+      if (data.success && data.gardens) {
+        setGardens(data.gardens);
+        console.log('🌱 Fetched gardens:', data.gardens);
+      } else {
+        console.log('🌱 No gardens found:', data);
+        setGardens([]);
+      }
+    } catch (error) {
+      console.error('❌ Error fetching gardens:', error);
+      setGardens([]);
     }
   };
 
@@ -89,10 +117,9 @@ export default function MyDevicesPage() {
     setFormData({
       deviceId: '',
       deviceName: '',
+      gardenId: '',
       location: '',
       description: '',
-      wifiSSID: 'Qureshi Deco',
-      wifiPassword: '65327050',
       temperatureEnabled: true,
       humidityEnabled: true,
       lightLevelEnabled: true,
@@ -107,10 +134,9 @@ export default function MyDevicesPage() {
     setFormData({
       deviceId: device.deviceId,
       deviceName: device.deviceName,
+      gardenId: device.gardenId,
       location: device.location,
       description: device.description,
-      wifiSSID: device.network.wifiSSID,
-      wifiPassword: device.network.wifiPassword,
       temperatureEnabled: device.sensors.temperature.enabled,
       humidityEnabled: device.sensors.humidity.enabled,
       lightLevelEnabled: device.sensors.lightLevel.enabled,
@@ -403,6 +429,27 @@ void loop() {
               </div>
 
               <div className="form-group">
+                <label>Garden *</label>
+                <select
+                  value={formData.gardenId}
+                  onChange={(e) => setFormData({...formData, gardenId: e.target.value})}
+                  required
+                >
+                  <option value="">Select a garden...</option>
+                  {gardens.map((garden) => (
+                    <option key={garden.gardenId} value={garden.gardenId}>
+                      {garden.gardenName} ({garden.location})
+                    </option>
+                  ))}
+                </select>
+                {gardens.length === 0 && (
+                  <p className="form-help">
+                    No gardens found. <a href="/garden-config">Create a garden first</a>.
+                  </p>
+                )}
+              </div>
+
+              <div className="form-group">
                 <label>Location</label>
                 <input
                   type="text"
@@ -423,23 +470,9 @@ void loop() {
               </div>
 
               <div className="form-group">
-                <label>WiFi SSID</label>
-                <input
-                  type="text"
-                  value={formData.wifiSSID}
-                  onChange={(e) => setFormData({...formData, wifiSSID: e.target.value})}
-                  placeholder="Your WiFi network name"
-                />
-              </div>
-
-              <div className="form-group">
-                <label>WiFi Password</label>
-                <input
-                  type="password"
-                  value={formData.wifiPassword}
-                  onChange={(e) => setFormData({...formData, wifiPassword: e.target.value})}
-                  placeholder="Your WiFi password"
-                />
+                <div className="form-info">
+                  <p>📶 WiFi settings are configured at the garden level. Devices will automatically use the garden's WiFi configuration.</p>
+                </div>
               </div>
 
               <div className="form-group">

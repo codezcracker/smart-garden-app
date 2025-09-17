@@ -1,19 +1,24 @@
 import { NextResponse } from 'next/server';
 import { connectToDatabase } from '@/lib/mongodb';
 
-// POST /api/iot/setup-sample-device - Create a sample device for testing
+// POST /api/iot/setup-sample-device - Create a sample garden and device for testing
 export async function POST(request) {
   try {
     const { db } = await connectToDatabase();
     
-    // Sample device data
-    const sampleDevice = {
-      userId: 'demo-user-123', // This should be the actual user ID in production
-      deviceId: 'DB007',
-      deviceName: 'Smart Garden Sensor 1',
-      deviceType: 'ESP8266',
+    const userId = 'demo-user-123'; // This should be the actual user ID in production
+    
+    // First, create a sample garden
+    const gardenId = `GARDEN_${Date.now()}_${Math.random().toString(36).substr(2, 5).toUpperCase()}`;
+    
+    const sampleGarden = {
+      userId: userId,
+      gardenId: gardenId,
+      gardenName: 'Living Room Garden',
       location: 'Living Room',
-      description: 'Main garden sensor monitoring temperature, humidity, light, and soil moisture',
+      area: '50 sq ft',
+      description: 'Main indoor garden with herbs and small plants',
+      gardenType: 'Indoor',
       
       // Network configuration
       network: {
@@ -22,6 +27,50 @@ export async function POST(request) {
         serverURL: 'http://192.168.68.58:3000',
         backupServerURL: 'https://smart-garden-app.vercel.app'
       },
+      
+      // Garden settings
+      settings: {
+        timezone: 'UTC',
+        units: 'metric',
+        dataRetentionDays: 30,
+        alertThresholds: {
+          temperature: { min: 15, max: 35 },
+          humidity: { min: 30, max: 80 },
+          soilMoisture: { min: 20, max: 80 }
+        }
+      },
+      
+      status: 'active',
+      createdAt: new Date(),
+      updatedAt: new Date()
+    };
+    
+    // Check if sample garden already exists
+    const existingGarden = await db.collection('gardens').findOne({ 
+      gardenName: 'Living Room Garden',
+      userId: userId 
+    });
+    
+    let finalGardenId = gardenId;
+    
+    if (existingGarden) {
+      finalGardenId = existingGarden.gardenId;
+      console.log('📱 Setup API: Using existing garden', finalGardenId);
+    } else {
+      // Insert sample garden
+      await db.collection('gardens').insertOne(sampleGarden);
+      console.log('📱 Setup API: Created sample garden', finalGardenId);
+    }
+    
+    // Sample device data
+    const sampleDevice = {
+      userId: userId,
+      gardenId: finalGardenId,
+      deviceId: 'DB007',
+      deviceName: 'Smart Garden Sensor 1',
+      deviceType: 'ESP8266',
+      location: 'Living Room',
+      description: 'Main garden sensor monitoring temperature, humidity, light, and soil moisture',
       
       // Sensor configuration
       sensors: {

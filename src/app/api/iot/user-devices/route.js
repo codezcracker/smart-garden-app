@@ -69,11 +69,24 @@ export async function POST(request) {
     const deviceData = await request.json();
     
     // Validate required fields
-    if (!deviceData.deviceId || !deviceData.deviceName) {
+    if (!deviceData.deviceId || !deviceData.deviceName || !deviceData.gardenId) {
       return NextResponse.json({
         success: false,
-        error: 'Device ID and Device Name are required'
+        error: 'Device ID, Device Name, and Garden are required'
       }, { status: 400 });
+    }
+    
+    // Verify garden exists and belongs to user
+    const garden = await db.collection('gardens').findOne({ 
+      gardenId: deviceData.gardenId, 
+      userId: userId 
+    });
+    
+    if (!garden) {
+      return NextResponse.json({
+        success: false,
+        error: 'Garden not found or access denied'
+      }, { status: 404 });
     }
     
     // Check if device ID already exists for any user
@@ -88,19 +101,12 @@ export async function POST(request) {
     // Create device document
     const deviceDocument = {
       userId: userId,
+      gardenId: deviceData.gardenId,
       deviceId: deviceData.deviceId,
       deviceName: deviceData.deviceName,
       deviceType: deviceData.deviceType || 'ESP8266',
       location: deviceData.location || '',
       description: deviceData.description || '',
-      
-      // Network configuration
-      network: {
-        wifiSSID: deviceData.wifiSSID || '',
-        wifiPassword: deviceData.wifiPassword || '',
-        serverURL: deviceData.serverURL || 'http://192.168.68.58:3000',
-        backupServerURL: deviceData.backupServerURL || 'https://smart-garden-q37q6fr40-codezs-projects.vercel.app'
-      },
       
       // Sensor configuration
       sensors: {

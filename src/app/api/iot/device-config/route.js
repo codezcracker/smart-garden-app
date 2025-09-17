@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { connectToDatabase } from '@/lib/mongodb';
 
-// GET /api/iot/device-config - Get device configuration by deviceId
+// GET /api/iot/device-config - Get device configuration by deviceId (with garden config)
 export async function GET(request) {
   try {
     const { db } = await connectToDatabase();
@@ -25,13 +25,23 @@ export async function GET(request) {
       }, { status: 404 });
     }
     
+    // Get garden configuration
+    const garden = await db.collection('gardens').findOne({ gardenId: device.gardenId });
+    
+    if (!garden) {
+      return NextResponse.json({
+        success: false,
+        error: 'Garden configuration not found'
+      }, { status: 404 });
+    }
+    
     // Update last seen timestamp
     await db.collection('user_devices').updateOne(
       { deviceId },
       { $set: { lastSeen: new Date(), status: 'online' } }
     );
     
-    // Return configuration in ESP8266-friendly format
+    // Return configuration in ESP8266-friendly format (garden config takes precedence)
     const config = {
       success: true,
       deviceId: device.deviceId,
@@ -39,20 +49,30 @@ export async function GET(request) {
       deviceType: device.deviceType,
       location: device.location,
       description: device.description,
+      gardenId: device.gardenId,
+      gardenName: garden.gardenName,
+      gardenLocation: garden.location,
       
-      // Network configuration
+      // Network configuration from garden
       network: {
-        wifiSSID: device.network.wifiSSID,
-        wifiPassword: device.network.wifiPassword,
-        serverURL: device.network.serverURL,
-        backupServerURL: device.network.backupServerURL
+        wifiSSID: garden.network.wifiSSID,
+        wifiPassword: garden.network.wifiPassword,
+        serverURL: garden.network.serverURL,
+        backupServerURL: garden.network.backupServerURL
       },
       
-      // Sensor configuration
+      // Sensor configuration from device
       sensors: device.sensors,
       
       // Device settings
       settings: device.settings,
+      
+      // Garden settings
+      gardenSettings: {
+        timezone: garden.settings.timezone,
+        units: garden.settings.units,
+        alertThresholds: garden.settings.alertThresholds
+      },
       
       // Metadata
       firmwareVersion: device.firmwareVersion,
@@ -60,7 +80,7 @@ export async function GET(request) {
       configVersion: device.configVersion || 1
     };
     
-    console.log('📱 Device Config API: Sending config for', deviceId, 'to user', device.userId);
+    console.log('📱 Device Config API: Sending config for', deviceId, 'from garden', garden.gardenName);
     
     return NextResponse.json(config);
     
