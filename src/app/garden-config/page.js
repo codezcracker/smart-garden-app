@@ -58,11 +58,9 @@ export default function GardenConfigPage() {
       if (data.success && data.gardens) {
         setGardens(data.gardens);
         console.log('🌱 Fetched gardens:', data.gardens);
-        showToast('success', `Loaded ${data.gardens.length} garden(s)`);
       } else {
         console.log('🌱 No gardens found or API error:', data);
         setGardens([]);
-        showToast('info', 'No gardens found. Create your first garden to get started.');
       }
     } catch (error) {
       console.error('❌ Error fetching gardens:', error);

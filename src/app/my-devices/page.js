@@ -9,11 +9,6 @@ export default function MyDevicesPage() {
   const [loading, setLoading] = useState(true);
   const { showToast } = useNotifications();
 
-  // Test notification function
-  const testNotification = () => {
-    console.log('🧪 Testing notification...');
-    showToast('success', 'Test notification working!', 3000);
-  };
   const [showAddForm, setShowAddForm] = useState(false);
   const [editingDevice, setEditingDevice] = useState(null);
   const [deviceStatuses, setDeviceStatuses] = useState({});
@@ -61,11 +56,9 @@ export default function MyDevicesPage() {
         setDevices(data.devices);
         console.log('📱 Fetched devices:', data.devices);
         console.log('📱 Device IDs from user-devices API:', data.devices.map(d => d.deviceId));
-        showToast('success', `Loaded ${data.devices.length} device(s) successfully`);
       } else {
         console.log('📱 No devices found or API error:', data);
         setDevices([]);
-        showToast('info', 'No devices found. Click "Setup Sample Device" to get started.');
       }
     } catch (error) {
       console.error('❌ Error fetching devices:', error);
@@ -90,11 +83,9 @@ export default function MyDevicesPage() {
       if (data.success && data.gardens) {
         setGardens(data.gardens);
         console.log('🌱 Fetched gardens:', data.gardens);
-        showToast('success', `Loaded ${data.gardens.length} garden(s)`);
       } else {
         console.log('🌱 No gardens found:', data);
         setGardens([]);
-        showToast('info', 'No gardens found. Create a garden first.');
       }
     } catch (error) {
       console.error('❌ Error fetching gardens:', error);
@@ -373,13 +364,6 @@ void loop() {
         <div className="section-header">
           <h2>Your Devices ({devices.length})</h2>
           <div className="header-actions">
-            <button 
-              className="btn btn-secondary"
-              onClick={testNotification}
-              style={{ backgroundColor: '#f59e0b', color: 'white' }}
-            >
-              🧪 Test Notification
-            </button>
             <button 
               className="btn btn-secondary"
               onClick={setupSampleDevice}

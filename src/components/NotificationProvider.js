@@ -5,40 +5,7 @@ import { createContext, useContext, useState } from 'react';
 const NotificationContext = createContext(undefined);
 
 export function NotificationProvider({ children }) {
-  const [notifications, setNotifications] = useState([
-    {
-      id: '1',
-      title: 'Watering Complete',
-      message: 'All plants have been watered successfully',
-      type: 'success',
-      timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000),
-      read: false,
-    },
-    {
-      id: '2',
-      title: 'Temperature Alert',
-      message: 'Greenhouse temperature is above optimal range',
-      type: 'warning',
-      timestamp: new Date(Date.now() - 4 * 60 * 60 * 1000),
-      read: false,
-    },
-    {
-      id: '3',
-      title: 'New Plant Added',
-      message: 'Tomato plant has been added to your garden',
-      type: 'info',
-      timestamp: new Date(Date.now() - 6 * 60 * 60 * 1000),
-      read: true,
-    },
-    {
-      id: '4',
-      title: 'Sensor Offline',
-      message: 'Soil moisture sensor #3 is not responding',
-      type: 'error',
-      timestamp: new Date(Date.now() - 8 * 60 * 60 * 1000),
-      read: true,
-    },
-  ]);
+  const [notifications, setNotifications] = useState([]);
 
   const unreadCount = notifications.filter(n => !n.read).length;
 

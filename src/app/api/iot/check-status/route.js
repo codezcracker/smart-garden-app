@@ -8,23 +8,23 @@ function getConnectionQuality(lastSeen) {
   const now = new Date();
   const timeDiff = now - new Date(lastSeen);
   
-  if (timeDiff < 2000) return 'excellent';      // Less than 2 seconds
-  if (timeDiff < 4000) return 'good';           // Less than 4 seconds  
-  if (timeDiff < 6000) return 'poor';           // Less than 6 seconds
-  return 'disconnected';                        // More than 30 seconds
+  if (timeDiff < 5000) return 'excellent';      // Less than 5 seconds
+  if (timeDiff < 10000) return 'good';          // Less than 10 seconds  
+  if (timeDiff < 15000) return 'poor';          // Less than 15 seconds
+  return 'disconnected';                        // More than 15 seconds
 }
 
 export async function GET(request) {
   try {
     const { db } = await connectToDatabase();
     
-    // Check for devices that haven't been seen in the last 4 seconds (stable)
-    const fourSecondsAgo = new Date(Date.now() - 4 * 1000);
+    // Check for devices that haven't been seen in the last 10 seconds (more realistic)
+    const tenSecondsAgo = new Date(Date.now() - 10 * 1000);
     
     // Mark devices as offline if they haven't been seen recently (both collections)
     const result1 = await db.collection('iot_devices').updateMany(
       { 
-        lastSeen: { $lt: fourSecondsAgo },
+        lastSeen: { $lt: tenSecondsAgo },
         status: 'online'
       },
       { 
@@ -37,7 +37,7 @@ export async function GET(request) {
     
     const result2 = await db.collection('user_devices').updateMany(
       { 
-        lastSeen: { $lt: fourSecondsAgo },
+        lastSeen: { $lt: tenSecondsAgo },
         status: 'online'
       },
       { 
