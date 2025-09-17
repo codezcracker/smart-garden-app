@@ -122,15 +122,8 @@ export default function MyDevicesPage() {
           
           console.log('🔍 Status check:', { deviceId, currentStatus, previousStatus });
           
-          // Force notification for testing when device comes online for first time
-          if (!previousStatus && currentStatus === 'online') {
-            const device = devices.find(d => d.deviceId === deviceId);
-            const deviceName = device?.deviceName || deviceId;
-            console.log('🆕 Device came online for first time:', { deviceId, deviceName });
-            showToast('success', `🔗 ${deviceName} connected!`, 4000);
-          }
-          
-          if (previousStatus && previousStatus !== currentStatus) {
+          // Show notification for status changes
+          if (previousStatus !== currentStatus) {
             const device = devices.find(d => d.deviceId === deviceId);
             const deviceName = device?.deviceName || deviceId;
             
@@ -143,10 +136,10 @@ export default function MyDevicesPage() {
               totalDevices: devices.length
             });
             
-            if (currentStatus === 'online' && previousStatus === 'offline') {
+            if (currentStatus === 'online') {
               console.log('🔗 Showing connection notification');
               showToast('success', `🔗 ${deviceName} connected!`, 4000);
-            } else if (currentStatus === 'offline' && previousStatus === 'online') {
+            } else if (currentStatus === 'offline') {
               console.log('🔌 Showing disconnection notification');
               showToast('warning', `🔌 ${deviceName} disconnected!`, 4000);
             }

@@ -50,10 +50,10 @@ export default function RealtimeIoTDashboard() {
           if (previousDeviceStatus !== device.status) {
             console.log('📢 Dashboard Status change detected:', { from: previousDeviceStatus, to: device.status });
             
-            if (isOnline && previousDeviceStatus === 'offline') {
+            if (device.status === 'online') {
               console.log('🔗 Dashboard: Showing connection notification');
               showToast('success', '🔗 Smart Garden Device connected!', 4000);
-            } else if (!isOnline && previousDeviceStatus === 'online') {
+            } else if (device.status === 'offline') {
               console.log('🔌 Dashboard: Showing disconnection notification');
               showToast('warning', '🔌 Smart Garden Device disconnected!', 4000);
             }

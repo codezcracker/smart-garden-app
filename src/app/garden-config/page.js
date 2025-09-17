@@ -93,15 +93,15 @@ export default function GardenConfigPage() {
           
           console.log('🔍 Garden Status check:', { deviceId, currentStatus, previousStatus });
           
-          if (previousStatus && previousStatus !== currentStatus) {
+          if (previousStatus !== currentStatus) {
             const deviceName = deviceId; // Use deviceId as name since we don't have device details here
             
             console.log('📢 Garden Status change detected:', { deviceId, from: previousStatus, to: currentStatus });
             
-            if (currentStatus === 'online' && previousStatus === 'offline') {
+            if (currentStatus === 'online') {
               console.log('🔗 Garden: Showing connection notification');
               showToast('success', `🔗 Device ${deviceName} connected!`, 4000);
-            } else if (currentStatus === 'offline' && previousStatus === 'online') {
+            } else if (currentStatus === 'offline') {
               console.log('🔌 Garden: Showing disconnection notification');
               showToast('warning', `🔌 Device ${deviceName} disconnected!`, 4000);
             }
