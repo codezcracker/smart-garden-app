@@ -37,8 +37,8 @@ export default function GardenConfigPage() {
     fetchGardens();
     fetchDeviceStatuses();
     
-    // Update device statuses every 5 seconds
-    const interval = setInterval(fetchDeviceStatuses, 5000);
+    // Update device statuses every 1 second for instant detection
+    const interval = setInterval(fetchDeviceStatuses, 1000);
     return () => clearInterval(interval);
   }, []);
 
@@ -91,12 +91,18 @@ export default function GardenConfigPage() {
           const currentStatus = statusMap[deviceId].status;
           const previousStatus = previousDeviceStatuses[deviceId]?.status;
           
+          console.log('🔍 Garden Status check:', { deviceId, currentStatus, previousStatus });
+          
           if (previousStatus && previousStatus !== currentStatus) {
             const deviceName = deviceId; // Use deviceId as name since we don't have device details here
             
+            console.log('📢 Garden Status change detected:', { deviceId, from: previousStatus, to: currentStatus });
+            
             if (currentStatus === 'online' && previousStatus === 'offline') {
+              console.log('🔗 Garden: Showing connection notification');
               showToast('success', `🔗 Device ${deviceName} connected!`, 4000);
             } else if (currentStatus === 'offline' && previousStatus === 'online') {
+              console.log('🔌 Garden: Showing disconnection notification');
               showToast('warning', `🔌 Device ${deviceName} disconnected!`, 4000);
             }
           }

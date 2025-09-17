@@ -35,8 +35,8 @@ export default function MyDevicesPage() {
     fetchGardens();
     fetchDeviceStatuses();
     
-    // Update device statuses every 3 seconds
-    const interval = setInterval(fetchDeviceStatuses, 3000);
+        // Update device statuses every 1 second for instant detection
+        const interval = setInterval(fetchDeviceStatuses, 1000);
     return () => clearInterval(interval);
   }, []);
 
@@ -114,12 +114,18 @@ export default function MyDevicesPage() {
           const currentStatus = statusMap[deviceId].status;
           const previousStatus = previousDeviceStatuses[deviceId]?.status;
           
+          console.log('🔍 Status check:', { deviceId, currentStatus, previousStatus });
+          
           if (previousStatus && previousStatus !== currentStatus) {
             const deviceName = devices.find(d => d.deviceId === deviceId)?.deviceName || deviceId;
             
+            console.log('📢 Status change detected:', { deviceId, deviceName, from: previousStatus, to: currentStatus });
+            
             if (currentStatus === 'online' && previousStatus === 'offline') {
+              console.log('🔗 Showing connection notification');
               showToast('success', `🔗 ${deviceName} connected!`, 4000);
             } else if (currentStatus === 'offline' && previousStatus === 'online') {
+              console.log('🔌 Showing disconnection notification');
               showToast('warning', `🔌 ${deviceName} disconnected!`, 4000);
             }
           }
