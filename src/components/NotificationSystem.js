@@ -5,23 +5,26 @@ import { useState, useEffect } from 'react';
 const NotificationSystem = () => {
   const [notifications, setNotifications] = useState([]);
 
-  useEffect(() => {
-    console.log('🔔 NotificationSystem component mounted!');
-    
-    // Listen for custom notification events
-    const handleNotification = (event) => {
-      console.log('🔔 NotificationSystem received event:', event.detail);
-      const { type, message, duration = 5000 } = event.detail;
-      addNotification(type, message, duration);
-    };
+        useEffect(() => {
+            console.log('🔔 NotificationSystem component mounted!');
+            
+            // Clear any existing notifications on mount
+            setNotifications([]);
+            
+            // Listen for custom notification events
+            const handleNotification = (event) => {
+              console.log('🔔 NotificationSystem received event:', event.detail);
+              const { type, message, duration = 5000 } = event.detail;
+              addNotification(type, message, duration);
+            };
 
-    console.log('🔔 NotificationSystem setting up event listener');
-    window.addEventListener('showToast', handleNotification);
-    return () => {
-      console.log('🔔 NotificationSystem cleaning up event listener');
-      window.removeEventListener('showToast', handleNotification);
-    };
-  }, []);
+            console.log('🔔 NotificationSystem setting up event listener');
+            window.addEventListener('showToast', handleNotification);
+            return () => {
+              console.log('🔔 NotificationSystem cleaning up event listener');
+              window.removeEventListener('showToast', handleNotification);
+            };
+          }, []);
 
   const addNotification = (type, message, duration = 5000) => {
     console.log('🔔 Adding notification:', { type, message, duration });

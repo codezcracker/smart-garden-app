@@ -1,11 +1,17 @@
 'use client';
 
-import { createContext, useContext, useState } from 'react';
+        import { createContext, useContext, useState, useEffect } from 'react';
 
 const NotificationContext = createContext(undefined);
 
-export function NotificationProvider({ children }) {
-  const [notifications, setNotifications] = useState([]);
+        export function NotificationProvider({ children }) {
+          const [notifications, setNotifications] = useState([]);
+          
+          // Clear notifications on page load/refresh
+          useEffect(() => {
+            console.log('🔔 NotificationProvider: Clearing notifications on page load');
+            setNotifications([]);
+          }, []);
 
   const unreadCount = notifications.filter(n => !n.read).length;
 
@@ -33,22 +39,18 @@ export function NotificationProvider({ children }) {
     setNotifications(prev => [newNotification, ...prev]);
   };
 
-  // Add toast notification function
-  const showToast = (type, message, duration = 5000) => {
-    console.log('🔔 NotificationProvider showToast called:', { type, message, duration });
-    const event = new CustomEvent('showToast', {
-      detail: { type, message, duration }
-    });
-    console.log('🔔 Dispatching showToast event:', event);
-    window.dispatchEvent(event);
-    
-    // Also add to persistent notifications
-    addNotification({
-      title: type.charAt(0).toUpperCase() + type.slice(1),
-      message: message,
-      type: type,
-    });
-  };
+          // Add toast notification function
+          const showToast = (type, message, duration = 5000) => {
+            console.log('🔔 NotificationProvider showToast called:', { type, message, duration });
+            const event = new CustomEvent('showToast', {
+              detail: { type, message, duration }
+            });
+            console.log('🔔 Dispatching showToast event:', event);
+            window.dispatchEvent(event);
+            
+            // Don't add to persistent notifications - only show toast
+            // This prevents showing old notifications on page refresh
+          };
 
   const clearAll = () => {
     setNotifications([]);
