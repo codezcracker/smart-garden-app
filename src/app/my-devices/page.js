@@ -11,6 +11,7 @@ export default function MyDevicesPage() {
   const [showAddForm, setShowAddForm] = useState(false);
   const [editingDevice, setEditingDevice] = useState(null);
   const [deviceStatuses, setDeviceStatuses] = useState({});
+  const [previousDeviceStatuses, setPreviousDeviceStatuses] = useState({});
 
   // Form states
   const [formData, setFormData] = useState({
@@ -111,15 +112,27 @@ export default function MyDevicesPage() {
             connectionQuality: device.connectionQuality
           };
         });
+        // Check for connection status changes
+        Object.keys(statusMap).forEach(deviceId => {
+          const currentStatus = statusMap[deviceId].status;
+          const previousStatus = previousDeviceStatuses[deviceId]?.status;
+          
+          if (previousStatus && previousStatus !== currentStatus) {
+            const deviceName = devices.find(d => d.deviceId === deviceId)?.deviceName || deviceId;
+            
+            if (currentStatus === 'online' && previousStatus === 'offline') {
+              showToast('success', `🔗 ${deviceName} connected!`, 4000);
+            } else if (currentStatus === 'offline' && previousStatus === 'online') {
+              showToast('warning', `🔌 ${deviceName} disconnected!`, 4000);
+            }
+          }
+        });
+        
+        // Update states
+        setPreviousDeviceStatuses(deviceStatuses);
         setDeviceStatuses(statusMap);
         console.log('📱 Device statuses updated:', statusMap);
         console.log('📱 Available devices in status data:', Object.keys(statusMap));
-        
-        // Show notification for status changes
-        const onlineDevices = Object.values(statusMap).filter(s => s.status === 'online').length;
-        if (onlineDevices > 0) {
-          showToast('success', `${onlineDevices} device(s) online`, 3000);
-        }
       }
     } catch (error) {
       console.error('❌ Error fetching device statuses:', error);

@@ -11,6 +11,7 @@ export default function GardenConfigPage() {
   const [showAddForm, setShowAddForm] = useState(false);
   const [editingGarden, setEditingGarden] = useState(null);
   const [deviceStatuses, setDeviceStatuses] = useState({});
+  const [previousDeviceStatuses, setPreviousDeviceStatuses] = useState({});
 
   // Form states
   const [formData, setFormData] = useState({
@@ -87,6 +88,24 @@ export default function GardenConfigPage() {
             connectionQuality: device.connectionQuality
           };
         });
+        // Check for connection status changes
+        Object.keys(statusMap).forEach(deviceId => {
+          const currentStatus = statusMap[deviceId].status;
+          const previousStatus = previousDeviceStatuses[deviceId]?.status;
+          
+          if (previousStatus && previousStatus !== currentStatus) {
+            const deviceName = deviceId; // Use deviceId as name since we don't have device details here
+            
+            if (currentStatus === 'online' && previousStatus === 'offline') {
+              showToast('success', `🔗 Device ${deviceName} connected!`, 4000);
+            } else if (currentStatus === 'offline' && previousStatus === 'online') {
+              showToast('warning', `🔌 Device ${deviceName} disconnected!`, 4000);
+            }
+          }
+        });
+        
+        // Update states
+        setPreviousDeviceStatuses(deviceStatuses);
         setDeviceStatuses(statusMap);
         console.log('📱 Device statuses updated:', statusMap);
       }

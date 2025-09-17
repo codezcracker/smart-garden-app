@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
+import { useNotifications } from '@/components/NotificationProvider';
 import './iot-dashboard.css';
 
 export default function IoTDashboard() {
@@ -9,7 +10,9 @@ export default function IoTDashboard() {
   const [error, setError] = useState(null);
   const [lastUpdate, setLastUpdate] = useState(null);
   const [isRealtime, setIsRealtime] = useState(false);
+  const [previousDeviceStatus, setPreviousDeviceStatus] = useState(null);
   const eventSourceRef = useRef(null);
+  const { showToast } = useNotifications();
 
   // Fetch device data
   const fetchDeviceData = async () => {

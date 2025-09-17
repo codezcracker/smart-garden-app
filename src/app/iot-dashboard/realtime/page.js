@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
+import { useNotifications } from '@/components/NotificationProvider';
 import '../iot-dashboard.css';
 
 export default function RealtimeIoTDashboard() {
@@ -16,8 +17,10 @@ export default function RealtimeIoTDashboard() {
   const [stableStatus, setStableStatus] = useState('offline');
   const [statusChangeTime, setStatusChangeTime] = useState(0);
   const [consecutiveOfflineCount, setConsecutiveOfflineCount] = useState(0);
+  const [previousDeviceStatus, setPreviousDeviceStatus] = useState('offline');
   const eventSourceRef = useRef(null);
   const statusCheckIntervalRef = useRef(null);
+  const { showToast } = useNotifications();
 
   // Check device status with improved detection
   const checkDeviceStatus = async () => {
@@ -42,6 +45,16 @@ export default function RealtimeIoTDashboard() {
           
           // Debug: Force status display
           console.log('🎯 FORCING STATUS UPDATE:', device.status);
+          
+          // Check for connection status changes and show notifications
+          if (previousDeviceStatus !== device.status) {
+            if (isOnline && previousDeviceStatus === 'offline') {
+              showToast('success', '🔗 Smart Garden Device connected!', 4000);
+            } else if (!isOnline && previousDeviceStatus === 'online') {
+              showToast('warning', '🔌 Smart Garden Device disconnected!', 4000);
+            }
+            setPreviousDeviceStatus(device.status);
+          }
           
           // Simple and reliable status update
           if (isOnline) {
