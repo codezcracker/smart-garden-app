@@ -1,11 +1,24 @@
 import { NextResponse } from 'next/server';
 import { connectToDatabase } from '../../../../lib/mongodb';
+import { authenticateDevice } from '../../../../lib/device-auth';
 
 export async function POST(request) {
   try {
     console.log('📡 IoT Device Data API: Received data');
     
     const data = await request.json();
+    
+    // Authenticate device
+    const auth = await authenticateDevice(request);
+    if (!auth.authenticated) {
+      console.log('❌ Device authentication failed:', auth.error);
+      return NextResponse.json({
+        success: false,
+        error: auth.error
+      }, { status: 401 });
+    }
+    
+    console.log('✅ Device authenticated:', data.deviceId, 'for user:', auth.userId);
     console.log('📊 Device Data:', {
       deviceId: data.deviceId,
       timestamp: data.timestamp,

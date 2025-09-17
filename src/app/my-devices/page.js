@@ -1,0 +1,513 @@
+'use client';
+
+import { useState, useEffect } from 'react';
+import './my-devices.css';
+
+export default function MyDevicesPage() {
+  const [devices, setDevices] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [showAddForm, setShowAddForm] = useState(false);
+  const [editingDevice, setEditingDevice] = useState(null);
+
+  // Form states
+  const [formData, setFormData] = useState({
+    deviceId: '',
+    deviceName: '',
+    location: '',
+    description: '',
+    wifiSSID: 'Qureshi Deco',
+    wifiPassword: '65327050',
+    temperatureEnabled: true,
+    humidityEnabled: true,
+    lightLevelEnabled: true,
+    soilMoistureEnabled: true,
+    sendInterval: 1000
+  });
+
+  useEffect(() => {
+    fetchDevices();
+  }, []);
+
+  const fetchDevices = async () => {
+    try {
+      setLoading(true);
+      // In a real app, you would get the auth token from your auth system
+      const token = localStorage.getItem('auth_token');
+      
+      const response = await fetch('/api/iot/user-devices', {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+      
+      const data = await response.json();
+      
+      if (data.success && data.devices) {
+        setDevices(data.devices);
+        console.log('📱 Fetched devices:', data.devices);
+      } else {
+        console.log('📱 No devices found or API error:', data);
+        setDevices([]);
+      }
+    } catch (error) {
+      console.error('❌ Error fetching devices:', error);
+      setDevices([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const setupSampleDevice = async () => {
+    try {
+      console.log('🚀 Setting up sample device...');
+      
+      const response = await fetch('/api/iot/setup-sample-device', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+
+      const responseData = await response.json();
+      console.log('📡 Setup API Response:', responseData);
+
+      if (response.ok && responseData.success) {
+        alert('Sample device (DB007) created successfully! You can now download the ESP8266 code.');
+        fetchDevices(); // Refresh the device list
+      } else {
+        console.error('❌ Setup failed:', responseData);
+        alert(`Error setting up sample device: ${responseData.error || responseData.message || 'Unknown error'}`);
+      }
+    } catch (error) {
+      console.error('❌ Error setting up sample device:', error);
+      alert('Error setting up sample device: ' + error.message);
+    }
+  };
+
+  const handleAddDevice = () => {
+    setFormData({
+      deviceId: '',
+      deviceName: '',
+      location: '',
+      description: '',
+      wifiSSID: 'Qureshi Deco',
+      wifiPassword: '65327050',
+      temperatureEnabled: true,
+      humidityEnabled: true,
+      lightLevelEnabled: true,
+      soilMoistureEnabled: true,
+      sendInterval: 1000
+    });
+    setEditingDevice(null);
+    setShowAddForm(true);
+  };
+
+  const handleEditDevice = (device) => {
+    setFormData({
+      deviceId: device.deviceId,
+      deviceName: device.deviceName,
+      location: device.location,
+      description: device.description,
+      wifiSSID: device.network.wifiSSID,
+      wifiPassword: device.network.wifiPassword,
+      temperatureEnabled: device.sensors.temperature.enabled,
+      humidityEnabled: device.sensors.humidity.enabled,
+      lightLevelEnabled: device.sensors.lightLevel.enabled,
+      soilMoistureEnabled: device.sensors.soilMoisture.enabled,
+      sendInterval: device.settings.sendInterval
+    });
+    setEditingDevice(device);
+    setShowAddForm(true);
+  };
+
+  const handleSaveDevice = async () => {
+    try {
+      console.log('💾 Saving device data:', formData);
+      
+      const token = localStorage.getItem('auth_token');
+      
+      const response = await fetch('/api/iot/user-devices', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(formData)
+      });
+
+      const responseData = await response.json();
+      console.log('📡 API Response:', responseData);
+
+      if (response.ok && responseData.success) {
+        setShowAddForm(false);
+        fetchDevices();
+        alert('Device configuration saved successfully!');
+      } else {
+        console.error('❌ Save failed:', responseData);
+        alert(`Error saving device configuration: ${responseData.error || 'Unknown error'}`);
+      }
+    } catch (error) {
+      console.error('❌ Error saving device:', error);
+      alert('Error saving device configuration: ' + error.message);
+    }
+  };
+
+  const handleUpdateDevice = async () => {
+    try {
+      console.log('💾 Updating device data:', formData);
+      
+      const token = localStorage.getItem('auth_token');
+      
+      const response = await fetch('/api/iot/device-config', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(formData)
+      });
+
+      const responseData = await response.json();
+      console.log('📡 API Response:', responseData);
+
+      if (response.ok && responseData.success) {
+        setShowAddForm(false);
+        fetchDevices();
+        alert('Device configuration updated successfully!');
+      } else {
+        console.error('❌ Update failed:', responseData);
+        alert(`Error updating device configuration: ${responseData.error || 'Unknown error'}`);
+      }
+    } catch (error) {
+      console.error('❌ Error updating device:', error);
+      alert('Error updating device configuration: ' + error.message);
+    }
+  };
+
+  const generateDeviceCode = (device) => {
+    const code = `/*
+ * Smart Garden IoT - Device: ${device.deviceName}
+ * Generated on: ${new Date().toLocaleDateString()}
+ * 
+ * This code will automatically fetch configuration from MongoDB
+ * No need to modify this code for configuration changes!
+ */
+
+#include <ESP8266WiFi.h>
+#include <ESP8266HTTPClient.h>
+#include <ArduinoJson.h>
+
+// This device will fetch ALL configuration from MongoDB
+// Device ID: ${device.deviceId}
+// Owner: Your Account
+
+void setup() {
+  Serial.begin(115200);
+  delay(1000);
+  
+  Serial.println("🌱 Smart Garden IoT - MongoDB Configuration");
+  Serial.println("Device ID: ${device.deviceId}");
+  Serial.println("==========================================");
+  
+  // Load configuration from MongoDB
+  loadDeviceConfiguration();
+  
+  // Connect to WiFi and start data transmission
+  connectToWiFi();
+  testServerConnection();
+  
+  Serial.println("🚀 Starting data transmission...");
+}
+
+void loop() {
+  // Main loop - configuration will be fetched automatically
+  // This code handles everything dynamically!
+}
+
+// The rest of the code will be the same as MongoDB_Config_ESP8266.ino
+// This is just the setup portion showing your device configuration`;
+
+    // Create a blob and download
+    const blob = new Blob([code], { type: 'text/plain' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `SmartGarden_${device.deviceId}_Setup.ino`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    window.URL.revokeObjectURL(url);
+  };
+
+  const getStatusIcon = (status) => {
+    switch (status) {
+      case 'online': return '🟢';
+      case 'offline': return '🔴';
+      case 'inactive': return '⚪';
+      default: return '❓';
+    }
+  };
+
+  const getStatusColor = (status) => {
+    switch (status) {
+      case 'online': return '#10b981';
+      case 'offline': return '#ef4444';
+      case 'inactive': return '#6b7280';
+      default: return '#9ca3af';
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="my-devices-page">
+        <div className="loading-container">
+          <div className="loading-spinner"></div>
+          <p>Loading your devices...</p>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="my-devices-page">
+      <div className="page-header">
+        <h1>📱 My IoT Devices</h1>
+        <p>Manage your Smart Garden IoT devices</p>
+      </div>
+
+      <div className="devices-section">
+        <div className="section-header">
+          <h2>Your Devices ({devices.length})</h2>
+          <div className="header-actions">
+            <button 
+              className="btn btn-secondary"
+              onClick={setupSampleDevice}
+            >
+              🚀 Setup Sample Device
+            </button>
+            <button 
+              className="btn btn-primary"
+              onClick={handleAddDevice}
+            >
+              ➕ Add Device
+            </button>
+          </div>
+        </div>
+
+        {devices.length === 0 ? (
+          <div className="empty-state">
+            <div className="empty-icon">📱</div>
+            <h3>No devices registered</h3>
+            <p>Add your first Smart Garden IoT device to get started</p>
+            <button 
+              className="btn btn-primary"
+              onClick={handleAddDevice}
+            >
+              Add Device
+            </button>
+          </div>
+        ) : (
+          <div className="devices-grid">
+            {devices.map((device) => (
+              <div key={device.deviceId} className="device-card">
+                <div className="device-header">
+                  <div className="device-info">
+                    <h3>{device.deviceName}</h3>
+                    <p className="device-id">ID: {device.deviceId}</p>
+                  </div>
+                  <div className="device-status">
+                    <span 
+                      className="status-indicator"
+                      style={{ color: getStatusColor(device.status) }}
+                    >
+                      {getStatusIcon(device.status)} {device.status?.toUpperCase() || 'UNKNOWN'}
+                    </span>
+                  </div>
+                </div>
+
+                <div className="device-details">
+                  <div className="detail-item">
+                    <span className="label">Location:</span>
+                    <span className="value">{device.location || 'Not set'}</span>
+                  </div>
+                  <div className="detail-item">
+                    <span className="label">Last Seen:</span>
+                    <span className="value">
+                      {device.lastSeen ? new Date(device.lastSeen).toLocaleString() : 'Never'}
+                    </span>
+                  </div>
+                  <div className="detail-item">
+                    <span className="label">WiFi Signal:</span>
+                    <span className="value">{device.wifiRSSI || 'N/A'} dBm</span>
+                  </div>
+                  <div className="detail-item">
+                    <span className="label">Config Version:</span>
+                    <span className="value">{device.configVersion || 'N/A'}</span>
+                  </div>
+                </div>
+
+                <div className="device-actions">
+                  <button 
+                    className="btn btn-secondary"
+                    onClick={() => handleEditDevice(device)}
+                  >
+                    ✏️ Edit
+                  </button>
+                  <button 
+                    className="btn btn-success"
+                    onClick={() => generateDeviceCode(device)}
+                  >
+                    📥 Download Code
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {showAddForm && (
+        <div className="modal-overlay">
+          <div className="modal-content">
+            <div className="modal-header">
+              <h2>{editingDevice ? 'Edit Device' : 'Add New Device'}</h2>
+              <button 
+                className="close-btn"
+                onClick={() => setShowAddForm(false)}
+              >
+                ✕
+              </button>
+            </div>
+
+            <div className="modal-body">
+              <div className="form-group">
+                <label>Device ID *</label>
+                <input
+                  type="text"
+                  value={formData.deviceId}
+                  onChange={(e) => setFormData({...formData, deviceId: e.target.value})}
+                  placeholder="e.g., DB001, DB002"
+                  disabled={editingDevice}
+                />
+              </div>
+
+              <div className="form-group">
+                <label>Device Name *</label>
+                <input
+                  type="text"
+                  value={formData.deviceName}
+                  onChange={(e) => setFormData({...formData, deviceName: e.target.value})}
+                  placeholder="e.g., Garden Sensor 1"
+                />
+              </div>
+
+              <div className="form-group">
+                <label>Location</label>
+                <input
+                  type="text"
+                  value={formData.location}
+                  onChange={(e) => setFormData({...formData, location: e.target.value})}
+                  placeholder="e.g., Living Room, Balcony"
+                />
+              </div>
+
+              <div className="form-group">
+                <label>Description</label>
+                <textarea
+                  value={formData.description}
+                  onChange={(e) => setFormData({...formData, description: e.target.value})}
+                  placeholder="Device description..."
+                  rows="3"
+                />
+              </div>
+
+              <div className="form-group">
+                <label>WiFi SSID</label>
+                <input
+                  type="text"
+                  value={formData.wifiSSID}
+                  onChange={(e) => setFormData({...formData, wifiSSID: e.target.value})}
+                  placeholder="Your WiFi network name"
+                />
+              </div>
+
+              <div className="form-group">
+                <label>WiFi Password</label>
+                <input
+                  type="password"
+                  value={formData.wifiPassword}
+                  onChange={(e) => setFormData({...formData, wifiPassword: e.target.value})}
+                  placeholder="Your WiFi password"
+                />
+              </div>
+
+              <div className="form-group">
+                <label>Send Interval (ms)</label>
+                <input
+                  type="number"
+                  value={formData.sendInterval}
+                  onChange={(e) => setFormData({...formData, sendInterval: parseInt(e.target.value)})}
+                  placeholder="1000"
+                />
+              </div>
+
+              <div className="form-group">
+                <label>Enabled Sensors</label>
+                <div className="sensor-checkboxes">
+                  <label className="checkbox-label">
+                    <input
+                      type="checkbox"
+                      checked={formData.temperatureEnabled}
+                      onChange={(e) => setFormData({...formData, temperatureEnabled: e.target.checked})}
+                    />
+                    🌡️ Temperature
+                  </label>
+                  <label className="checkbox-label">
+                    <input
+                      type="checkbox"
+                      checked={formData.humidityEnabled}
+                      onChange={(e) => setFormData({...formData, humidityEnabled: e.target.checked})}
+                    />
+                    💧 Humidity
+                  </label>
+                  <label className="checkbox-label">
+                    <input
+                      type="checkbox"
+                      checked={formData.lightLevelEnabled}
+                      onChange={(e) => setFormData({...formData, lightLevelEnabled: e.target.checked})}
+                    />
+                    ☀️ Light Level
+                  </label>
+                  <label className="checkbox-label">
+                    <input
+                      type="checkbox"
+                      checked={formData.soilMoistureEnabled}
+                      onChange={(e) => setFormData({...formData, soilMoistureEnabled: e.target.checked})}
+                    />
+                    🌱 Soil Moisture
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            <div className="modal-footer">
+              <button 
+                className="btn btn-secondary"
+                onClick={() => setShowAddForm(false)}
+              >
+                Cancel
+              </button>
+              <button 
+                className="btn btn-primary"
+                onClick={editingDevice ? handleUpdateDevice : handleSaveDevice}
+              >
+                {editingDevice ? 'Update Device' : 'Add Device'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
