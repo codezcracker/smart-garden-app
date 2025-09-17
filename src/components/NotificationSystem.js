@@ -65,32 +65,82 @@ const NotificationSystem = () => {
   };
 
   return (
-    <div className="notification-container">
+    <div style={{
+      position: 'fixed',
+      top: '20px',
+      right: '20px',
+      zIndex: 9999,
+      pointerEvents: 'none',
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'flex-end',
+      gap: '8px'
+    }}>
       {notifications.length > 0 && (
-        <div className="notification-counter">
+        <div style={{
+          position: 'fixed',
+          top: '10px',
+          right: '10px',
+          background: '#4caf50',
+          color: 'white',
+          padding: '4px 8px',
+          borderRadius: '4px',
+          fontSize: '12px',
+          zIndex: 10000,
+          pointerEvents: 'none'
+        }}>
           🔔 {notifications.length} notification(s)
         </div>
       )}
       {notifications.map(notification => (
         <div
           key={notification.id}
-          className="notification"
-          style={{ backgroundColor: getNotificationColor(notification.type) }}
+          style={{
+            backgroundColor: getNotificationColor(notification.type),
+            color: 'white',
+            padding: '12px 16px',
+            borderRadius: '8px',
+            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '12px',
+            minWidth: '300px',
+            maxWidth: '500px',
+            animation: 'slideInRight 0.3s ease-out',
+            position: 'relative',
+            pointerEvents: 'auto'
+          }}
         >
-          <span className="notification-icon">
+          <span style={{ fontSize: '18px', flexShrink: 0 }}>
             {getNotificationIcon(notification.type)}
           </span>
-          <div className="notification-content">
-            <div className="notification-message">
+          <div style={{ flex: 1 }}>
+            <div style={{ fontWeight: '500', marginBottom: '4px' }}>
               {notification.message}
             </div>
-            <div className="notification-time">
+            <div style={{ 
+              fontSize: '12px', 
+              opacity: 0.8,
+              fontFamily: 'monospace'
+            }}>
               {notification.timestamp.toLocaleTimeString()}
             </div>
           </div>
           <button
-            className="notification-close"
             onClick={() => removeNotification(notification.id)}
+            style={{
+              background: 'none',
+              border: 'none',
+              color: 'white',
+              cursor: 'pointer',
+              fontSize: '18px',
+              padding: '4px',
+              opacity: 0.7,
+              transition: 'opacity 0.2s',
+              flexShrink: 0
+            }}
+            onMouseOver={(e) => e.target.style.opacity = '1'}
+            onMouseOut={(e) => e.target.style.opacity = '0.7'}
           >
             ×
           </button>
@@ -98,82 +148,6 @@ const NotificationSystem = () => {
       ))}
       
       <style jsx>{`
-        .notification-container {
-          position: fixed;
-          top: 20px;
-          right: 20px;
-          z-index: 9999;
-          pointer-events: none;
-          display: flex;
-          flex-direction: column;
-          align-items: flex-end;
-          gap: 8px;
-        }
-        
-        .notification-counter {
-          position: fixed;
-          top: 10px;
-          right: 10px;
-          background: #4caf50;
-          color: white;
-          padding: 4px 8px;
-          border-radius: 4px;
-          font-size: 12px;
-          z-index: 10000;
-          pointer-events: none;
-        }
-        
-        .notification {
-          pointer-events: auto;
-          color: white;
-          padding: 12px 16px;
-          border-radius: 8px;
-          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-          display: flex;
-          align-items: center;
-          gap: 12px;
-          min-width: 300px;
-          max-width: 500px;
-          animation: slideInRight 0.3s ease-out;
-          position: relative;
-        }
-        
-        .notification-icon {
-          font-size: 18px;
-          flex-shrink: 0;
-        }
-        
-        .notification-content {
-          flex: 1;
-        }
-        
-        .notification-message {
-          font-weight: 500;
-          margin-bottom: 4px;
-        }
-        
-        .notification-time {
-          font-size: 12px;
-          opacity: 0.8;
-          font-family: monospace;
-        }
-        
-        .notification-close {
-          background: none;
-          border: none;
-          color: white;
-          cursor: pointer;
-          font-size: 18px;
-          padding: 4px;
-          opacity: 0.7;
-          transition: opacity 0.2s;
-          flex-shrink: 0;
-        }
-        
-        .notification-close:hover {
-          opacity: 1;
-        }
-        
         @keyframes slideInRight {
           from {
             transform: translateX(100%);
@@ -183,11 +157,6 @@ const NotificationSystem = () => {
             transform: translateX(0);
             opacity: 1;
           }
-        }
-        
-        .notification:hover {
-          transform: translateX(-5px);
-          transition: transform 0.2s ease;
         }
       `}</style>
     </div>

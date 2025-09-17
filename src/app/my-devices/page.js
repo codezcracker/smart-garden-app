@@ -9,6 +9,12 @@ export default function MyDevicesPage() {
   const [loading, setLoading] = useState(true);
   const { showToast } = useNotifications();
 
+  // Test notification function
+  const testNotification = () => {
+    console.log('🧪 Testing notification...');
+    showToast('success', 'Test notification working!', 3000);
+  };
+
   const [showAddForm, setShowAddForm] = useState(false);
   const [editingDevice, setEditingDevice] = useState(null);
   const [deviceStatuses, setDeviceStatuses] = useState({});
@@ -370,6 +376,13 @@ void loop() {
         <div className="section-header">
           <h2>Your Devices ({devices.length})</h2>
           <div className="header-actions">
+            <button 
+              className="btn btn-secondary"
+              onClick={testNotification}
+              style={{ backgroundColor: '#f59e0b', color: 'white' }}
+            >
+              🧪 Test Notification
+            </button>
             <button 
               className="btn btn-secondary"
               onClick={setupSampleDevice}
