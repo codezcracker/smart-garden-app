@@ -4,12 +4,24 @@ import { useState, useEffect } from 'react';
 
 const NotificationSystem = () => {
   const [notifications, setNotifications] = useState([]);
+  
+  // Force immediate clear on every render
+  console.log('🔔 NotificationSystem render - current notifications:', notifications.length);
 
         useEffect(() => {
             console.log('🔔 NotificationSystem component mounted!');
             
-            // Clear any existing notifications on mount
+            // Aggressively clear everything
             setNotifications([]);
+            
+            // Clear any potential localStorage/sessionStorage
+            try {
+              localStorage.removeItem('notifications');
+              sessionStorage.removeItem('notifications');
+              console.log('🔔 Cleared localStorage and sessionStorage');
+            } catch (e) {
+              console.log('🔔 Could not clear storage:', e);
+            }
             
             // Listen for custom notification events
             const handleNotification = (event) => {
@@ -21,28 +33,9 @@ const NotificationSystem = () => {
             console.log('🔔 NotificationSystem setting up event listener');
             window.addEventListener('showToast', handleNotification);
             
-            // Clear notifications on page visibility change (refresh)
-            const handleVisibilityChange = () => {
-              if (document.visibilityState === 'visible') {
-                console.log('🔔 Page became visible - clearing notifications');
-                setNotifications([]);
-              }
-            };
-            
-            // Clear notifications before page unload (refresh/close)
-            const handleBeforeUnload = () => {
-              console.log('🔔 Page unloading - clearing notifications');
-              setNotifications([]);
-            };
-            
-            document.addEventListener('visibilitychange', handleVisibilityChange);
-            window.addEventListener('beforeunload', handleBeforeUnload);
-            
             return () => {
               console.log('🔔 NotificationSystem cleaning up event listener');
               window.removeEventListener('showToast', handleNotification);
-              document.removeEventListener('visibilitychange', handleVisibilityChange);
-              window.removeEventListener('beforeunload', handleBeforeUnload);
             };
           }, []);
 
@@ -87,34 +80,58 @@ const NotificationSystem = () => {
     }
   };
 
-  return (
-    <div style={{
-      position: 'fixed',
-      top: '20px',
-      right: '20px',
-      zIndex: 9999,
-      pointerEvents: 'none',
-      display: 'flex',
-      flexDirection: 'column',
-      alignItems: 'flex-end',
-      gap: '8px'
-    }}>
-      {notifications.length > 0 && (
-        <div style={{
-          position: 'fixed',
-          top: '10px',
-          right: '10px',
-          background: '#4caf50',
-          color: 'white',
-          padding: '4px 8px',
-          borderRadius: '4px',
-          fontSize: '12px',
-          zIndex: 10000,
-          pointerEvents: 'none'
-        }}>
-          🔔 {notifications.length} notification(s)
-        </div>
-      )}
+          return (
+            <div style={{
+              position: 'fixed',
+              top: '20px',
+              right: '20px',
+              zIndex: 9999,
+              pointerEvents: 'none',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'flex-end',
+              gap: '8px'
+            }}>
+              {/* Debug: Clear button */}
+              <button
+                onClick={() => {
+                  console.log('🔔 Manual clear button clicked');
+                  setNotifications([]);
+                }}
+                style={{
+                  position: 'fixed',
+                  top: '10px',
+                  left: '10px',
+                  background: '#ef4444',
+                  color: 'white',
+                  padding: '8px 12px',
+                  borderRadius: '4px',
+                  fontSize: '12px',
+                  zIndex: 10000,
+                  pointerEvents: 'auto',
+                  border: 'none',
+                  cursor: 'pointer'
+                }}
+              >
+                🗑️ Clear All Notifications
+              </button>
+              
+              {notifications.length > 0 && (
+                <div style={{
+                  position: 'fixed',
+                  top: '10px',
+                  right: '10px',
+                  background: '#4caf50',
+                  color: 'white',
+                  padding: '4px 8px',
+                  borderRadius: '4px',
+                  fontSize: '12px',
+                  zIndex: 10000,
+                  pointerEvents: 'none'
+                }}>
+                  🔔 {notifications.length} notification(s)
+                </div>
+              )}
       {notifications.map(notification => (
         <div
           key={notification.id}

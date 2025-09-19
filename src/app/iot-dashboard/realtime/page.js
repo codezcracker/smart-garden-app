@@ -48,20 +48,25 @@ export default function RealtimeIoTDashboard() {
           console.log('🎯 FORCING STATUS UPDATE:', device.status);
           
           // Check for connection status changes and show notifications (with 5 second cooldown)
+          // Don't show notifications on first load (when previousDeviceStatus is undefined)
           const notificationTime = Date.now();
-          if (previousDeviceStatus !== device.status && 
+          if (previousDeviceStatus !== 'offline' && // Skip initial state changes
+              previousDeviceStatus !== device.status && 
               (notificationTime - lastNotificationTime) > 5000) {
-            console.log('📢 Dashboard Status change detected:', { from: previousDeviceStatus, to: device.status });
+            console.log('📢 Dashboard Status change detected (DB007):', { from: previousDeviceStatus, to: device.status });
             
             setLastNotificationTime(notificationTime);
             
             if (device.status === 'online') {
               console.log('🔗 Dashboard: Showing connection notification');
-              showToast('success', '🔗 Smart Garden Device connected!', 4000);
+              showToast('success', '🔗 Smart Garden Device (DB007) connected!', 4000);
             } else if (device.status === 'offline') {
               console.log('🔌 Dashboard: Showing disconnection notification');
-              showToast('warning', '🔌 Smart Garden Device disconnected!', 4000);
+              showToast('warning', '🔌 Smart Garden Device (DB007) disconnected!', 4000);
             }
+            setPreviousDeviceStatus(device.status);
+          } else if (previousDeviceStatus === 'offline') {
+            // Only update the previous status without notification on first load
             setPreviousDeviceStatus(device.status);
           }
           

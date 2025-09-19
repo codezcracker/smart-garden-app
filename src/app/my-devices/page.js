@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useNotifications } from '@/components/NotificationProvider';
 import './my-devices.css';
 
@@ -9,10 +9,92 @@ export default function MyDevicesPage() {
   const [loading, setLoading] = useState(true);
   const { showToast } = useNotifications();
 
-  // Test notification function
-  const testNotification = () => {
-    console.log('🧪 Testing notification...');
-    showToast('success', 'Test notification working!', 3000);
+  // Device Discovery Functions
+  const startDeviceScan = async () => {
+    setIsScanning(true);
+    setDiscoveredDevices([]);
+    
+    try {
+      const response = await fetch('/api/iot/device-discovery');
+      const data = await response.json();
+      
+      if (data.success) {
+        setDiscoveredDevices(data.devices);
+        
+        // Show summary in notification
+        const total = data.summary?.total || data.devices.length;
+        
+        if (total > 0) {
+          showToast('success', `Found ${total} device${total !== 1 ? 's' : ''} available for pairing`, 4000);
+        } else {
+          showToast('info', 'No devices found in discovery mode', 3000);
+        }
+      } else {
+        showToast('error', 'Failed to scan for devices', 3000);
+      }
+    } catch (error) {
+      console.error('Device scan error:', error);
+      showToast('error', 'Error scanning for devices', 3000);
+    } finally {
+      setIsScanning(false);
+    }
+  };
+
+  const pairDevice = async (discoveryDevice) => {
+    try {
+      const deviceId = `DB${String(Math.floor(Math.random() * 9000) + 1000)}`;
+      const deviceName = `${discoveryDevice.deviceType} ${deviceId}`;
+      
+      // Start pairing process
+      setPairingDevice(discoveryDevice.id);
+      setPairingStatus('Connecting...');
+      showToast('info', `Pairing device ${deviceName}...`, 2000);
+      
+      const response = await fetch('/api/iot/device-pairing', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          discoveryId: discoveryDevice.id,
+          deviceId: deviceId,
+          deviceName: deviceName,
+          userId: 'demo-user-123'
+        })
+      });
+      
+      const data = await response.json();
+      
+      if (data.success) {
+        setPairingStatus('Device Connected! ✅');
+        showToast('success', `Device ${deviceName} connected successfully!`, 4000);
+        
+        // Wait 2 seconds then refresh
+        setTimeout(() => {
+          fetchDevices();
+          setDiscoveredDevices([]);
+          setPairingDevice(null);
+          setPairingStatus('');
+        }, 2000);
+      } else {
+        setPairingStatus('Connection Failed ❌');
+        showToast('error', `Failed to pair device: ${data.error}`, 4000);
+        
+        // Reset after 3 seconds
+        setTimeout(() => {
+          setPairingDevice(null);
+          setPairingStatus('');
+        }, 3000);
+      }
+    } catch (error) {
+      console.error('Pairing error:', error);
+      setPairingStatus('Connection Error ❌');
+      showToast('error', 'Error pairing device', 4000);
+      
+      // Reset after 3 seconds
+      setTimeout(() => {
+        setPairingDevice(null);
+        setPairingStatus('');
+      }, 3000);
+    }
   };
 
   const [showAddForm, setShowAddForm] = useState(false);
@@ -20,6 +102,12 @@ export default function MyDevicesPage() {
   const [deviceStatuses, setDeviceStatuses] = useState({});
   const [previousDeviceStatuses, setPreviousDeviceStatuses] = useState({});
   const [notificationCooldowns, setNotificationCooldowns] = useState({});
+  
+  // Device Discovery States
+  const [showDiscovery, setShowDiscovery] = useState(false);
+  const [discoveredDevices, setDiscoveredDevices] = useState([]);
+  const [isScanning, setIsScanning] = useState(false);
+  const [pairingStates, setPairingStates] = useState({}); // Track pairing states for each device
 
   // Form states
   const [formData, setFormData] = useState({
@@ -37,17 +125,7 @@ export default function MyDevicesPage() {
 
   const [gardens, setGardens] = useState([]);
 
-  useEffect(() => {
-    fetchDevices();
-    fetchGardens();
-    fetchDeviceStatuses();
-    
-        // Update device statuses every 1 second for instant detection
-        const interval = setInterval(fetchDeviceStatuses, 1000);
-    return () => clearInterval(interval);
-  }, []);
-
-  const fetchDevices = async () => {
+  const fetchDevices = useCallback(async () => {
     try {
       setLoading(true);
       // For testing - no authentication required
@@ -61,8 +139,8 @@ export default function MyDevicesPage() {
       
       if (data.success && data.devices) {
         setDevices(data.devices);
-        console.log('📱 Fetched devices:', data.devices);
-        console.log('📱 Device IDs from user-devices API:', data.devices.map(d => d.deviceId));
+        // console.log('📱 Fetched devices:', data.devices);
+        // console.log('📱 Device IDs from user-devices API:', data.devices.map(d => d.deviceId));
       } else {
         console.log('📱 No devices found or API error:', data);
         setDevices([]);
@@ -74,9 +152,9 @@ export default function MyDevicesPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [showToast]);
 
-  const fetchGardens = async () => {
+  const fetchGardens = useCallback(async () => {
     try {
       // For testing - no authentication required
       const response = await fetch('/api/iot/gardens', {
@@ -89,7 +167,7 @@ export default function MyDevicesPage() {
       
       if (data.success && data.gardens) {
         setGardens(data.gardens);
-        console.log('🌱 Fetched gardens:', data.gardens);
+        // console.log('🌱 Fetched gardens:', data.gardens);
       } else {
         console.log('🌱 No gardens found:', data);
         setGardens([]);
@@ -99,9 +177,9 @@ export default function MyDevicesPage() {
       setGardens([]);
       showToast('error', 'Failed to load gardens. Please try again.');
     }
-  };
+  }, [showToast]);
 
-  const fetchDeviceStatuses = async () => {
+  const fetchDeviceStatuses = useCallback(async () => {
     try {
       const response = await fetch('/api/iot/check-status');
       const data = await response.json();
@@ -116,29 +194,34 @@ export default function MyDevicesPage() {
             connectionQuality: device.connectionQuality
           };
         });
-        // Check for connection status changes
+        // Check for connection status changes - ONLY for devices that belong to this user
         Object.keys(statusMap).forEach(deviceId => {
           const currentStatus = statusMap[deviceId].status;
           const previousStatus = previousDeviceStatuses[deviceId]?.status;
           const lastNotificationTime = notificationCooldowns[deviceId];
           const now = Date.now();
           
-          console.log('🔍 Status check:', { deviceId, currentStatus, previousStatus, lastNotificationTime });
+          // ONLY show notifications for devices that exist in the user's device list
+          const device = devices.find(d => d.deviceId === deviceId);
+          if (!device) {
+          // console.log('🔇 Skipping notification for device not owned by user:', deviceId);
+          // console.log('🔍 Available user devices:', devices.map(d => d.deviceId));
+            return; // Skip devices that don't belong to this user
+          }
           
-          // Show notification for status changes (with 5 second cooldown)
-          if (previousStatus !== currentStatus && 
+          // console.log('🔍 Status check (user device):', { deviceId, currentStatus, previousStatus, lastNotificationTime });
+          
+          if (previousStatus !== undefined && 
+              previousStatus !== currentStatus && 
               (!lastNotificationTime || (now - lastNotificationTime) > 5000)) {
             
-            const device = devices.find(d => d.deviceId === deviceId);
-            const deviceName = device?.deviceName || deviceId;
+            const deviceName = device.deviceName || deviceId;
             
-            console.log('📢 Status change detected:', { 
+            console.log('📢 Status change detected (user device):', { 
               deviceId, 
               deviceName, 
               from: previousStatus, 
-              to: currentStatus,
-              deviceFound: !!device,
-              totalDevices: devices.length
+              to: currentStatus
             });
             
             // Update cooldown timestamp
@@ -160,14 +243,14 @@ export default function MyDevicesPage() {
         // Update states
         setPreviousDeviceStatuses(deviceStatuses);
         setDeviceStatuses(statusMap);
-        console.log('📱 Device statuses updated:', statusMap);
-        console.log('📱 Available devices in status data:', Object.keys(statusMap));
-        console.log('📱 Previous device statuses:', previousDeviceStatuses);
+        // console.log('📱 Device statuses updated:', statusMap);
+        // console.log('📱 Available devices in status data:', Object.keys(statusMap));
+        // console.log('📱 Previous device statuses:', previousDeviceStatuses);
       }
     } catch (error) {
       console.error('❌ Error fetching device statuses:', error);
     }
-  };
+  }, [devices, previousDeviceStatuses, notificationCooldowns, showToast]);
 
   const setupSampleDevice = async () => {
     try {
@@ -366,7 +449,7 @@ void loop() {
   const getDeviceStatus = (deviceId) => {
     const deviceStatus = deviceStatuses[deviceId];
     const status = deviceStatus?.status || 'unknown';
-    console.log('🔍 Device Status Check:', { deviceId, deviceStatus, status });
+    // console.log('🔍 Device Status Check:', { deviceId, deviceStatus, status });
     return status;
   };
 
@@ -374,6 +457,17 @@ void loop() {
     const deviceStatus = deviceStatuses[deviceId];
     return deviceStatus?.connectionQuality || 'unknown';
   };
+
+  // Initialize data on component mount
+  useEffect(() => {
+    fetchDevices();
+    fetchGardens();
+    fetchDeviceStatuses();
+    
+    // Update device statuses every 5 seconds to reduce load
+    const interval = setInterval(fetchDeviceStatuses, 5000);
+    return () => clearInterval(interval);
+  }, [fetchDevices, fetchGardens, fetchDeviceStatuses]);
 
   if (loading) {
     return (
@@ -397,13 +491,7 @@ void loop() {
         <div className="section-header">
           <h2>Your Devices ({devices.length})</h2>
           <div className="header-actions">
-            <button 
-              className="btn btn-secondary"
-              onClick={testNotification}
-              style={{ backgroundColor: '#f59e0b', color: 'white' }}
-            >
-              🧪 Test Notification
-            </button>
+            {/* Removed test notification button */}
             <button 
               className="btn btn-secondary"
               onClick={setupSampleDevice}
@@ -412,9 +500,16 @@ void loop() {
             </button>
             <button 
               className="btn btn-primary"
+              onClick={() => setShowDiscovery(true)}
+              style={{ backgroundColor: '#3b82f6', color: 'white' }}
+            >
+              🔍 Scan for Devices
+            </button>
+            <button 
+              className="btn btn-secondary"
               onClick={handleAddDevice}
             >
-              ➕ Add Device
+              ➕ Add Device Manually
             </button>
           </div>
         </div>
@@ -581,7 +676,7 @@ void loop() {
 
               <div className="form-group">
                 <div className="form-info">
-                  <p>📶 WiFi settings are configured at the garden level. Devices will automatically use the garden's WiFi configuration.</p>
+                  <p>📶 WiFi settings are configured at the garden level. Devices will automatically use the garden&apos;s WiFi configuration.</p>
                 </div>
               </div>
 
@@ -647,6 +742,246 @@ void loop() {
               >
                 {editingDevice ? 'Update Device' : 'Add Device'}
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Device Discovery Modal */}
+      {showDiscovery && (
+        <div className="modal-overlay">
+          <div className="modal-content" style={{ maxWidth: '600px' }}>
+            <div className="modal-header">
+              <h2>🔍 Device Discovery</h2>
+              <button 
+                className="modal-close"
+                onClick={() => setShowDiscovery(false)}
+              >
+                ✕
+              </button>
+            </div>
+            
+            <div className="modal-body">
+              <p>Scan for nearby Smart Garden devices that are in discovery mode.</p>
+              
+              <div style={{ marginBottom: '20px' }}>
+                <button 
+                  className="btn btn-primary"
+                  onClick={startDeviceScan}
+                  disabled={isScanning}
+                  style={{ 
+                    backgroundColor: '#3b82f6', 
+                    color: 'white',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px'
+                  }}
+                >
+                  {isScanning ? (
+                    <>
+                      <span className="spinner"></span>
+                      Scanning...
+                    </>
+                  ) : (
+                    <>
+                      🔍 Start Scan
+                    </>
+                  )}
+                </button>
+              </div>
+
+              {discoveredDevices.length > 0 && (
+                <div>
+                  <h3>Found Devices ({discoveredDevices.length})</h3>
+                  
+                  {/* Summary */}
+                  <div style={{ 
+                    backgroundColor: '#f3f4f6', 
+                    padding: '12px', 
+                    borderRadius: '6px', 
+                    marginBottom: '16px',
+                    fontSize: '14px',
+                    color: '#374151'
+                  }}>
+                    📊 Found {discoveredDevices.length} device{discoveredDevices.length !== 1 ? 's' : ''} available for pairing
+                    <br />
+                    🔍 All devices shown are ready to be paired
+                  </div>
+                  
+                  <div className="device-list">
+                    {discoveredDevices.map((device, index) => (
+                      <div key={index} className="device-card" style={{
+                        border: device.isPaired ? '2px solid #10b981' : '1px solid #e5e7eb',
+                        borderRadius: '8px',
+                        padding: '16px',
+                        marginBottom: '12px',
+                        backgroundColor: device.isPaired ? '#f0fdf4' : '#f9fafb'
+                      }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                          <div>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
+                              <h4 style={{ margin: '0', fontSize: '16px' }}>
+                                {device.deviceType}
+                              </h4>
+                              {device.isPaired ? (
+                                <span style={{
+                                  backgroundColor: '#10b981',
+                                  color: 'white',
+                                  padding: '2px 8px',
+                                  borderRadius: '12px',
+                                  fontSize: '10px',
+                                  fontWeight: 'bold'
+                                }}>
+                                  ✅ PAIRED
+                                </span>
+                              ) : pairingStates[device.id] === 'connecting' ? (
+                                <span style={{
+                                  backgroundColor: '#f59e0b',
+                                  color: 'white',
+                                  padding: '2px 8px',
+                                  borderRadius: '12px',
+                                  fontSize: '10px',
+                                  fontWeight: 'bold'
+                                }}>
+                                  🔄 CONNECTING
+                                </span>
+                              ) : pairingStates[device.id] === 'connected' ? (
+                                <span style={{
+                                  backgroundColor: '#10b981',
+                                  color: 'white',
+                                  padding: '2px 8px',
+                                  borderRadius: '12px',
+                                  fontSize: '10px',
+                                  fontWeight: 'bold'
+                                }}>
+                                  ✅ CONNECTED
+                                </span>
+                              ) : (
+                                <span style={{
+                                  backgroundColor: '#10b981',
+                                  color: 'white',
+                                  padding: '2px 8px',
+                                  borderRadius: '12px',
+                                  fontSize: '10px',
+                                  fontWeight: 'bold'
+                                }}>
+                                  🔍 AVAILABLE
+                                </span>
+                              )}
+                            </div>
+                            <p style={{ margin: '0', color: '#6b7280', fontSize: '14px' }}>
+                              Serial: {device.serialNumber}
+                            </p>
+                            {device.isPaired && device.deviceId && (
+                              <p style={{ margin: '0', color: '#10b981', fontSize: '14px', fontWeight: '500' }}>
+                                Device ID: {device.deviceId}
+                              </p>
+                            )}
+                            <p style={{ margin: '0', color: '#6b7280', fontSize: '12px' }}>
+                              Signal: {device.signalStrength} dBm
+                            </p>
+                          </div>
+                          
+                          {device.isPaired ? (
+                            <div style={{ textAlign: 'right' }}>
+                              <p style={{ 
+                                margin: '0 0 8px 0', 
+                                color: '#10b981', 
+                                fontSize: '12px',
+                                fontWeight: '500'
+                              }}>
+                                Already paired
+                              </p>
+                              <button 
+                                className="btn btn-secondary"
+                                disabled
+                                style={{ 
+                                  backgroundColor: '#d1d5db', 
+                                  color: '#9ca3af',
+                                  cursor: 'not-allowed'
+                                }}
+                              >
+                                ✅ Paired
+                              </button>
+                            </div>
+                          ) : pairingDevice === device.id ? (
+                            <div style={{ textAlign: 'center' }}>
+                              <p style={{ 
+                                margin: '0 0 8px 0', 
+                                color: '#3b82f6', 
+                                fontSize: '14px',
+                                fontWeight: '500'
+                              }}>
+                                {pairingStatus}
+                              </p>
+                              <button 
+                                className="btn btn-secondary"
+                                disabled
+                                style={{ 
+                                  backgroundColor: '#3b82f6', 
+                                  color: 'white',
+                                  cursor: 'not-allowed'
+                                }}
+                              >
+                                {pairingStatus.includes('Connected') ? '✅' : pairingStatus.includes('Failed') || pairingStatus.includes('Error') ? '❌' : '🔄'} {pairingStatus}
+                              </button>
+                            </div>
+                          ) : (
+                            <button 
+                              className="btn btn-primary"
+                              onClick={() => pairDevice(device)}
+                              disabled={pairingStates[device.id] === 'connecting'}
+                              style={{ 
+                                backgroundColor: pairingStates[device.id] === 'connecting' ? '#f59e0b' : 
+                                                pairingStates[device.id] === 'connected' ? '#10b981' : '#10b981', 
+                                color: 'white',
+                                cursor: pairingStates[device.id] === 'connecting' ? 'not-allowed' : 'pointer',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '8px'
+                              }}
+                            >
+                              {pairingStates[device.id] === 'connecting' ? (
+                                <>
+                                  <span className="loading-spinner" style={{ 
+                                    width: '12px', 
+                                    height: '12px', 
+                                    border: '2px solid transparent',
+                                    borderTop: '2px solid white',
+                                    margin: '0'
+                                  }}></span>
+                                  Connecting...
+                                </>
+                              ) : pairingStates[device.id] === 'connected' ? (
+                                <>
+                                  ✅ Connected!
+                                </>
+                              ) : (
+                                <>
+                                  🔗 Pair Device
+                                </>
+                              )}
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {discoveredDevices.length === 0 && !isScanning && (
+                <div style={{ 
+                  textAlign: 'center', 
+                  padding: '40px 20px',
+                  color: '#6b7280'
+                }}>
+                  <p>No devices found in discovery mode.</p>
+                  <p style={{ fontSize: '14px' }}>
+                    Make sure your ESP8266 is running the discovery code and within range.
+                  </p>
+                </div>
+              )}
             </div>
           </div>
         </div>

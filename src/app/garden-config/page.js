@@ -87,16 +87,24 @@ export default function GardenConfigPage() {
             connectionQuality: device.connectionQuality
           };
         });
-        // Check for connection status changes
+        // Check for connection status changes - ONLY for devices that belong to user's gardens
         Object.keys(statusMap).forEach(deviceId => {
           const currentStatus = statusMap[deviceId].status;
           const previousStatus = previousDeviceStatuses[deviceId]?.status;
           const lastNotificationTime = notificationCooldowns[deviceId];
           const now = Date.now();
           
+          // ONLY show notifications for devices that belong to the user's gardens
+          // For now, skip notifications on garden config page since we don't have device details
+          console.log('🔇 Garden Config: Skipping notification for device (no device ownership check):', deviceId);
+          return; // Skip all notifications on garden config page for now
+          
+          /*
           console.log('🔍 Garden Status check:', { deviceId, currentStatus, previousStatus, lastNotificationTime });
           
-          if (previousStatus !== currentStatus && 
+          // Don't show notifications on first load (when previousStatus is undefined)
+          if (previousStatus !== undefined && 
+              previousStatus !== currentStatus && 
               (!lastNotificationTime || (now - lastNotificationTime) > 5000)) {
             const deviceName = deviceId; // Use deviceId as name since we don't have device details here
             
@@ -116,6 +124,7 @@ export default function GardenConfigPage() {
               showToast('warning', `🔌 Device ${deviceName} disconnected!`, 4000);
             }
           }
+          */
         });
         
         // Update states

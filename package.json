@@ -3,7 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "node simple-websocket-server.js",
+    "dev": "next dev",
+    "dev:websocket": "node simple-websocket-server.js",
     "build": "next build",
     "start": "NODE_ENV=production node server.js",
     "lint": "next lint"
