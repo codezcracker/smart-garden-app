@@ -20,7 +20,7 @@ const char* serverURL = "https://smart-garden-app.vercel.app";  // Use HTTPS for
 const char* serverEndpoint = "/api/sensor-data";
 
 // Production Optimizations
-#define DATA_SEND_INTERVAL_SECONDS 30  // 30 seconds for production (battery life)
+#define DATA_SEND_INTERVAL_SECONDS 10  // 10 seconds for production (battery life)
 #define MAX_RETRY_ATTEMPTS 3
 #define RETRY_DELAY 5000  // 5 seconds
 #define CONNECTION_TIMEOUT 10000  // 10 seconds
