@@ -17,7 +17,7 @@
 
 #include <ESP8266WiFi.h>
 #include <ESP8266HTTPClient.h>
-#include <WiFiClient.h>
+#include <WiFiClientSecure.h>
 #include <ArduinoJson.h>
 #include <EEPROM.h>
 #include <DHT.h>
@@ -39,8 +39,8 @@ DHT dht(DHT_PIN, DHT_TYPE);
 const char* ssid = "Qureshi";
 const char* password = "65327050";
 
-// Server Configuration - PRODUCTION (HTTP for ESP8266 compatibility)
-const char* serverURL = "http://smart-garden-app.vercel.app";
+// Server Configuration - PRODUCTION (HTTPS with SSL support)
+const char* serverURL = "https://smart-garden-app.vercel.app";
 const char* discoveryEndpoint = "/api/iot/device-discovery";
 const char* dataEndpoint = "/api/sensor-data";  // Updated to match production endpoint
 
@@ -141,16 +141,19 @@ void sendSensorData() {
     return;
   }
 
-  WiFiClient client;
+  WiFiClientSecure client;
   HTTPClient http;
   String fullURL = String(serverURL) + String(dataEndpoint);
   
   Serial.println("📡 Connecting to: " + fullURL);
   
+  // Skip SSL certificate verification for ESP8266 compatibility
+  client.setInsecure();
+  
   http.begin(client, fullURL);
   http.addHeader("Content-Type", "application/json");
   http.addHeader("x-device-id", deviceId);
-  http.setTimeout(10000); // 10 second timeout
+  http.setTimeout(15000); // 15 second timeout for HTTPS
 
   // Read DHT11 sensor (NOW WORKING!)
   float temperature = dht.readTemperature();
@@ -259,6 +262,10 @@ void sendSensorData() {
       Serial.println("⚠️ Redirect error - server may be redirecting HTTP to HTTPS");
     } else if (httpResponseCode == -1) {
       Serial.println("⚠️ Connection failed - check WiFi and server URL");
+    } else if (httpResponseCode == -11) {
+      Serial.println("⚠️ SSL connection failed - check HTTPS certificate");
+    } else if (httpResponseCode == -2) {
+      Serial.println("⚠️ Connection timeout - server may be slow");
     }
   }
   
