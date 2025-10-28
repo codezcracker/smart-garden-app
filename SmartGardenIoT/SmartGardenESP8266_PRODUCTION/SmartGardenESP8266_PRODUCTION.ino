@@ -1,5 +1,4 @@
-# Smart Garden IoT - Production ESP8266 Firmware
-# Optimized for deployment with production settings
+
 
 #include <ESP8266WiFi.h>
 #include <ESP8266HTTPClient.h>
