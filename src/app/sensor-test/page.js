@@ -2,10 +2,6 @@
 
 import { useState, useEffect } from 'react';
 
-// Force dynamic rendering (no static caching)
-export const dynamic = 'force-dynamic';
-export const revalidate = 0;
-
 export default function SensorTestPage() {
   const [sensorData, setSensorData] = useState([]);
   const [isLoading, setIsLoading] = useState(true);

@@ -2,10 +2,6 @@
 
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-
-// Force dynamic rendering (no static caching)
-export const dynamic = 'force-dynamic';
-export const revalidate = 0;
 import {
   LineChart, Line, AreaChart, Area, BarChart, Bar,
   XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
