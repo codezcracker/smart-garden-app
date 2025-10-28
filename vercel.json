@@ -1,28 +1,22 @@
 {
-    "version": 2,
-    "name": "smart-garden-iot",
-    "functions": {
-      "pages/api/**/*.js": {
-        "maxDuration": 30
-      }
+  "version": 2,
+  "name": "smart-garden-iot",
+  "functions": {
+    "pages/api/**/*.js": {
+      "maxDuration": 30
+    }
+  },
+  "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "/api/$1"
     },
-    "routes": [
-      {
-        "src": "/api/(.*)",
-        "dest": "/api/$1"
-      },
-      {
-        "src": "/(.*)",
-        "dest": "/$1"
-      }
-    ],
-    "env": {
-      "MONGODB_URI": "@mongodb-uri",
-      "NEXTAUTH_SECRET": "@nextauth-secret",
-      "NEXTAUTH_URL": "@nextauth-url",
-      "NODE_ENV": "production"
-    },
-    "regions": ["iad1"],
-    "framework": "nextjs"
-  }
+    {
+      "src": "/(.*)",
+      "dest": "/$1"
+    }
+  ],
+  "regions": ["iad1"],
+  "framework": "nextjs"
+}
   
