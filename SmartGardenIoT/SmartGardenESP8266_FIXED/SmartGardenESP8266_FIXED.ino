@@ -39,8 +39,8 @@ DHT dht(DHT_PIN, DHT_TYPE);
 const char* ssid = "Qureshi";
 const char* password = "65327050";
 
-// Server Configuration - PRODUCTION
-const char* serverURL = "https://smart-garden-app.vercel.app";
+// Server Configuration - PRODUCTION (HTTP for ESP8266 compatibility)
+const char* serverURL = "http://smart-garden-app.vercel.app";
 const char* discoveryEndpoint = "/api/iot/device-discovery";
 const char* dataEndpoint = "/api/sensor-data";  // Updated to match production endpoint
 
@@ -144,9 +144,13 @@ void sendSensorData() {
   WiFiClient client;
   HTTPClient http;
   String fullURL = String(serverURL) + String(dataEndpoint);
+  
+  Serial.println("📡 Connecting to: " + fullURL);
+  
   http.begin(client, fullURL);
   http.addHeader("Content-Type", "application/json");
   http.addHeader("x-device-id", deviceId);
+  http.setTimeout(10000); // 10 second timeout
 
   // Read DHT11 sensor (NOW WORKING!)
   float temperature = dht.readTemperature();
@@ -242,11 +246,22 @@ void sendSensorData() {
   int httpResponseCode = http.POST(payload);
 
   if (httpResponseCode == 200) {
-    Serial.println("✅ Sensor data sent successfully (HTTP)\n");
+    Serial.println("✅ Sensor data sent successfully (HTTP)");
+    String response = http.getString();
+    Serial.println("📨 Server response: " + response);
   } else {
-    Serial.println("❌ Failed to send sensor data: " + String(httpResponseCode) + "\n");
+    Serial.println("❌ Failed to send sensor data: " + String(httpResponseCode));
+    String errorResponse = http.getString();
+    Serial.println("📨 Error response: " + errorResponse);
+    
+    // Handle specific error codes
+    if (httpResponseCode == 308) {
+      Serial.println("⚠️ Redirect error - server may be redirecting HTTP to HTTPS");
+    } else if (httpResponseCode == -1) {
+      Serial.println("⚠️ Connection failed - check WiFi and server URL");
+    }
   }
-
+  
   http.end();
 }
 
