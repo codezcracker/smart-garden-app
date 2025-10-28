@@ -17,9 +17,10 @@ export async function POST(request) {
     // Connect to database
     const { db } = await connectToDatabase();
     
-    // Add received timestamp
+    // Add received timestamp and status
     data.receivedAt = new Date();
     data.dataType = 'sensor_reading';
+    data.status = 'online'; // Device is online if sending data
     
     // Store sensor data
     await db.collection('iot_device_data').insertOne(data);
