@@ -20,7 +20,7 @@ const char* ssid = "Qureshi Deco";
 const char* password = "65327050";
 
 // Server Configuration - Update this to your local server IP
-const char* serverURL = "http://192.168.68.65:3000";  // ← Your actual computer IP
+const char* serverURL = "http://192.168.68.57:3000";  // ← Your actual computer IP
 const char* discoveryEndpoint = "/api/iot/device-discovery";
 
 // Device Configuration
@@ -174,7 +174,7 @@ void broadcastDiscovery() {
     Serial.println("📨 Server response: " + String(httpResponseCode));
     Serial.println("📥 Response body: " + response);
     
-    if (httpResponseCode == 200) {
+      if (httpResponseCode == 200) {
       Serial.println("✅ Discovery broadcast successful");
       
       // Check if device was paired
@@ -186,6 +186,9 @@ void broadcastDiscovery() {
         deviceId = responseDoc["deviceId"].as<String>();
         Serial.println("🎉 Device paired successfully!");
         Serial.println("🆔 Assigned Device ID: " + deviceId);
+        Serial.println("🔒 Stopping discovery broadcasts - device is now paired");
+      } else {
+        Serial.println("🔍 Device in discovery mode - waiting for pairing");
       }
     }
   } else {

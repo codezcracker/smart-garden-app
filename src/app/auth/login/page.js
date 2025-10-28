@@ -130,6 +130,11 @@ export default function LoginPage() {
                 Sign up here
               </Link>
             </p>
+            <p>
+              <Link href="/auth/reset-password">
+                Forgot your password?
+              </Link>
+            </p>
           </div>
         </form>
 

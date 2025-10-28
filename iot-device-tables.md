@@ -53,3 +53,4 @@
 - **Difficulty**: Intermediate
 - **Power**: May need external power
 - **Sensors**: Advanced soil analysis + environmental monitoring
+

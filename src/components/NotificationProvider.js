@@ -15,7 +15,7 @@ const NotificationContext = createContext(undefined);
           }, []);
 
   // Simplified notification management - no persistent storage
-  const unreadCount = 0; // Always 0 since we don't store notifications
+  const unreadCount = notifications.length; // Show count of current notifications only
 
   const markAsRead = (id) => {
     // No-op since we don't store notifications

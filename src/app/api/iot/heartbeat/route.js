@@ -30,10 +30,25 @@ export async function POST(request) {
         $set: {
           deviceId: data.deviceId,
           lastHeartbeat: new Date(),
+          lastSeen: new Date(),  // Add lastSeen for real-time status
           status: 'online',
           uptime: data.uptime,
           wifiRSSI: data.wifiRSSI,
           errorCount: data.errorCount
+        }
+      },
+      { upsert: true }
+    );
+
+    // Also update user_devices collection
+    await db.collection('user_devices').updateOne(
+      { deviceId: data.deviceId },
+      { 
+        $set: {
+          deviceId: data.deviceId,
+          lastSeen: new Date(),
+          status: 'online',
+          wifiRSSI: data.wifiRSSI
         }
       },
       { upsert: true }
@@ -90,3 +105,4 @@ export async function GET(request) {
     );
   }
 }
+

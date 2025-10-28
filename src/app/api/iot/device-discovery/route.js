@@ -61,7 +61,21 @@ export async function POST(request) {
     const { db } = await connectToDatabase();
     console.log('✅ Database connected successfully');
     
-    // Register device in discovery mode
+    // Check if device is already paired
+    const existingDevice = await db.collection('device_discovery').findOne({ id: id });
+    const isPaired = existingDevice && existingDevice.status === 'paired';
+    
+    if (isPaired) {
+      console.log('🔒 Device already paired, ignoring discovery broadcast:', { id, serialNumber });
+      return NextResponse.json({
+        success: true,
+        message: 'Device already paired',
+        paired: true,
+        deviceId: existingDevice.deviceId
+      });
+    }
+    
+    // Register device in discovery mode (only if not paired)
     const result = await db.collection('device_discovery').updateOne(
       { id: id },
       { 

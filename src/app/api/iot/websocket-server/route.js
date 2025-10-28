@@ -56,3 +56,5 @@ export function sendToDevice(deviceId, data) {
     }
   }
 }
+
+

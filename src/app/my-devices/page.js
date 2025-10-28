@@ -67,10 +67,19 @@ export default function MyDevicesPage() {
         setPairingStatus('Device Connected! ✅');
         showToast('success', `Device ${deviceName} connected successfully!`, 4000);
         
-        // Wait 2 seconds then refresh
+        // Update the discovered device to show it's paired
+        setDiscoveredDevices(prev => 
+          prev.map(device => 
+            device.id === discoveryDevice.id 
+              ? { ...device, isPaired: true, deviceId: deviceId }
+              : device
+          )
+        );
+        
+        // Refresh device list but keep discovery modal open
         setTimeout(() => {
           fetchDevices();
-          setDiscoveredDevices([]);
+          // Don't clear discovered devices - keep modal open to show connection status
           setPairingDevice(null);
           setPairingStatus('');
         }, 2000);
@@ -108,6 +117,8 @@ export default function MyDevicesPage() {
   const [discoveredDevices, setDiscoveredDevices] = useState([]);
   const [isScanning, setIsScanning] = useState(false);
   const [pairingStates, setPairingStates] = useState({}); // Track pairing states for each device
+  const [pairingDevice, setPairingDevice] = useState(null);
+  const [pairingStatus, setPairingStatus] = useState('');
 
   // Form states
   const [formData, setFormData] = useState({
@@ -194,26 +205,25 @@ export default function MyDevicesPage() {
             connectionQuality: device.connectionQuality
           };
         });
+        
+        // Update states first
+        setPreviousDeviceStatuses(deviceStatuses);
+        setDeviceStatuses(statusMap);
+        
         // Check for connection status changes - ONLY for devices that belong to this user
         Object.keys(statusMap).forEach(deviceId => {
           const currentStatus = statusMap[deviceId].status;
-          const previousStatus = previousDeviceStatuses[deviceId]?.status;
-          const lastNotificationTime = notificationCooldowns[deviceId];
+          const previousStatus = deviceStatuses[deviceId]?.status; // Use current deviceStatuses instead of previousDeviceStatuses
           const now = Date.now();
           
           // ONLY show notifications for devices that exist in the user's device list
           const device = devices.find(d => d.deviceId === deviceId);
           if (!device) {
-          // console.log('🔇 Skipping notification for device not owned by user:', deviceId);
-          // console.log('🔍 Available user devices:', devices.map(d => d.deviceId));
             return; // Skip devices that don't belong to this user
           }
           
-          // console.log('🔍 Status check (user device):', { deviceId, currentStatus, previousStatus, lastNotificationTime });
-          
           if (previousStatus !== undefined && 
-              previousStatus !== currentStatus && 
-              (!lastNotificationTime || (now - lastNotificationTime) > 5000)) {
+              previousStatus !== currentStatus) {
             
             const deviceName = device.deviceName || deviceId;
             
@@ -224,12 +234,6 @@ export default function MyDevicesPage() {
               to: currentStatus
             });
             
-            // Update cooldown timestamp
-            setNotificationCooldowns(prev => ({
-              ...prev,
-              [deviceId]: now
-            }));
-            
             if (currentStatus === 'online') {
               console.log('🔗 Showing connection notification');
               showToast('success', `🔗 ${deviceName} connected!`, 4000);
@@ -239,18 +243,11 @@ export default function MyDevicesPage() {
             }
           }
         });
-        
-        // Update states
-        setPreviousDeviceStatuses(deviceStatuses);
-        setDeviceStatuses(statusMap);
-        // console.log('📱 Device statuses updated:', statusMap);
-        // console.log('📱 Available devices in status data:', Object.keys(statusMap));
-        // console.log('📱 Previous device statuses:', previousDeviceStatuses);
       }
     } catch (error) {
       console.error('❌ Error fetching device statuses:', error);
     }
-  }, [devices, previousDeviceStatuses, notificationCooldowns, showToast]);
+  }, [devices, deviceStatuses, showToast]);
 
   const setupSampleDevice = async () => {
     try {
@@ -467,7 +464,7 @@ void loop() {
     // Update device statuses every 5 seconds to reduce load
     const interval = setInterval(fetchDeviceStatuses, 5000);
     return () => clearInterval(interval);
-  }, [fetchDevices, fetchGardens, fetchDeviceStatuses]);
+  }, [fetchDevices, fetchGardens]); // Removed fetchDeviceStatuses from dependencies to prevent infinite loop
 
   if (loading) {
     return (
@@ -534,14 +531,14 @@ void loop() {
                   <div className="device-info">
                     <h3>{device.deviceName}</h3>
                     <p className="device-id">ID: {device.deviceId}</p>
-                  </div>
-                  <div className="device-status">
-                    <span 
-                      className="status-indicator"
-                      style={{ color: getStatusColor(getDeviceStatus(device.deviceId)) }}
-                    >
-                      {getStatusIcon(getDeviceStatus(device.deviceId))} {getDeviceStatus(device.deviceId).toUpperCase()}
-                    </span>
+                    <div className="device-status">
+                      <span 
+                        className="status-indicator"
+                        style={{ color: getStatusColor(getDeviceStatus(device.deviceId)) }}
+                      >
+                        {getStatusIcon(getDeviceStatus(device.deviceId))} {getDeviceStatus(device.deviceId).toUpperCase()}
+                      </span>
+                    </div>
                   </div>
                 </div>
 
@@ -763,6 +760,34 @@ void loop() {
             
             <div className="modal-body">
               <p>Scan for nearby Smart Garden devices that are in discovery mode.</p>
+              
+              {/* Success message for paired devices */}
+              {discoveredDevices.some(device => device.isPaired) && (
+                <div style={{
+                  backgroundColor: '#d1fae5',
+                  border: '1px solid #10b981',
+                  borderRadius: '8px',
+                  padding: '12px',
+                  marginBottom: '16px',
+                  color: '#065f46'
+                }}>
+                  <p style={{ margin: '0 0 8px 0', fontWeight: '500' }}>
+                    ✅ Device paired successfully! The device is now connected and will appear in your device list.
+                  </p>
+                  <button 
+                    className="btn btn-success"
+                    onClick={() => setShowDiscovery(false)}
+                    style={{ 
+                      backgroundColor: '#10b981', 
+                      color: 'white',
+                      fontSize: '12px',
+                      padding: '6px 12px'
+                    }}
+                  >
+                    📱 View My Devices
+                  </button>
+                </div>
+              )}
               
               <div style={{ marginBottom: '20px' }}>
                 <button 

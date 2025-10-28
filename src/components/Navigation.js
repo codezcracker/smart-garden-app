@@ -109,26 +109,12 @@ export default function Navigation({ children = null }) {
           description: 'Data Analytics'
         },
         {
-          name: 'Settings',
-          href: '/settings',
-          icon: '⚙️',
-          gradient: 'linear-gradient(135deg, #795548 0%, #5d4037 100%)',
-          description: 'System Settings'
+          name: 'Sensor Test',
+          href: '/sensor-test',
+          icon: '🔬',
+          gradient: 'linear-gradient(135deg, #ff5722 0%, #d84315 100%)',
+          description: 'Test Sensor Data (No Auth)'
         },
-        {
-          name: 'Preferences',
-          href: '/preferences',
-          icon: '🎛️',
-          gradient: 'linear-gradient(135deg, #ff9800 0%, #f57c00 100%)',
-          description: 'User Preferences'
-        },
-        {
-          name: 'My Garden',
-          href: '/my-garden',
-          icon: '🌱',
-          gradient: 'linear-gradient(135deg, #4caf50 0%, #388e3c 100%)',
-          description: 'My Garden'
-        }
       ];
 
       // Add role-specific apps
@@ -155,13 +141,6 @@ export default function Navigation({ children = null }) {
             gradient: 'linear-gradient(135deg, #ff9a56 0%, #ff6b6b 100%)',
             description: 'Manage Managers'
           },
-          {
-            name: 'System Analytics',
-            href: '/admin/analytics',
-            icon: '📈',
-            gradient: 'linear-gradient(135deg, #26de81 0%, #20bf6b 100%)',
-            description: 'System-wide Analytics'
-          }
         );
       } else if (user && user.role === 'manager') {
         baseApps.push(
@@ -179,13 +158,6 @@ export default function Navigation({ children = null }) {
             gradient: 'linear-gradient(135deg, #a55eea 0%, #8b5cf6 100%)',
             description: 'Manage Assigned Clients'
           },
-          {
-            name: 'Client Analytics',
-            href: '/manager/analytics',
-            icon: '📊',
-            gradient: 'linear-gradient(135deg, #26de81 0%, #20bf6b 100%)',
-            description: 'Client Analytics'
-          }
         );
       }
 
@@ -213,6 +185,13 @@ export default function Navigation({ children = null }) {
           icon: '⚖️',
           gradient: 'linear-gradient(135deg, #9c27b0 0%, #7b1fa2 100%)',
           description: 'Plant Comparison'
+        },
+        {
+          name: 'Sensor Test',
+          href: '/sensor-test',
+          icon: '🔬',
+          gradient: 'linear-gradient(135deg, #ff5722 0%, #d84315 100%)',
+          description: 'Test Sensor Data'
         }
       ];
     }
