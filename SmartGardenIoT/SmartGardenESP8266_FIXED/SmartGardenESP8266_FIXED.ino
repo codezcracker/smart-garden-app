@@ -39,10 +39,10 @@ DHT dht(DHT_PIN, DHT_TYPE);
 const char* ssid = "Qureshi";
 const char* password = "65327050";
 
-// Server Configuration
-const char* serverURL = "http://192.168.0.57:3000";
+// Server Configuration - PRODUCTION
+const char* serverURL = "https://smart-garden-app.vercel.app";
 const char* discoveryEndpoint = "/api/iot/device-discovery";
-const char* dataEndpoint = "/api/iot/device-data";
+const char* dataEndpoint = "/api/sensor-data";  // Updated to match production endpoint
 
 // Set to false to disable HTTP sending (for testing)
 const bool ENABLE_HTTP_SENDING = true;
