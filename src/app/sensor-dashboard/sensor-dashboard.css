@@ -1,42 +1,56 @@
-/* Compact Tesla/Whoop Style Dashboard */
-.compact-dashboard {
+/* Advanced Garden Dashboard - Medical Dashboard Style */
+.garden-dashboard {
   min-height: 100vh;
-  background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
-  color: #ffffff;
-  padding: 20px;
+  background: linear-gradient(135deg, #f8fffe 0%, #e8f5f3 100%);
+  color: #2c3e50;
   font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
-  max-width: 800px;
-  margin: 0 auto;
+  overflow-x: hidden;
 }
 
 /* Loading Animation */
-.loading-pulse {
+.loading-container {
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 200px;
+  min-height: 100vh;
 }
 
-.loading-pulse::before {
-  content: '';
-  width: 40px;
-  height: 40px;
-  border: 3px solid #00ff88;
-  border-top: 3px solid transparent;
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-
-.no-data {
+.plant-loading {
   text-align: center;
-  font-size: 24px;
-  color: #666;
-  margin-top: 100px;
+}
+
+.plant-sprout {
+  width: 60px;
+  height: 60px;
+  margin: 0 auto 20px;
+  background: linear-gradient(45deg, #00ff88, #00aaff);
+  border-radius: 50%;
+  animation: grow 2s ease-in-out infinite;
+}
+
+@keyframes grow {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.2); }
+}
+
+.loading-text {
+  font-size: 18px;
+  color: #00ff88;
+  font-weight: 600;
+}
+
+.no-data-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  text-align: center;
+}
+
+.sad-plant {
+  font-size: 80px;
+  margin-bottom: 20px;
 }
 
 /* Header */
@@ -44,18 +58,55 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 30px;
-  padding-bottom: 20px;
-  border-bottom: 1px solid #333;
+  padding: 20px 40px;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(0, 255, 136, 0.1);
+  box-shadow: 0 2px 20px rgba(0, 0, 0, 0.05);
 }
 
-.dashboard-header h2 {
-  font-size: 28px;
-  font-weight: 600;
-  margin: 0;
-  background: linear-gradient(45deg, #00ff88, #00aaff);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 40px;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 24px;
+  font-weight: 700;
+  color: #00ff88;
+}
+
+.logo-icon {
+  font-size: 32px;
+}
+
+.nav-links {
+  display: flex;
+  gap: 30px;
+}
+
+.nav-link {
+  text-decoration: none;
+  color: #2c3e50;
+  font-weight: 500;
+  padding: 8px 16px;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+
+.nav-link:hover {
+  background: rgba(0, 255, 136, 0.1);
+  color: #00ff88;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 20px;
 }
 
 .status-indicator {
@@ -64,6 +115,7 @@
   gap: 8px;
   font-size: 14px;
   color: #00ff88;
+  font-weight: 600;
 }
 
 .status-dot {
@@ -73,170 +125,553 @@
   border-radius: 50%;
 }
 
-/* Stats Grid */
-.stats-grid {
+/* Main Content */
+.dashboard-content {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 15px;
-  margin-bottom: 30px;
+  grid-template-columns: 300px 1fr 350px;
+  gap: 30px;
+  padding: 30px 40px;
+  max-width: 1600px;
+  margin: 0 auto;
 }
 
-.stat-card {
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 16px;
+/* Left Sidebar */
+.left-sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.plant-selection {
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 20px;
   padding: 20px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(20px);
+}
+
+.plant-selection h3 {
+  margin: 0 0 15px 0;
+  font-size: 16px;
+  color: #2c3e50;
+}
+
+.plant-cards {
+  display: flex;
+  gap: 10px;
+}
+
+.plant-card {
+  flex: 1;
+  background: rgba(255, 255, 255, 0.7);
+  border: 2px solid transparent;
+  border-radius: 12px;
+  padding: 15px;
   text-align: center;
-  backdrop-filter: blur(10px);
+  cursor: pointer;
   transition: all 0.3s ease;
-  position: relative;
-  overflow: hidden;
 }
 
-.stat-card::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 2px;
-  background: linear-gradient(90deg, #00ff88, #00aaff);
-  opacity: 0;
-  transition: opacity 0.3s ease;
+.plant-card.active {
+  border-color: #00ff88;
+  background: rgba(0, 255, 136, 0.1);
 }
 
-.stat-card:hover::before {
-  opacity: 1;
-}
-
-.stat-card:hover {
+.plant-card:hover {
   transform: translateY(-2px);
-  border-color: rgba(0, 255, 136, 0.3);
+  box-shadow: 0 8px 25px rgba(0, 255, 136, 0.2);
 }
 
-.stat-icon {
+.plant-icon {
   font-size: 24px;
   margin-bottom: 8px;
 }
 
-.stat-value {
-  font-size: 32px;
-  font-weight: 700;
-  margin-bottom: 4px;
-  color: #00ff88;
-}
-
-.stat-label {
+.plant-name {
   font-size: 12px;
-  color: #999;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
+  font-weight: 600;
+  color: #2c3e50;
 }
 
-/* Charts Section */
-.charts-section {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 15px;
-  margin-bottom: 30px;
+.plant-health-card {
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 20px;
+  padding: 20px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(20px);
 }
 
-.mini-chart {
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 16px;
-  padding: 15px;
-  backdrop-filter: blur(10px);
+.plant-photo {
+  text-align: center;
+  margin-bottom: 15px;
 }
 
-.chart-title {
-  font-size: 12px;
-  color: #999;
-  margin-bottom: 10px;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-/* WiFi Status */
-.wifi-status {
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 16px;
-  padding: 15px;
-  backdrop-filter: blur(10px);
-}
-
-.wifi-info {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-size: 14px;
-  color: #999;
-}
-
-/* Responsive */
-@media (max-width: 768px) {
-  .compact-dashboard {
-    padding: 15px;
-  }
-  
-  .stats-grid {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 10px;
-  }
-  
-  .charts-section {
-    grid-template-columns: 1fr;
-    gap: 10px;
-  }
-  
-  .stat-card {
-    padding: 15px;
-  }
-  
-  .stat-value {
-    font-size: 24px;
-  }
-  
-  .dashboard-header h2 {
-    font-size: 24px;
-  }
-}
-
-/* Animation Enhancements */
-.stat-card {
-  animation: fadeInUp 0.6s ease-out;
-}
-
-@keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-/* Pulse animation for live data */
-.stat-value span {
+.plant-image {
+  font-size: 60px;
   display: inline-block;
 }
 
-/* Glow effect for active cards */
-.stat-card.temp:hover {
-  box-shadow: 0 0 20px rgba(0, 255, 136, 0.2);
+.plant-info h4 {
+  margin: 0 0 8px 0;
+  font-size: 18px;
+  color: #2c3e50;
 }
 
-.stat-card.humidity:hover {
-  box-shadow: 0 0 20px rgba(0, 170, 255, 0.2);
+.plant-info p {
+  margin: 4px 0;
+  font-size: 14px;
+  color: #7f8c8d;
 }
 
-.stat-card.moisture:hover {
-  box-shadow: 0 0 20px rgba(255, 170, 0, 0.2);
+.health-metrics {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-top: 15px;
 }
 
-.stat-card.light:hover {
-  box-shadow: 0 0 20px rgba(255, 255, 0, 0.2);
+.metric-card {
+  background: rgba(255, 255, 255, 0.7);
+  border-radius: 12px;
+  padding: 12px;
+  text-align: center;
+}
+
+.metric-icon {
+  font-size: 16px;
+  margin-bottom: 4px;
+}
+
+.metric-value {
+  font-size: 16px;
+  font-weight: 700;
+  color: #00ff88;
+  margin-bottom: 2px;
+}
+
+.metric-label {
+  font-size: 10px;
+  color: #7f8c8d;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.health-condition {
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 20px;
+  padding: 20px;
+  text-align: center;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(20px);
+}
+
+.health-circle {
+  position: relative;
+  width: 120px;
+  height: 120px;
+  margin: 0 auto 15px;
+}
+
+.progress-ring {
+  width: 100%;
+  height: 100%;
+  transform: rotate(-90deg);
+}
+
+.health-percentage {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 24px;
+  font-weight: 700;
+  color: #00ff88;
+}
+
+.health-text h3 {
+  margin: 0 0 5px 0;
+  font-size: 16px;
+  color: #2c3e50;
+}
+
+.health-text p {
+  margin: 0;
+  font-size: 12px;
+  color: #7f8c8d;
+}
+
+/* Center Garden Visualization */
+.center-garden {
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 20px;
+  padding: 20px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(20px);
+  position: relative;
+  overflow: hidden;
+}
+
+.garden-visualization {
+  height: 100%;
+  position: relative;
+}
+
+.garden-scene {
+  height: 400px;
+  position: relative;
+  border-radius: 15px;
+  overflow: hidden;
+  background: linear-gradient(180deg, #87CEEB 0%, #98FB98 30%, #8B4513 100%);
+}
+
+/* Soil Layer */
+.soil-layer {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 40%;
+  background: linear-gradient(45deg, #8B4513, #D2691E);
+  transition: all 1s ease;
+}
+
+.soil-texture {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: 
+    radial-gradient(circle at 20% 30%, rgba(139, 69, 19, 0.3) 2px, transparent 2px),
+    radial-gradient(circle at 80% 70%, rgba(210, 105, 30, 0.3) 1px, transparent 1px);
+  background-size: 20px 20px, 15px 15px;
+}
+
+/* Plant Visual */
+.plant-visual {
+  position: absolute;
+  bottom: 40%;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10;
+}
+
+.plant-stem {
+  width: 8px;
+  height: 80px;
+  background: linear-gradient(180deg, #228B22, #32CD32);
+  margin: 0 auto;
+  border-radius: 4px;
+}
+
+.plant-leaves {
+  position: relative;
+}
+
+.leaf {
+  position: absolute;
+  width: 30px;
+  height: 20px;
+  background: linear-gradient(45deg, #32CD32, #228B22);
+  border-radius: 50% 0 50% 0;
+  animation: sway 3s ease-in-out infinite;
+}
+
+.leaf-1 {
+  top: -10px;
+  left: -15px;
+  transform: rotate(-30deg);
+  animation-delay: 0s;
+}
+
+.leaf-2 {
+  top: -5px;
+  right: -15px;
+  transform: rotate(30deg);
+  animation-delay: 1s;
+}
+
+.leaf-3 {
+  top: 5px;
+  left: -10px;
+  transform: rotate(-45deg);
+  animation-delay: 2s;
+}
+
+@keyframes sway {
+  0%, 100% { transform: rotate(-30deg) scale(1); }
+  50% { transform: rotate(-20deg) scale(1.05); }
+}
+
+.plant-fruit {
+  position: absolute;
+  top: -20px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 20px;
+  animation: bounce 2s ease-in-out infinite;
+}
+
+@keyframes bounce {
+  0%, 100% { transform: translateX(-50%) translateY(0); }
+  50% { transform: translateX(-50%) translateY(-5px); }
+}
+
+/* Water Drops */
+.water-drops {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+}
+
+.water-drop {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  background: #4ecdc4;
+  border-radius: 50%;
+  box-shadow: 0 0 6px #4ecdc4;
+}
+
+.water-drop:nth-child(1) { left: 20%; }
+.water-drop:nth-child(2) { left: 35%; }
+.water-drop:nth-child(3) { left: 50%; }
+.water-drop:nth-child(4) { left: 65%; }
+.water-drop:nth-child(5) { left: 80%; }
+
+/* Sun Light */
+.sun-light {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  z-index: 5;
+}
+
+.sun {
+  font-size: 40px;
+  filter: drop-shadow(0 0 10px #f9ca24);
+}
+
+.light-rays {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 80px;
+  height: 80px;
+}
+
+.light-ray {
+  position: absolute;
+  width: 2px;
+  height: 20px;
+  background: linear-gradient(180deg, #f9ca24, transparent);
+  top: 0;
+  left: 50%;
+  transform-origin: bottom center;
+}
+
+.light-ray:nth-child(1) { transform: translateX(-50%) rotate(0deg); }
+.light-ray:nth-child(2) { transform: translateX(-50%) rotate(45deg); }
+.light-ray:nth-child(3) { transform: translateX(-50%) rotate(90deg); }
+.light-ray:nth-child(4) { transform: translateX(-50%) rotate(135deg); }
+.light-ray:nth-child(5) { transform: translateX(-50%) rotate(180deg); }
+.light-ray:nth-child(6) { transform: translateX(-50%) rotate(225deg); }
+.light-ray:nth-child(7) { transform: translateX(-50%) rotate(270deg); }
+.light-ray:nth-child(8) { transform: translateX(-50%) rotate(315deg); }
+
+/* Heat Waves */
+.heat-waves {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+}
+
+.heat-wave {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(circle, rgba(255, 100, 100, 0.1) 0%, transparent 70%);
+  border-radius: 50%;
+}
+
+.heat-wave:nth-child(1) { animation-delay: 0s; }
+.heat-wave:nth-child(2) { animation-delay: 0.5s; }
+.heat-wave:nth-child(3) { animation-delay: 1s; }
+
+/* Garden Controls */
+.garden-controls {
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  display: flex;
+  gap: 10px;
+}
+
+.control-btn {
+  width: 40px;
+  height: 40px;
+  border: none;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(20px);
+  cursor: pointer;
+  font-size: 16px;
+  transition: all 0.3s ease;
+}
+
+.control-btn:hover {
+  transform: scale(1.1);
+  box-shadow: 0 4px 15px rgba(0, 255, 136, 0.3);
+}
+
+/* Right Sidebar */
+.right-sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.metrics-section {
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 20px;
+  padding: 20px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(20px);
+}
+
+.metrics-section h3 {
+  margin: 0 0 20px 0;
+  font-size: 16px;
+  color: #2c3e50;
+}
+
+.metric-card {
+  background: rgba(255, 255, 255, 0.7);
+  border-radius: 15px;
+  padding: 15px;
+  margin-bottom: 15px;
+  transition: all 0.3s ease;
+}
+
+.metric-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+}
+
+.metric-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.metric-icon {
+  font-size: 16px;
+}
+
+.metric-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #2c3e50;
+}
+
+.metric-value {
+  font-size: 24px;
+  font-weight: 700;
+  color: #00ff88;
+  margin-bottom: 8px;
+}
+
+.metric-chart {
+  height: 40px;
+}
+
+.garden-history {
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 20px;
+  padding: 20px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(20px);
+}
+
+.garden-history h3 {
+  margin: 0 0 15px 0;
+  font-size: 16px;
+  color: #2c3e50;
+}
+
+.history-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.history-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px;
+  background: rgba(255, 255, 255, 0.7);
+  border-radius: 10px;
+  transition: all 0.3s ease;
+}
+
+.history-item:hover {
+  background: rgba(0, 255, 136, 0.1);
+  transform: translateX(5px);
+}
+
+.history-icon {
+  font-size: 16px;
+}
+
+.history-text {
+  flex: 1;
+  font-size: 14px;
+  color: #2c3e50;
+}
+
+.history-date {
+  font-size: 12px;
+  color: #7f8c8d;
+}
+
+/* Responsive Design */
+@media (max-width: 1200px) {
+  .dashboard-content {
+    grid-template-columns: 250px 1fr 300px;
+    gap: 20px;
+    padding: 20px;
+  }
+}
+
+@media (max-width: 768px) {
+  .dashboard-content {
+    grid-template-columns: 1fr;
+    gap: 20px;
+    padding: 15px;
+  }
+  
+  .dashboard-header {
+    padding: 15px 20px;
+  }
+  
+  .header-left {
+    gap: 20px;
+  }
+  
+  .nav-links {
+    gap: 15px;
+  }
+  
+  .garden-scene {
+    height: 300px;
+  }
 }
