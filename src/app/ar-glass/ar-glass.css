@@ -1,0 +1,437 @@
+/* AR Glass View - Glassmorphism Style */
+.ar-glass-container {
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  background: #000;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 9999;
+}
+
+/* Start Screen */
+.ar-glass-start {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 20px;
+}
+
+.start-content {
+  text-align: center;
+  max-width: 500px;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(20px);
+  border-radius: 30px;
+  padding: 40px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+.start-icon {
+  font-size: 80px;
+  margin-bottom: 20px;
+}
+
+.start-content h1 {
+  margin: 0 0 10px 0;
+  font-size: 32px;
+  color: #fff;
+  font-weight: 700;
+}
+
+.start-content p {
+  margin: 0 0 15px 0;
+  font-size: 16px;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.no-marker-text {
+  font-size: 14px;
+  color: #00ff88;
+  font-weight: 600;
+  padding: 10px;
+  background: rgba(0, 255, 136, 0.2);
+  border-radius: 10px;
+  margin: 20px 0;
+}
+
+.preview-mini {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 20px 0;
+  padding: 15px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 15px;
+}
+
+.mini-stat {
+  display: flex;
+  justify-content: space-around;
+  gap: 10px;
+  font-size: 14px;
+  color: #fff;
+  font-weight: 600;
+}
+
+.start-ar-btn {
+  padding: 15px 40px;
+  border: none;
+  border-radius: 15px;
+  background: #00ff88;
+  color: #000;
+  font-size: 18px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 20px rgba(0, 255, 136, 0.4);
+  margin-top: 20px;
+}
+
+.start-ar-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 25px rgba(0, 255, 136, 0.6);
+}
+
+.start-ar-btn:active {
+  transform: translateY(0);
+}
+
+.error-msg {
+  margin-top: 15px;
+  padding: 10px;
+  background: rgba(255, 107, 107, 0.2);
+  border: 1px solid #ff6b6b;
+  border-radius: 10px;
+  color: #fff;
+  font-size: 14px;
+}
+
+/* AR View */
+.ar-glass-view {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  overflow: hidden;
+}
+
+.ar-camera-feed {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.ar-glass-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+/* Glass Cards */
+.glass-card {
+  position: absolute;
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 20px;
+  padding: 20px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  min-width: 180px;
+  overflow: hidden;
+}
+
+.glass-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: var(--status-color, #00ff88);
+  opacity: 0.8;
+}
+
+.card-icon {
+  font-size: 36px;
+  filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.3));
+}
+
+.card-content {
+  flex: 1;
+}
+
+.card-label {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.8);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 5px;
+  font-weight: 600;
+}
+
+.card-value {
+  font-size: 28px;
+  color: #fff;
+  font-weight: 700;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+}
+
+.card-status-bar {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: var(--status-color, #00ff88);
+  opacity: 0.5;
+}
+
+/* Card Positions */
+.glass-top-left {
+  top: 100px;
+  left: 20px;
+}
+
+.glass-top-right {
+  top: 100px;
+  right: 20px;
+}
+
+.glass-bottom-left {
+  bottom: 100px;
+  left: 20px;
+}
+
+.glass-bottom-right {
+  bottom: 100px;
+  right: 20px;
+}
+
+.glass-center {
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  min-width: 180px;
+  padding: 25px;
+}
+
+/* Header */
+.glass-header {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  right: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(20px);
+  border-radius: 15px;
+  padding: 15px 20px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.garden-icon {
+  font-size: 24px;
+}
+
+.garden-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: #fff;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+}
+
+.live-indicator {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #00ff88;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+
+.live-dot {
+  width: 8px;
+  height: 8px;
+  background: #00ff88;
+  border-radius: 50%;
+  box-shadow: 0 0 10px #00ff88;
+}
+
+/* Footer */
+.glass-footer {
+  position: absolute;
+  bottom: 20px;
+  left: 20px;
+  right: 20px;
+  background: rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(20px);
+  border-radius: 15px;
+  padding: 12px 20px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.footer-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.8);
+  gap: 20px;
+}
+
+/* Health Circle */
+.health-circle-container {
+  position: relative;
+  width: 130px;
+  height: 130px;
+}
+
+.health-circle-svg {
+  width: 100%;
+  height: 100%;
+}
+
+.health-text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+}
+
+.health-value {
+  font-size: 36px;
+  font-weight: 700;
+  color: #00ff88;
+  text-shadow: 0 2px 15px rgba(0, 255, 136, 0.5);
+}
+
+.health-label {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.8);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-top: 5px;
+  font-weight: 600;
+}
+
+/* Stop Button */
+.ar-stop-btn {
+  position: absolute;
+  bottom: 30px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(255, 107, 107, 0.9);
+  backdrop-filter: blur(20px);
+  color: #fff;
+  font-size: 24px;
+  cursor: pointer;
+  box-shadow: 0 4px 20px rgba(255, 107, 107, 0.4);
+  pointer-events: auto;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .glass-card {
+    min-width: 140px;
+    padding: 15px;
+  }
+
+  .card-icon {
+    font-size: 28px;
+  }
+
+  .card-value {
+    font-size: 22px;
+  }
+
+  .card-label {
+    font-size: 10px;
+  }
+
+  .glass-top-left,
+  .glass-top-right {
+    top: 80px;
+  }
+
+  .glass-bottom-left,
+  .glass-bottom-right {
+    bottom: 80px;
+  }
+
+  .glass-top-left,
+  .glass-bottom-left {
+    left: 10px;
+  }
+
+  .glass-top-right,
+  .glass-bottom-right {
+    right: 10px;
+  }
+
+  .health-circle-container {
+    width: 110px;
+    height: 110px;
+  }
+
+  .health-value {
+    font-size: 28px;
+  }
+
+  .glass-header,
+  .glass-footer {
+    left: 10px;
+    right: 10px;
+  }
+
+  .footer-info {
+    flex-direction: column;
+    gap: 5px;
+    text-align: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .glass-card {
+    min-width: 120px;
+    padding: 12px;
+    gap: 10px;
+  }
+
+  .card-icon {
+    font-size: 24px;
+  }
+
+  .card-value {
+    font-size: 18px;
+  }
+}

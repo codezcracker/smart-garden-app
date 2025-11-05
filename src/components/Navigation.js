@@ -116,11 +116,18 @@ export default function Navigation({ children = null }) {
           description: 'Test Sensor Data (No Auth)'
         },
         {
+          name: 'AR Glass View',
+          href: '/ar-glass',
+          icon: '🪟',
+          gradient: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+          description: 'Glassmorphism AR (No Marker)'
+        },
+        {
           name: 'AR Garden',
           href: '/ar-garden',
           icon: '🎯',
-          gradient: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-          description: 'View Garden Data in AR'
+          gradient: 'linear-gradient(135deg, #7f7fd5 0%, #86a8e7 100%)',
+          description: 'Marker-Based AR'
         },
         {
           name: 'Sensor Dashboard',
@@ -208,11 +215,18 @@ export default function Navigation({ children = null }) {
           description: 'Test Sensor Data'
         },
         {
+          name: 'AR Glass View',
+          href: '/ar-glass',
+          icon: '🪟',
+          gradient: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+          description: 'Glassmorphism AR (No Marker)'
+        },
+        {
           name: 'AR Garden',
           href: '/ar-garden',
           icon: '🎯',
-          gradient: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-          description: 'View Garden Data in AR'
+          gradient: 'linear-gradient(135deg, #7f7fd5 0%, #86a8e7 100%)',
+          description: 'Marker-Based AR'
         },
         {
           name: 'Sensor Dashboard',
