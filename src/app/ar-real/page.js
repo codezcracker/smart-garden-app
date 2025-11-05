@@ -19,9 +19,16 @@ export default function ARReal() {
   const fetchSensorData = async () => {
     try {
       const response = await fetch('/api/sensor-data');
-      const data = await response.json();
-      if (data && data.length > 0) {
-        setSensorData(data[0]);
+      const result = await response.json();
+      console.log('Fetched sensor data:', result);
+      
+      // Handle both response formats
+      if (result.success && result.data && result.data.length > 0) {
+        setSensorData(result.data[0]);
+      } else if (Array.isArray(result) && result.length > 0) {
+        setSensorData(result[0]);
+      } else {
+        console.log('No sensor data available');
       }
     } catch (error) {
       console.error('Error fetching sensor data:', error);
