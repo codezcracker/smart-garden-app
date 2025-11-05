@@ -63,9 +63,9 @@ export default function ARGardenDashboard() {
         const aframeScript = document.createElement('script');
         aframeScript.src = 'https://aframe.io/releases/1.4.0/aframe.min.js';
         aframeScript.onload = () => {
-          // Load AR.js after A-Frame
+          // Load AR.js after A-Frame (using standard build for better compatibility)
           const arjsScript = document.createElement('script');
-          arjsScript.src = 'https://cdn.jsdelivr.net/gh/AR-js-org/AR.js@3.4.2/aframe/build/aframe-ar-nft.js';
+          arjsScript.src = 'https://cdn.jsdelivr.net/gh/AR-js-org/AR.js@3.4.2/aframe/build/aframe-ar.js';
           arjsScript.onload = () => {
             // Wait a bit for AR.js to initialize
             setTimeout(() => {
@@ -84,7 +84,7 @@ export default function ARGardenDashboard() {
       } else {
         // A-Frame loaded, just load AR.js
         const arjsScript = document.createElement('script');
-        arjsScript.src = 'https://cdn.jsdelivr.net/gh/AR-js-org/AR.js@3.4.2/aframe/build/aframe-ar-nft.js';
+        arjsScript.src = 'https://cdn.jsdelivr.net/gh/AR-js-org/AR.js@3.4.2/aframe/build/aframe-ar.js';
         arjsScript.onload = () => {
           setTimeout(() => {
             if (window.AFRAME && window.AFRAME.systems && window.AFRAME.systems.arjs) {
@@ -131,7 +131,7 @@ export default function ARGardenDashboard() {
       <a-scene 
         vr-mode-ui="enabled: false"
         embedded
-        arjs="sourceType: webcam; detectionMode: mono_and_matrix; matrixCodeType: 3x3; debugUIEnabled: false;"
+        arjs="sourceType: webcam; detectionMode: mono_and_matrix; matrixCodeType: 3x3; debugUIEnabled: false; trackingMethod: best;"
         style="width: 100%; height: 100%;"
       >
         <!-- Marker -->
@@ -269,7 +269,7 @@ export default function ARGardenDashboard() {
         </a-marker>
         
         <!-- Camera -->
-        <a-entity camera></a-entity>
+        <a-entity camera="fov: 60; near: 0.1; far: 1000;" look-controls="enabled: false"></a-entity>
       </a-scene>
     `;
 
