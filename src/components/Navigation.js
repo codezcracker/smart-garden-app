@@ -116,11 +116,18 @@ export default function Navigation({ children = null }) {
           description: 'Test Sensor Data (No Auth)'
         },
         {
+          name: 'AR Placement',
+          href: '/ar-placement',
+          icon: '📍',
+          gradient: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
+          description: '3D Placement (Like IKEA)'
+        },
+        {
           name: 'AR Glass View',
           href: '/ar-glass',
           icon: '🪟',
           gradient: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-          description: 'Glassmorphism AR (No Marker)'
+          description: 'Glass Overlay AR'
         },
         {
           name: 'AR Garden',
@@ -215,11 +222,18 @@ export default function Navigation({ children = null }) {
           description: 'Test Sensor Data'
         },
         {
+          name: 'AR Placement',
+          href: '/ar-placement',
+          icon: '📍',
+          gradient: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
+          description: '3D Placement (Like IKEA)'
+        },
+        {
           name: 'AR Glass View',
           href: '/ar-glass',
           icon: '🪟',
           gradient: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-          description: 'Glassmorphism AR (No Marker)'
+          description: 'Glass Overlay AR'
         },
         {
           name: 'AR Garden',
