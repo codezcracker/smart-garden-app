@@ -116,17 +116,24 @@ export default function Navigation({ children = null }) {
           description: 'Test Sensor Data (No Auth)'
         },
         {
+          name: 'AR 3D Placement',
+          href: '/ar-real',
+          icon: '🎯',
+          gradient: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+          description: 'IKEA-Style 3D AR - Place Anywhere!'
+        },
+        {
           name: 'AR Tap to Place',
           href: '/ar-tap-place',
           icon: '✨',
-          gradient: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
+          gradient: 'linear-gradient(135deg, #14b8a6 0%, #0d9488 100%)',
           description: 'Tap to Place Glowing Cards'
         },
         {
           name: 'AR Garden',
           href: '/ar-garden',
-          icon: '🎯',
-          gradient: 'linear-gradient(135deg, #7f7fd5 0%, #86a8e7 100%)',
+          icon: '🌿',
+          gradient: 'linear-gradient(135deg, #22c55e 0%, #16a34a 100%)',
           description: 'Marker-Based AR'
         },
         {
@@ -215,17 +222,24 @@ export default function Navigation({ children = null }) {
           description: 'Test Sensor Data'
         },
         {
+          name: 'AR 3D Placement',
+          href: '/ar-real',
+          icon: '🎯',
+          gradient: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+          description: 'IKEA-Style 3D AR - Place Anywhere!'
+        },
+        {
           name: 'AR Tap to Place',
           href: '/ar-tap-place',
           icon: '✨',
-          gradient: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
+          gradient: 'linear-gradient(135deg, #14b8a6 0%, #0d9488 100%)',
           description: 'Tap to Place Glowing Cards'
         },
         {
           name: 'AR Garden',
           href: '/ar-garden',
-          icon: '🎯',
-          gradient: 'linear-gradient(135deg, #7f7fd5 0%, #86a8e7 100%)',
+          icon: '🌿',
+          gradient: 'linear-gradient(135deg, #22c55e 0%, #16a34a 100%)',
           description: 'Marker-Based AR'
         },
         {
