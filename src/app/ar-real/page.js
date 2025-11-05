@@ -1,33 +1,20 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import Script from 'next/script';
+import { useEffect, useState, useRef } from 'react';
 import './ar-real.css';
 
 export default function ARReal() {
   const [sensorData, setSensorData] = useState(null);
-  const [isARSupported, setIsARSupported] = useState(false);
-  const [errorMessage, setErrorMessage] = useState('');
+  const [isARActive, setIsARActive] = useState(false);
+  const [placedCards, setPlacedCards] = useState([]);
+  const [isGyroActive, setIsGyroActive] = useState(false);
+  const [orientation, setOrientation] = useState({ alpha: 0, beta: 0, gamma: 0 });
+  const videoRef = useRef(null);
+  const canvasRef = useRef(null);
 
   useEffect(() => {
     fetchSensorData();
     const interval = setInterval(fetchSensorData, 10000);
-    
-    // Check WebXR support
-    if (navigator.xr) {
-      navigator.xr.isSessionSupported('immersive-ar').then((supported) => {
-        setIsARSupported(supported);
-        if (!supported) {
-          setErrorMessage('AR not supported on this device. Try Chrome on Android or Safari on iPhone.');
-        }
-      }).catch(() => {
-        setIsARSupported(false);
-        setErrorMessage('WebXR not available. Please use a compatible browser.');
-      });
-    } else {
-      setErrorMessage('WebXR not available. Please use Chrome (Android) or Safari (iOS).');
-    }
-    
     return () => clearInterval(interval);
   }, []);
 
@@ -46,160 +33,93 @@ export default function ARReal() {
     }
   };
 
-  const startARSession = async () => {
-    if (!navigator.xr) {
-      alert('WebXR not supported on this device');
-      return;
-    }
-
+  const startAR = async () => {
     try {
-      const canvas = document.createElement('canvas');
-      document.getElementById('ar-container').appendChild(canvas);
-      
-      const gl = canvas.getContext('webgl', { xrCompatible: true });
-      
-      const session = await navigator.xr.requestSession('immersive-ar', {
-        requiredFeatures: ['hit-test'],
-        optionalFeatures: ['dom-overlay'],
-        domOverlay: { root: document.getElementById('ar-overlay') }
+      // Request camera access
+      const stream = await navigator.mediaDevices.getUserMedia({ 
+        video: { facingMode: 'environment' } 
       });
+      
+      if (videoRef.current) {
+        videoRef.current.srcObject = stream;
+        videoRef.current.play();
+      }
 
-      await gl.makeXRCompatible();
-      
-      // Initialize Three.js with WebXR
-      if (window.THREE && window.ARButton) {
-        initThreeAR(canvas, session);
+      setIsARActive(true);
+
+      // Request device orientation
+      if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
+        const permission = await DeviceOrientationEvent.requestPermission();
+        if (permission === 'granted') {
+          startGyroscope();
+        }
       } else {
-        alert('3D libraries not loaded. Please refresh and try again.');
+        startGyroscope();
       }
-      
+
     } catch (error) {
-      console.error('AR Error:', error);
-      if (error.name === 'NotSupportedError') {
-        alert('AR is not supported on this device.\n\nRequires:\n- iPhone 6S+ with iOS 12+\n- Android with ARCore (Pixel, Samsung S9+, etc.)');
-      } else if (error.name === 'SecurityError') {
-        alert('AR requires HTTPS. Please use: https://smart-garden-app.vercel.app/ar-real');
-      } else {
-        alert('Failed to start AR: ' + error.message);
-      }
+      console.error('Camera access error:', error);
+      alert('Camera access required for AR. Please allow camera permissions.');
     }
   };
 
-  const initThreeAR = (canvas, session) => {
-    const scene = new window.THREE.Scene();
-    const camera = new window.THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.01, 20);
-    
-    const renderer = new window.THREE.WebGLRenderer({ 
-      canvas: canvas,
-      antialias: true, 
-      alpha: true,
-      context: canvas.getContext('webgl', { xrCompatible: true })
-    });
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    renderer.xr.enabled = true;
-    renderer.xr.setSession(session);
+  const startGyroscope = () => {
+    window.addEventListener('deviceorientation', handleOrientation);
+    setIsGyroActive(true);
+  };
 
-    // Add lighting
-    const light = new window.THREE.HemisphereLight(0xffffff, 0xbbbbff, 1);
-    scene.add(light);
-
-    // Create sensor display
-    const boardGroup = new window.THREE.Group();
-    
-    const boardGeometry = new window.THREE.BoxGeometry(0.4, 0.3, 0.02);
-    const boardMaterial = new window.THREE.MeshStandardMaterial({ 
-      color: 0x2d5a2d,
-      metalness: 0.3,
-      roughness: 0.4
-    });
-    const board = new window.THREE.Mesh(boardGeometry, boardMaterial);
-    boardGroup.add(board);
-
-    // Add colored data boxes
-    const dataBoxGeometry = new window.THREE.BoxGeometry(0.15, 0.12, 0.03);
-    
-    const boxes = [
-      { color: 0xff6b6b, pos: [-0.1, 0.08, 0.02] },  // Temperature
-      { color: 0x4ecdc4, pos: [0.1, 0.08, 0.02] },   // Humidity
-      { color: 0x8b4513, pos: [-0.1, -0.08, 0.02] }, // Soil
-      { color: 0xffd93d, pos: [0.1, -0.08, 0.02] }   // Light
-    ];
-
-    boxes.forEach(({ color, pos }) => {
-      const material = new window.THREE.MeshStandardMaterial({ color });
-      const box = new window.THREE.Mesh(dataBoxGeometry, material);
-      box.position.set(...pos);
-      boardGroup.add(box);
-    });
-
-    boardGroup.visible = false;
-    scene.add(boardGroup);
-
-    // Reticle
-    const reticleGeometry = new window.THREE.RingGeometry(0.15, 0.2, 32).rotateX(-Math.PI / 2);
-    const reticleMaterial = new window.THREE.MeshBasicMaterial({ color: 0x4CAF50 });
-    const reticle = new window.THREE.Mesh(reticleGeometry, reticleMaterial);
-    reticle.matrixAutoUpdate = false;
-    reticle.visible = false;
-    scene.add(reticle);
-
-    let hitTestSource = null;
-    let placedObject = null;
-
-    session.requestReferenceSpace('viewer').then((referenceSpace) => {
-      session.requestHitTestSource({ space: referenceSpace }).then((source) => {
-        hitTestSource = source;
-      });
-    });
-
-    const controller = renderer.xr.getController(0);
-    controller.addEventListener('select', () => {
-      if (reticle.visible && !placedObject) {
-        const placedBoard = boardGroup.clone();
-        placedBoard.position.setFromMatrixPosition(reticle.matrix);
-        placedBoard.visible = true;
-        scene.add(placedBoard);
-        placedObject = placedBoard;
-        reticle.visible = false;
-      }
-    });
-    scene.add(controller);
-
-    renderer.setAnimationLoop((timestamp, frame) => {
-      if (frame) {
-        const referenceSpace = renderer.xr.getReferenceSpace();
-
-        if (hitTestSource && !placedObject) {
-          const hitTestResults = frame.getHitTestResults(hitTestSource);
-          if (hitTestResults.length) {
-            const hit = hitTestResults[0];
-            reticle.visible = true;
-            reticle.matrix.fromArray(hit.getPose(referenceSpace).transform.matrix);
-          } else {
-            reticle.visible = false;
-          }
-        }
-
-        if (placedObject) {
-          placedObject.rotation.y += 0.01;
-        }
-      }
-
-      renderer.render(scene, camera);
+  const handleOrientation = (event) => {
+    setOrientation({
+      alpha: event.alpha || 0,
+      beta: event.beta || 0,
+      gamma: event.gamma || 0
     });
   };
 
-  return (
-    <>
-      <Script 
-        src="https://cdn.jsdelivr.net/npm/three@0.159.0/build/three.min.js"
-        strategy="beforeInteractive"
-      />
-      
+  const handleScreenTap = (e) => {
+    if (!sensorData) return;
+
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+
+    // Calculate 3D-like position based on gyroscope
+    const depth = 1 + (orientation.beta / 90); // Simulated depth
+    const scale = Math.max(0.5, Math.min(1.5, depth));
+
+    const newCard = {
+      id: Date.now(),
+      x: x,
+      y: y,
+      scale: scale,
+      rotation: orientation.gamma / 2,
+      data: { ...sensorData },
+      depth: depth
+    };
+
+    setPlacedCards([...placedCards, newCard]);
+  };
+
+  const removeCard = (id) => {
+    setPlacedCards(placedCards.filter(card => card.id !== id));
+  };
+
+  const stopAR = () => {
+    if (videoRef.current && videoRef.current.srcObject) {
+      videoRef.current.srcObject.getTracks().forEach(track => track.stop());
+    }
+    window.removeEventListener('deviceorientation', handleOrientation);
+    setIsARActive(false);
+    setIsGyroActive(false);
+    setPlacedCards([]);
+  };
+
+  if (!isARActive) {
+    return (
       <div className="ar-real-container">
         <div className="ar-real-intro">
-          <h1>🌱 3D AR Placement</h1>
-          <p>Place your garden sensor display in real 3D space - just like IKEA!</p>
+          <h1>🌱 AR Sensor Display</h1>
+          <p>Place 3D sensor displays anywhere in your space - IKEA style!</p>
           
           <div className="sensor-preview">
             <h3>Live Sensor Data:</h3>
@@ -233,59 +153,152 @@ export default function ARReal() {
 
           <button 
             className="start-ar-btn" 
-            onClick={startARSession}
+            onClick={startAR}
             disabled={!sensorData}
           >
-            {sensorData ? '🚀 Launch AR Experience' : '⏳ Loading...'}
+            {sensorData ? '🚀 Start AR - Place Anywhere!' : '⏳ Loading...'}
           </button>
 
-          {errorMessage && (
-            <div className="ar-error">
-              ⚠️ {errorMessage}
-            </div>
-          )}
-
           <div className="ar-info">
-            <h4>✨ True 3D AR Placement:</h4>
+            <h4>✨ How it works:</h4>
             <ul>
-              <li>📱 Tap anywhere to place your 3D sensor display</li>
-              <li>🚶 Walk around it in your real space</li>
-              <li>👁️ View from any angle</li>
-              <li>🏠 Place it on tables, floor, or in the air!</li>
+              <li>📱 Tap anywhere on the screen to place displays</li>
+              <li>🔄 Tilt your phone - displays adjust with perspective</li>
+              <li>🎯 Place multiple displays in different locations</li>
+              <li>👆 Tap on any display to remove it</li>
+              <li>📏 Displays scale with distance (perspective effect)</li>
             </ul>
           </div>
 
           <div className="ar-requirements">
-            <p>📱 <strong>Required:</strong> iPhone 6S+ (iOS 12+) or Android with ARCore</p>
-            <p>🌐 <strong>Browser:</strong> Safari (iOS) or Chrome (Android)</p>
-            <p>🔒 <strong>HTTPS required</strong> - use the Vercel deployment</p>
+            <p>📱 <strong>Works on ALL devices!</strong></p>
+            <p>🌐 iPhone, Android, Desktop - any browser</p>
+            <p>📸 Camera permission required</p>
           </div>
         </div>
       </div>
+    );
+  }
 
-      <div id="ar-container" className="ar-canvas-container" style={{ display: 'none' }}></div>
-      <div id="ar-overlay" className="ar-overlay-ui">
-        {sensorData && (
-          <div className="ar-data-hud">
-            <div className="hud-item">
-              <span className="hud-icon">🌡️</span>
-              <span className="hud-value">{sensorData.temperature}°C</span>
-            </div>
-            <div className="hud-item">
-              <span className="hud-icon">💧</span>
-              <span className="hud-value">{sensorData.humidity}%</span>
-            </div>
-            <div className="hud-item">
-              <span className="hud-icon">🌊</span>
-              <span className="hud-value">{sensorData.soilMoisture}%</span>
-            </div>
-            <div className="hud-item">
-              <span className="hud-icon">☀️</span>
-              <span className="hud-value">{sensorData.lightLevel} lux</span>
+  return (
+    <div className="ar-viewer-container">
+      {/* Camera Feed */}
+      <video 
+        ref={videoRef}
+        className="ar-camera-feed"
+        playsInline
+        autoPlay
+      />
+
+      {/* Canvas for placed objects */}
+      <div 
+        className="ar-placement-layer"
+        onClick={handleScreenTap}
+      >
+        {/* Placed 3D Cards */}
+        {placedCards.map((card) => (
+          <div
+            key={card.id}
+            className="ar-placed-card"
+            style={{
+              left: `${card.x}px`,
+              top: `${card.y}px`,
+              transform: `translate(-50%, -50%) scale(${card.scale}) rotateZ(${card.rotation}deg) rotateX(${orientation.beta / 10}deg) rotateY(${orientation.gamma / 10}deg)`,
+              zIndex: Math.floor(card.depth * 100)
+            }}
+            onClick={(e) => {
+              e.stopPropagation();
+              removeCard(card.id);
+            }}
+          >
+            <div className="card-3d-container">
+              <div className="card-3d-inner">
+                <div className="sensor-card-ar">
+                  <div className="card-header-ar">
+                    <span className="card-icon-ar">🌱</span>
+                    <h3>Garden Sensor</h3>
+                    <button className="card-close-ar">✕</button>
+                  </div>
+                  
+                  <div className="card-grid-ar">
+                    <div className="sensor-item-ar temp">
+                      <span className="sensor-icon-big">🌡️</span>
+                      <span className="sensor-label">Temperature</span>
+                      <span className="sensor-value-big">{card.data.temperature}°C</span>
+                    </div>
+                    
+                    <div className="sensor-item-ar humidity">
+                      <span className="sensor-icon-big">💧</span>
+                      <span className="sensor-label">Humidity</span>
+                      <span className="sensor-value-big">{card.data.humidity}%</span>
+                    </div>
+                    
+                    <div className="sensor-item-ar soil">
+                      <span className="sensor-icon-big">🌊</span>
+                      <span className="sensor-label">Soil</span>
+                      <span className="sensor-value-big">{card.data.soilMoisture}%</span>
+                    </div>
+                    
+                    <div className="sensor-item-ar light">
+                      <span className="sensor-icon-big">☀️</span>
+                      <span className="sensor-label">Light</span>
+                      <span className="sensor-value-big">{card.data.lightLevel}</span>
+                    </div>
+                  </div>
+
+                  <div className="card-shadow-3d"></div>
+                </div>
+              </div>
             </div>
           </div>
+        ))}
+
+        {/* Crosshair / Placement Indicator */}
+        <div className="ar-crosshair">
+          <div className="crosshair-inner">
+            <div className="crosshair-dot"></div>
+            <div className="crosshair-ring"></div>
+          </div>
+          <p className="crosshair-text">👆 Tap to place sensor display</p>
+        </div>
+      </div>
+
+      {/* Controls Overlay */}
+      <div className="ar-controls-overlay">
+        <div className="ar-status">
+          <span className="status-badge">
+            📸 AR Active
+          </span>
+          {isGyroActive && (
+            <span className="status-badge gyro">
+              🔄 3D Motion Active
+            </span>
+          )}
+          <span className="status-badge count">
+            {placedCards.length} Placed
+          </span>
+        </div>
+
+        <button className="ar-exit-btn" onClick={stopAR}>
+          ← Exit AR
+        </button>
+
+        {placedCards.length > 0 && (
+          <button 
+            className="ar-clear-btn"
+            onClick={() => setPlacedCards([])}
+          >
+            🗑️ Clear All
+          </button>
         )}
       </div>
-    </>
+
+      {/* Instructions */}
+      <div className="ar-instructions-bottom">
+        <p>👆 Tap anywhere to place</p>
+        <p>🔄 Tilt phone for 3D effect</p>
+        <p>✕ Tap display to remove</p>
+      </div>
+    </div>
   );
 }
