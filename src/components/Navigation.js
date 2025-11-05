@@ -116,18 +116,11 @@ export default function Navigation({ children = null }) {
           description: 'Test Sensor Data (No Auth)'
         },
         {
-          name: 'AR Placement',
-          href: '/ar-placement',
-          icon: '📍',
+          name: 'AR Tap to Place',
+          href: '/ar-tap-place',
+          icon: '✨',
           gradient: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
-          description: '3D Placement (Like IKEA)'
-        },
-        {
-          name: 'AR Glass View',
-          href: '/ar-glass',
-          icon: '🪟',
-          gradient: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-          description: 'Glass Overlay AR'
+          description: 'Tap to Place Glowing Cards'
         },
         {
           name: 'AR Garden',
@@ -222,18 +215,11 @@ export default function Navigation({ children = null }) {
           description: 'Test Sensor Data'
         },
         {
-          name: 'AR Placement',
-          href: '/ar-placement',
-          icon: '📍',
+          name: 'AR Tap to Place',
+          href: '/ar-tap-place',
+          icon: '✨',
           gradient: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
-          description: '3D Placement (Like IKEA)'
-        },
-        {
-          name: 'AR Glass View',
-          href: '/ar-glass',
-          icon: '🪟',
-          gradient: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-          description: 'Glass Overlay AR'
+          description: 'Tap to Place Glowing Cards'
         },
         {
           name: 'AR Garden',

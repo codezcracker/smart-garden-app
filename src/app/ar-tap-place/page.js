@@ -216,7 +216,7 @@ Let me know what you prefer!Human: it is not working can umodify ar glass in whi
 
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import './ar-glass.css';
+import './ar-tap-place.css';
 
 export default function ARGlassView() {
   const [sensorData, setSensorData] = useState(null);
@@ -351,9 +351,9 @@ export default function ARGlassView() {
             >
               ✨
             </motion.div>
-            <h1>AR Tap to Place</h1>
-            <p>Tap anywhere to place glowing sensor data cards!</p>
-            <p className="highlight-text">📍 Just like placing stickers in camera - tap to place cards anywhere!</p>
+            <h1>🎯 AR Tap to Place</h1>
+            <p>Tap anywhere on camera to place glowing sensor data cards!</p>
+            <p className="highlight-text">✨ Tap screen = Place card • Tap card = Remove • NEW FEATURE!</p>
             
             {sensorData && (
               <div className="preview-mini">

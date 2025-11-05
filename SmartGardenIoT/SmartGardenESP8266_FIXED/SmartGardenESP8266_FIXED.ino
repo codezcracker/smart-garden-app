@@ -61,7 +61,7 @@ String deviceId = "DB" + String(random(1000, 9999));
 #define DEVICE_ID_ADDR 1
 
 // CONFIGURABLE DATA SEND INTERVAL
-#define DATA_SEND_INTERVAL_SECONDS 1  // Change this value to adjust send frequency
+#define DATA_SEND_INTERVAL_SECONDS 1                            // Change this value to adjust send frequency
 #define DATA_SEND_INTERVAL (DATA_SEND_INTERVAL_SECONDS * 1000)  // Convert to milliseconds
 
 void setup() {
@@ -135,7 +135,7 @@ void sendSensorData() {
     Serial.println("⚠️ WiFi not connected, skipping data send");
     return;
   }
-  
+
   if (!ENABLE_HTTP_SENDING) {
     Serial.println("📡 HTTP sending disabled (for testing)");
     return;
@@ -144,16 +144,16 @@ void sendSensorData() {
   WiFiClientSecure client;
   HTTPClient http;
   String fullURL = String(serverURL) + String(dataEndpoint);
-  
+
   Serial.println("📡 Connecting to: " + fullURL);
-  
+
   // Skip SSL certificate verification for ESP8266 compatibility
   client.setInsecure();
-  
+
   http.begin(client, fullURL);
   http.addHeader("Content-Type", "application/json");
   http.addHeader("x-device-id", deviceId);
-  http.setTimeout(15000); // 15 second timeout for HTTPS
+  http.setTimeout(15000);  // 15 second timeout for HTTPS
 
   // Read DHT11 sensor (NOW WORKING!)
   float temperature = dht.readTemperature();
@@ -256,7 +256,7 @@ void sendSensorData() {
     Serial.println("❌ Failed to send sensor data: " + String(httpResponseCode));
     String errorResponse = http.getString();
     Serial.println("📨 Error response: " + errorResponse);
-    
+
     // Handle specific error codes
     if (httpResponseCode == 308) {
       Serial.println("⚠️ Redirect error - server may be redirecting HTTP to HTTPS");
@@ -268,7 +268,7 @@ void sendSensorData() {
       Serial.println("⚠️ Connection timeout - server may be slow");
     }
   }
-  
+
   http.end();
 }
 
