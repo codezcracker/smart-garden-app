@@ -115,6 +115,20 @@ export default function Navigation({ children = null }) {
           gradient: 'linear-gradient(135deg, #ff5722 0%, #d84315 100%)',
           description: 'Test Sensor Data (No Auth)'
         },
+        {
+          name: 'AR Garden',
+          href: '/ar-garden',
+          icon: '🎯',
+          gradient: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+          description: 'View Garden Data in AR'
+        },
+        {
+          name: 'Sensor Dashboard',
+          href: '/sensor-dashboard',
+          icon: '📊',
+          gradient: 'linear-gradient(135deg, #00ff88 0%, #00cc6a 100%)',
+          description: 'Animated Garden Dashboard'
+        },
       ];
 
       // Add role-specific apps
@@ -192,6 +206,20 @@ export default function Navigation({ children = null }) {
           icon: '🔬',
           gradient: 'linear-gradient(135deg, #ff5722 0%, #d84315 100%)',
           description: 'Test Sensor Data'
+        },
+        {
+          name: 'AR Garden',
+          href: '/ar-garden',
+          icon: '🎯',
+          gradient: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+          description: 'View Garden Data in AR'
+        },
+        {
+          name: 'Sensor Dashboard',
+          href: '/sensor-dashboard',
+          icon: '📊',
+          gradient: 'linear-gradient(135deg, #00ff88 0%, #00cc6a 100%)',
+          description: 'Animated Garden Dashboard'
         }
       ];
     }
