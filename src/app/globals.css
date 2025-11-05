@@ -1376,6 +1376,8 @@ body {
 .nav-menu-content {
   width: 100%;
   height: 100%;
+  overflow-y: auto;
+  max-height: calc(100vh - 100px);
 }
 
 .nav-menu-header {
@@ -1436,11 +1438,10 @@ body {
 .nav-apps-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  grid-template-rows: repeat(3, 1fr);
-  gap: 2rem 1.5rem;
+  gap: 1.5rem 1rem;
   max-width: 600px;
   justify-items: center;
-  align-items: center;
+  align-items: start;
 }
 
 .nav-app-card {
@@ -1449,11 +1450,12 @@ body {
   align-items: center;
   text-decoration: none;
   color: inherit;
-  padding: 1.2rem;
-  border-radius: 16px;
+  padding: 0.8rem 0.5rem;
+  border-radius: 12px;
   transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
   animation: iconFadeIn 0.6s ease-out;
   animation-delay: var(--delay);
+  width: 100%;
   animation-fill-mode: both;
   position: relative;
   background: rgba(255, 255, 255, 0.1);
@@ -1485,13 +1487,13 @@ body {
 }
 
 .app-icon {
-  width: 100px;
-  height: 100px;
+  width: 70px;
+  height: 70px;
   border-radius: 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 0.8rem;
+  margin-bottom: 0.5rem;
   box-shadow: none;
   transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
   position: relative;
@@ -1515,12 +1517,12 @@ body {
 }
 
 .app-name {
-  font-size: 0.9rem;
+  font-size: 0.7rem;
   font-weight: 600;
   color: #374151;
   text-align: center;
-  line-height: 1.3;
-  max-width: 120px;
+  line-height: 1.2;
+  max-width: 90px;
   word-wrap: break-word;
   margin: 0;
   text-shadow: none;
@@ -1534,10 +1536,11 @@ body {
 }
 
 .app-description {
-  font-size: 0.7rem;
+  font-size: 0.6rem;
   color: rgba(255, 255, 255, 0.8);
   margin: 0.2rem 0 0 0;
   text-align: center;
+  display: none; /* Hide on desktop for compactness */
 }
 
 /* Dark Theme Apps */
@@ -1754,20 +1757,19 @@ body {
   
   .nav-apps-grid {
     grid-template-columns: repeat(4, 1fr);
-    grid-template-rows: repeat(3, 1fr);
-    gap: 1.5rem 1.2rem;
-    max-width: 450px;
+    gap: 1rem 0.8rem;
+    max-width: 420px;
   }
   
   .app-icon {
-    width: 80px;
-    height: 80px;
-    font-size: 3rem;
+    width: 60px;
+    height: 60px;
+    font-size: 2.5rem;
   }
   
   .app-name {
-    font-size: 0.7rem;
-    max-width: 75px;
+    font-size: 0.65rem;
+    max-width: 70px;
   }
   
   .nav-menu-container {
@@ -1783,20 +1785,23 @@ body {
 @media (max-width: 480px) {
   .nav-apps-grid {
     grid-template-columns: repeat(3, 1fr);
-    grid-template-rows: repeat(4, 1fr);
-    gap: 1.2rem 1rem;
-    max-width: 350px;
+    gap: 0.8rem 0.6rem;
+    max-width: 320px;
   }
   
   .app-icon {
-    width: 70px;
-    height: 70px;
-    font-size: 2.5rem;
+    width: 50px;
+    height: 50px;
+    font-size: 2rem;
   }
   
   .app-name {
-    font-size: 0.65rem;
-    max-width: 65px;
+    font-size: 0.6rem;
+    max-width: 60px;
+  }
+  
+  .nav-app-card {
+    padding: 0.6rem 0.4rem;
   }
   
   .nav-menu-container {
