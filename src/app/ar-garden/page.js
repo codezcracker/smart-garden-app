@@ -7,42 +7,34 @@ import './ar-garden.css';
 export default function ARGardenDashboard() {
   const [sensorData, setSensorData] = useState(null);
   const [isARActive, setIsARActive] = useState(false);
-  const [arMode, setArMode] = useState('webar'); // 'webar' or 'webxr'
   const [isLoading, setIsLoading] = useState(true);
-  const [cameraPermission, setCameraPermission] = useState(false);
-  const arSceneRef = useRef(null);
-  const videoRef = useRef(null);
-  const canvasRef = useRef(null);
+  const [arReady, setArReady] = useState(false);
+  const [error, setError] = useState(null);
+  const arContainerRef = useRef(null);
 
   useEffect(() => {
     fetchSensorData();
     const interval = setInterval(fetchSensorData, 3000);
-    checkCameraPermission();
     return () => clearInterval(interval);
   }, []);
 
   useEffect(() => {
-    if (isARActive && sensorData) {
-      if (arMode === 'webar') {
-        initializeWebAR();
-      } else if (arMode === 'webxr') {
-        initializeWebXR();
-      }
-    }
-    return () => {
+    if (isARActive) {
+      loadARLibraries().then(() => {
+        setArReady(true);
+        setTimeout(() => {
+          createARScene();
+        }, 500);
+      }).catch(err => {
+        console.error('AR library loading failed:', err);
+        setError('Failed to load AR libraries. Please refresh the page.');
+      });
+    } else {
       cleanupAR();
-    };
-  }, [isARActive, sensorData, arMode]);
-
-  const checkCameraPermission = async () => {
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-      stream.getTracks().forEach(track => track.stop());
-      setCameraPermission(true);
-    } catch (err) {
-      setCameraPermission(false);
+      setArReady(false);
+      setError(null);
     }
-  };
+  }, [isARActive, sensorData]);
 
   const fetchSensorData = async () => {
     try {
@@ -58,41 +50,99 @@ export default function ARGardenDashboard() {
     }
   };
 
-  const initializeWebAR = () => {
-    // Load AR.js and A-Frame
-    if (typeof window === 'undefined' || window.AFRAME) return;
+  const loadARLibraries = () => {
+    return new Promise((resolve, reject) => {
+      // Check if already loaded
+      if (window.AFRAME && window.AFRAME.systems && window.AFRAME.systems.arjs) {
+        resolve();
+        return;
+      }
 
-    const loadScript = (src) => {
-      return new Promise((resolve, reject) => {
-        const script = document.createElement('script');
-        script.src = src;
-        script.onload = resolve;
-        script.onerror = reject;
-        document.head.appendChild(script);
-      });
-    };
-
-    Promise.all([
-      loadScript('https://aframe.io/releases/1.4.0/aframe.min.js'),
-    ]).then(() => {
-      loadScript('https://cdn.jsdelivr.net/gh/AR-js-org/AR.js@3.4.2/aframe/build/aframe-ar-nft.js').then(() => {
-        createARScene();
-      });
+      // Load A-Frame first
+      if (!window.AFRAME) {
+        const aframeScript = document.createElement('script');
+        aframeScript.src = 'https://aframe.io/releases/1.4.0/aframe.min.js';
+        aframeScript.onload = () => {
+          // Load AR.js after A-Frame
+          const arjsScript = document.createElement('script');
+          arjsScript.src = 'https://cdn.jsdelivr.net/gh/AR-js-org/AR.js@3.4.2/aframe/build/aframe-ar-nft.js';
+          arjsScript.onload = () => {
+            // Wait a bit for AR.js to initialize
+            setTimeout(() => {
+              if (window.AFRAME && window.AFRAME.systems && window.AFRAME.systems.arjs) {
+                resolve();
+              } else {
+                reject(new Error('AR.js system not found'));
+              }
+            }, 100);
+          };
+          arjsScript.onerror = () => reject(new Error('Failed to load AR.js'));
+          document.head.appendChild(arjsScript);
+        };
+        aframeScript.onerror = () => reject(new Error('Failed to load A-Frame'));
+        document.head.appendChild(aframeScript);
+      } else {
+        // A-Frame loaded, just load AR.js
+        const arjsScript = document.createElement('script');
+        arjsScript.src = 'https://cdn.jsdelivr.net/gh/AR-js-org/AR.js@3.4.2/aframe/build/aframe-ar-nft.js';
+        arjsScript.onload = () => {
+          setTimeout(() => {
+            if (window.AFRAME && window.AFRAME.systems && window.AFRAME.systems.arjs) {
+              resolve();
+            } else {
+              reject(new Error('AR.js system not found'));
+            }
+          }, 100);
+        };
+        arjsScript.onerror = () => reject(new Error('Failed to load AR.js'));
+        document.head.appendChild(arjsScript);
+      }
     });
   };
 
   const createARScene = () => {
     const container = document.getElementById('ar-container');
-    if (!container || !sensorData) return;
+    if (!container) {
+      console.error('AR container not found');
+      return;
+    }
+
+    if (!sensorData) {
+      container.innerHTML = `
+        <div class="ar-loading">
+          <p>📡 Waiting for sensor data...</p>
+          <p class="ar-hint">Make sure your ESP8266 is connected!</p>
+        </div>
+      `;
+      return;
+    }
+
+    // Calculate health
+    const healthValue = Math.round(
+      ((sensorData.soilMoisture || 0) + 
+       (sensorData.lightLevel || 0) + 
+       (sensorData.temperature || 0) * 2) / 4
+    );
+
+    // Use Hiro marker from CDN (standard AR.js marker)
+    const markerUrl = 'https://jeromeetienne.github.io/AR.js/data/images/HIRO.patt';
 
     container.innerHTML = `
       <a-scene 
-        vr-mode-ui="enabled: false" 
-        embedded 
-        arjs="sourceType: webcam; detectionMode: mono_and_matrix; matrixCodeType: 3x3;"
+        vr-mode-ui="enabled: false"
+        embedded
+        arjs="sourceType: webcam; detectionMode: mono_and_matrix; matrixCodeType: 3x3; debugUIEnabled: false;"
         style="width: 100%; height: 100%;"
       >
-        <a-marker type="pattern" url="/markers/hiro.patt" id="garden-marker">
+        <!-- Marker -->
+        <a-marker 
+          type="pattern" 
+          url="${markerUrl}"
+          id="garden-marker"
+          raycaster="objects: .clickable"
+          emitevents="true"
+          cursor="fuse: false; rayOrigin: mouse;"
+        >
           <!-- 3D Plant Visualization -->
           <a-box 
             position="0 0.5 0" 
@@ -101,100 +151,143 @@ export default function ARGardenDashboard() {
             depth="0.3" 
             color="#00ff88"
             animation="property: rotation; to: 0 360 0; loop: true; dur: 5000"
+            class="clickable"
           ></a-box>
           
-          <!-- Temperature -->
+          <!-- Temperature Card -->
+          <a-plane 
+            position="0 1.5 0"
+            width="0.8"
+            height="0.3"
+            color="#ff6b6b"
+            opacity="0.9"
+            rotation="-30 0 0"
+          ></a-plane>
           <a-text 
             value="🌡️ ${sensorData.temperature?.toFixed(1)}°C"
-            position="0 1.2 0"
+            position="0 1.5 0.01"
             align="center"
-            color="#ff6b6b"
-            scale="2 2 2"
+            color="#ffffff"
+            scale="1.5 1.5 1.5"
+            width="10"
           ></a-text>
           
-          <!-- Humidity -->
+          <!-- Humidity Card -->
+          <a-plane 
+            position="0.6 1.2 0"
+            width="0.7"
+            height="0.3"
+            color="#4ecdc4"
+            opacity="0.9"
+            rotation="-30 0 0"
+          ></a-plane>
           <a-text 
             value="💧 ${sensorData.humidity?.toFixed(0)}%"
-            position="0 1.0 0"
+            position="0.6 1.2 0.01"
             align="center"
-            color="#4ecdc4"
-            scale="2 2 2"
+            color="#ffffff"
+            scale="1.5 1.5 1.5"
+            width="10"
           ></a-text>
           
-          <!-- Soil Moisture -->
-          <a-text 
-            value="🌱 Soil: ${sensorData.soilMoisture?.toFixed(0)}%"
-            position="0 0.8 0"
-            align="center"
+          <!-- Soil Moisture Card -->
+          <a-plane 
+            position="-0.6 1.2 0"
+            width="0.7"
+            height="0.3"
             color="#45b7d1"
-            scale="2 2 2"
-          ></a-text>
-          
-          <!-- Light Level -->
+            opacity="0.9"
+            rotation="-30 0 0"
+          ></a-plane>
           <a-text 
-            value="☀️ Light: ${sensorData.lightLevel?.toFixed(0)}%"
-            position="0 0.6 0"
+            value="🌱 ${sensorData.soilMoisture?.toFixed(0)}%"
+            position="-0.6 1.2 0.01"
             align="center"
-            color="#f9ca24"
-            scale="2 2 2"
+            color="#ffffff"
+            scale="1.5 1.5 1.5"
+            width="10"
           ></a-text>
           
-          <!-- Health Circle -->
+          <!-- Light Level Card -->
+          <a-plane 
+            position="0 0.9 0"
+            width="0.8"
+            height="0.3"
+            color="#f9ca24"
+            opacity="0.9"
+            rotation="-30 0 0"
+          ></a-plane>
+          <a-text 
+            value="☀️ ${sensorData.lightLevel?.toFixed(0)}%"
+            position="0 0.9 0.01"
+            align="center"
+            color="#ffffff"
+            scale="1.5 1.5 1.5"
+            width="10"
+          ></a-text>
+          
+          <!-- Health Circle Background -->
           <a-ring 
-            radius-inner="0.15"
-            radius-outer="0.2"
+            radius-inner="0.18"
+            radius-outer="0.25"
+            position="0 0.4 0"
+            rotation="-90 0 0"
+            color="#333333"
+            opacity="0.5"
+          ></a-ring>
+          
+          <!-- Health Circle Progress -->
+          <a-ring 
+            radius-inner="0.18"
+            radius-outer="0.25"
             position="0 0.4 0"
             rotation="-90 0 0"
             color="#00ff88"
-            theta-length="${Math.round(((sensorData.soilMoisture || 0) + (sensorData.lightLevel || 0) + (sensorData.temperature || 0) * 2) / 4) * 3.6}"
+            theta-length="${healthValue * 3.6}"
+            opacity="0.9"
           ></a-ring>
           
+          <!-- Health Text -->
           <a-text 
-            value="${Math.round(((sensorData.soilMoisture || 0) + (sensorData.lightLevel || 0) + (sensorData.temperature || 0) * 2) / 4)}%"
+            value="${healthValue}%"
             position="0 0.4 0.1"
             align="center"
             color="#00ff88"
-            scale="1.5 1.5 1.5"
+            scale="2 2 2"
+            width="5"
+          ></a-text>
+          
+          <!-- Health Label -->
+          <a-text 
+            value="Health"
+            position="0 0.2 0.1"
+            align="center"
+            color="#ffffff"
+            scale="1 1 1"
+            width="5"
           ></a-text>
         </a-marker>
         
-        <a-camera gps-camera></a-camera>
+        <!-- Camera -->
+        <a-entity camera></a-entity>
       </a-scene>
     `;
-  };
 
-  const initializeWebXR = async () => {
-    if (!navigator.xr) {
-      alert('WebXR not supported on this device. Please use WebAR mode.');
-      setArMode('webar');
-      return;
-    }
-
-    try {
-      const supported = await navigator.xr.isSessionSupported('immersive-ar');
-      if (!supported) {
-        alert('AR not supported. Please use WebAR mode with marker.');
-        setArMode('webar');
-        return;
+    // Add event listeners for marker detection
+    setTimeout(() => {
+      const scene = container.querySelector('a-scene');
+      if (scene) {
+        const marker = scene.querySelector('#garden-marker');
+        if (marker) {
+          marker.addEventListener('markerFound', () => {
+            console.log('Marker detected!');
+          });
+          marker.addEventListener('markerLost', () => {
+            console.log('Marker lost');
+          });
+        }
       }
-
-      const session = await navigator.xr.requestSession('immersive-ar', {
-        requiredFeatures: ['local'],
-      });
-
-      // Create WebXR scene with Three.js
-      createWebXRScene(session);
-    } catch (err) {
-      console.error('WebXR initialization failed:', err);
-      alert('WebXR failed. Switching to WebAR mode.');
-      setArMode('webar');
-    }
-  };
-
-  const createWebXRScene = (session) => {
-    // This would require Three.js and WebXR rendering
-    // Simplified version - full implementation would need Three.js setup
-    console.log('WebXR session started:', session);
+    }, 1000);
   };
 
   const cleanupAR = () => {
@@ -205,16 +298,16 @@ export default function ARGardenDashboard() {
   };
 
   const startAR = async () => {
-    if (!cameraPermission) {
-      try {
-        await navigator.mediaDevices.getUserMedia({ video: true });
-        setCameraPermission(true);
-      } catch (err) {
-        alert('Camera permission is required for AR. Please allow camera access.');
-        return;
-      }
+    try {
+      // Request camera permission
+      await navigator.mediaDevices.getUserMedia({ video: true });
+      setIsARActive(true);
+      setError(null);
+    } catch (err) {
+      console.error('Camera permission denied:', err);
+      setError('Camera permission is required for AR. Please allow camera access in your browser settings.');
+      alert('Camera permission is required for AR. Please allow camera access.');
     }
-    setIsARActive(true);
   };
 
   const stopAR = () => {
@@ -257,6 +350,13 @@ export default function ARGardenDashboard() {
           )}
         </div>
       </motion.div>
+
+      {/* Error Message */}
+      {error && (
+        <div className="ar-error">
+          <p>⚠️ {error}</p>
+        </div>
+      )}
 
       {/* Instructions */}
       {!isARActive && (
@@ -305,10 +405,18 @@ export default function ARGardenDashboard() {
       {/* AR Container */}
       <div className="ar-wrapper">
         {isARActive ? (
-          <div id="ar-container" className="ar-container">
-            {!sensorData && (
+          <div id="ar-container" ref={arContainerRef} className="ar-container">
+            {!arReady && (
+              <div className="ar-loading">
+                <div className="loading-spinner">🌱</div>
+                <p>Loading AR...</p>
+                <p className="ar-hint">Initializing camera and AR libraries...</p>
+              </div>
+            )}
+            {arReady && !sensorData && (
               <div className="ar-loading">
                 <p>📡 Waiting for sensor data...</p>
+                <p className="ar-hint">Make sure your ESP8266 is connected!</p>
               </div>
             )}
           </div>
@@ -347,14 +455,19 @@ export default function ARGardenDashboard() {
         )}
       </div>
 
-      {/* AR Mode Info */}
-      <div className="ar-mode-info">
-        <p className="info-text">
-          {arMode === 'webar' 
-            ? '🎯 Using Marker-Based AR - Point camera at printed marker'
-            : '🌍 Using World Tracking AR - No marker needed (requires WebXR support)'}
-        </p>
-      </div>
+      {/* AR Status Info */}
+      {isARActive && (
+        <div className="ar-mode-info">
+          <p className="info-text">
+            🎯 Point your camera at the printed Hiro marker to see sensor data in AR!
+          </p>
+          {sensorData && (
+            <p className="info-text-small">
+              Data updates every 3 seconds • Last update: {new Date().toLocaleTimeString()}
+            </p>
+          )}
+        </div>
+      )}
     </div>
   );
 }

@@ -277,42 +277,45 @@
   color: #667eea;
 }
 
-/* AR Mode Selector */
-.ar-mode-selector {
-  display: flex;
-  gap: 15px;
-  justify-content: center;
-  margin-top: 20px;
+/* AR Error */
+.ar-error {
+  background: rgba(255, 107, 107, 0.2);
+  border: 2px solid #ff6b6b;
+  border-radius: 12px;
+  padding: 15px 20px;
+  margin: 20px 0;
+  color: #fff;
+  text-align: center;
 }
 
-.mode-btn {
-  padding: 12px 24px;
-  border: 2px solid rgba(255, 255, 255, 0.3);
-  background: rgba(255, 255, 255, 0.1);
-  color: #fff;
-  border-radius: 12px;
+.ar-error p {
+  margin: 0;
   font-size: 14px;
   font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s ease;
+}
+
+/* AR Mode Info */
+.ar-mode-info {
+  background: rgba(255, 255, 255, 0.1);
   backdrop-filter: blur(20px);
+  border-radius: 12px;
+  padding: 15px 20px;
+  margin-top: 20px;
+  text-align: center;
 }
 
-.mode-btn:hover:not(:disabled) {
-  background: rgba(255, 255, 255, 0.2);
-  border-color: rgba(255, 255, 255, 0.5);
-  transform: translateY(-2px);
+.info-text {
+  margin: 0 0 8px 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: #fff;
 }
 
-.mode-btn.active {
-  background: #00ff88;
-  color: #000;
-  border-color: #00ff88;
-}
-
-.mode-btn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
+.info-text-small {
+  margin: 0;
+  font-size: 12px;
+  opacity: 0.8;
+  color: #fff;
 }
 
 /* Responsive Design */
