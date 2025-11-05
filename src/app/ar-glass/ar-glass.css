@@ -1,4 +1,4 @@
-/* AR Glass View - Glassmorphism Style */
+/* AR Glass View - Tap to Place Cards */
 .ar-glass-container {
   width: 100vw;
   height: 100vh;
@@ -8,6 +8,7 @@
   top: 0;
   left: 0;
   z-index: 9999;
+  user-select: none;
 }
 
 /* Start Screen */
@@ -50,14 +51,15 @@
   color: rgba(255, 255, 255, 0.9);
 }
 
-.no-marker-text {
+.highlight-text {
   font-size: 14px;
   color: #00ff88;
   font-weight: 600;
-  padding: 10px;
+  padding: 12px;
   background: rgba(0, 255, 136, 0.2);
   border-radius: 10px;
   margin: 20px 0;
+  border: 1px solid rgba(0, 255, 136, 0.4);
 }
 
 .preview-mini {
@@ -336,27 +338,217 @@
   font-weight: 600;
 }
 
-/* Stop Button */
-.ar-stop-btn {
+/* Tap Effect */
+.tap-effect {
+  position: absolute;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(0, 255, 136, 0.8) 0%, transparent 70%);
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+  z-index: 5;
+}
+
+/* Placed Cards */
+.placed-card {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  cursor: pointer;
+  pointer-events: auto;
+  z-index: 10;
+  transition: transform 0.3s ease;
+}
+
+.placed-card:hover {
+  transform: translate(-50%, -50%) scale(1.05);
+}
+
+.card-glow {
+  position: absolute;
+  top: -10px;
+  left: -10px;
+  right: -10px;
+  bottom: -10px;
+  background: radial-gradient(circle, rgba(0, 255, 136, 0.4) 0%, transparent 70%);
+  border-radius: 20px;
+  animation: pulse-glow 2s ease-in-out infinite;
+  pointer-events: none;
+}
+
+@keyframes pulse-glow {
+  0%, 100% { opacity: 0.6; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.1); }
+}
+
+.card-content {
+  position: relative;
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(20px);
+  border: 2px solid rgba(0, 255, 136, 0.6);
+  border-radius: 15px;
+  padding: 15px;
+  min-width: 200px;
+  box-shadow: 0 8px 32px rgba(0, 255, 136, 0.4);
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+  color: #00ff88;
+  font-weight: 700;
+}
+
+.card-number {
+  font-size: 12px;
+}
+
+.card-close {
+  font-size: 20px;
+  cursor: pointer;
+  opacity: 0.7;
+  transition: opacity 0.2s;
+}
+
+.card-close:hover {
+  opacity: 1;
+}
+
+.card-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.card-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+}
+
+.card-icon {
+  font-size: 20px;
+}
+
+.card-value {
+  font-size: 14px;
+  font-weight: 700;
+  color: #fff;
+}
+
+.card-health {
+  margin-top: 10px;
+}
+
+.health-bar-small {
+  height: 6px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.health-fill-small {
+  height: 100%;
+  background: linear-gradient(90deg, #00ff88, #00cc6a);
+  border-radius: 3px;
+  transition: width 0.5s ease;
+}
+
+/* Top Controls */
+.ar-top-controls {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  right: 20px;
+  z-index: 15;
+  pointer-events: none;
+}
+
+.control-info {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.info-badge,
+.card-count-badge {
+  display: inline-block;
+  padding: 10px 20px;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(0, 255, 136, 0.4);
+  border-radius: 20px;
+  color: #00ff88;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.card-count-badge {
+  background: rgba(0, 255, 136, 0.2);
+}
+
+/* Bottom Controls */
+.ar-bottom-controls {
   position: absolute;
   bottom: 30px;
   left: 50%;
   transform: translateX(-50%);
-  width: 60px;
-  height: 60px;
-  border-radius: 50%;
-  border: none;
-  background: rgba(255, 107, 107, 0.9);
-  backdrop-filter: blur(20px);
-  color: #fff;
-  font-size: 24px;
-  cursor: pointer;
-  box-shadow: 0 4px 20px rgba(255, 107, 107, 0.4);
-  pointer-events: auto;
-  z-index: 10;
   display: flex;
-  align-items: center;
-  justify-content: center;
+  gap: 15px;
+  z-index: 15;
+  pointer-events: auto;
+}
+
+.clear-all-btn,
+.stop-ar-btn {
+  padding: 15px 30px;
+  border: none;
+  border-radius: 15px;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+  transition: all 0.3s ease;
+}
+
+.clear-all-btn {
+  background: rgba(255, 193, 7, 0.9);
+  color: #000;
+}
+
+.stop-ar-btn {
+  background: rgba(255, 107, 107, 0.9);
+  color: #fff;
+}
+
+/* Tap Hint */
+.tap-hint {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  color: #fff;
+  pointer-events: none;
+  z-index: 5;
+}
+
+.tap-hint div {
+  font-size: 60px;
+  margin-bottom: 10px;
+}
+
+.tap-hint p {
+  font-size: 18px;
+  font-weight: 600;
+  background: rgba(0, 0, 0, 0.7);
+  padding: 10px 20px;
+  border-radius: 10px;
+  border: 1px solid rgba(0, 255, 136, 0.4);
 }
 
 /* Responsive Design */
