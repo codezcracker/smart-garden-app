@@ -179,6 +179,114 @@
   color: #4CAF50;
 }
 
+.ar-checking {
+  background: rgba(76, 175, 80, 0.2);
+  border: 2px solid rgba(76, 175, 80, 0.5);
+  border-radius: 20px;
+  padding: 30px;
+  margin: 25px 0;
+  text-align: center;
+}
+
+.spinner {
+  width: 50px;
+  height: 50px;
+  border: 4px solid rgba(76, 175, 80, 0.3);
+  border-top-color: #4CAF50;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin: 0 auto 20px;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.ar-checking p {
+  color: white;
+  font-size: 1.1em;
+  font-weight: 600;
+}
+
+/* AR HUD Overlay */
+#ar-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  z-index: 10000;
+}
+
+.ar-hud {
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
+
+.ar-instructions-hud {
+  position: absolute;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(20px);
+  padding: 15px 30px;
+  border-radius: 25px;
+  border: 2px solid #4CAF50;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+}
+
+.ar-instructions-hud p {
+  color: white;
+  margin: 5px 0;
+  font-size: 1em;
+  font-weight: bold;
+  text-align: center;
+}
+
+.ar-data-display {
+  position: absolute;
+  bottom: 30px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: center;
+  max-width: 90%;
+}
+
+.data-pill {
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(20px);
+  padding: 12px 20px;
+  border-radius: 25px;
+  border: 2px solid #4CAF50;
+  color: white;
+  font-size: 1em;
+  font-weight: bold;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.5);
+}
+
+.ar-message-box {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(76, 175, 80, 0.95);
+  padding: 20px 40px;
+  border-radius: 20px;
+  color: white;
+  font-size: 1.2em;
+  font-weight: bold;
+  text-align: center;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+  display: none;
+  max-width: 80%;
+}
+
 /* AR Viewer */
 .ar-viewer-container {
   position: fixed;
