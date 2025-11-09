@@ -102,41 +102,6 @@ export default function Navigation({ children = null }) {
           description: 'Device Design'
         },
         {
-          name: 'Analytics',
-          href: '/analytics',
-          icon: '📊',
-          gradient: 'linear-gradient(135deg, #2196f3 0%, #1976d2 100%)',
-          description: 'Data Analytics'
-        },
-        {
-          name: 'Sensor Test',
-          href: '/sensor-test',
-          icon: '🔬',
-          gradient: 'linear-gradient(135deg, #ff5722 0%, #d84315 100%)',
-          description: 'Test Sensor Data (No Auth)'
-        },
-        {
-          name: 'AR 3D Placement',
-          href: '/ar-real',
-          icon: '🎯',
-          gradient: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
-          description: 'IKEA-Style 3D AR - Place Anywhere!'
-        },
-        {
-          name: 'AR Tap to Place',
-          href: '/ar-tap-place',
-          icon: '✨',
-          gradient: 'linear-gradient(135deg, #14b8a6 0%, #0d9488 100%)',
-          description: 'Tap to Place Glowing Cards'
-        },
-        {
-          name: 'AR Garden',
-          href: '/ar-garden',
-          icon: '🌿',
-          gradient: 'linear-gradient(135deg, #22c55e 0%, #16a34a 100%)',
-          description: 'Marker-Based AR'
-        },
-        {
           name: 'Sensor Dashboard',
           href: '/sensor-dashboard',
           icon: '📊',
@@ -206,41 +171,6 @@ export default function Navigation({ children = null }) {
           icon: '🌱',
           gradient: 'linear-gradient(135deg, #4caf50 0%, #388e3c 100%)',
           description: 'Plant Database'
-        },
-        {
-          name: 'Compare',
-          href: '/plants/comparison',
-          icon: '⚖️',
-          gradient: 'linear-gradient(135deg, #9c27b0 0%, #7b1fa2 100%)',
-          description: 'Plant Comparison'
-        },
-        {
-          name: 'Sensor Test',
-          href: '/sensor-test',
-          icon: '🔬',
-          gradient: 'linear-gradient(135deg, #ff5722 0%, #d84315 100%)',
-          description: 'Test Sensor Data'
-        },
-        {
-          name: 'AR 3D Placement',
-          href: '/ar-real',
-          icon: '🎯',
-          gradient: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
-          description: 'IKEA-Style 3D AR - Place Anywhere!'
-        },
-        {
-          name: 'AR Tap to Place',
-          href: '/ar-tap-place',
-          icon: '✨',
-          gradient: 'linear-gradient(135deg, #14b8a6 0%, #0d9488 100%)',
-          description: 'Tap to Place Glowing Cards'
-        },
-        {
-          name: 'AR Garden',
-          href: '/ar-garden',
-          icon: '🌿',
-          gradient: 'linear-gradient(135deg, #22c55e 0%, #16a34a 100%)',
-          description: 'Marker-Based AR'
         },
         {
           name: 'Sensor Dashboard',

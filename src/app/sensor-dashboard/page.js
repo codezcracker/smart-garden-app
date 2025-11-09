@@ -76,6 +76,34 @@ export default function SensorDashboard() {
      (latestData?.temperature || 0) * 2) / 4
   );
 
+  // Day/Night calculation based on light level
+  const lightLevel = latestData?.lightLevel || 0;
+  const isDay = lightLevel > 40;
+  const isDusk = lightLevel > 20 && lightLevel <= 40;
+  const isNight = lightLevel <= 20;
+  
+  // Background gradient based on time of day
+  const getBackgroundGradient = () => {
+    if (isNight) {
+      return 'linear-gradient(180deg, #0a1128 0%, #1a2456 100%)'; // Dark night
+    } else if (isDusk) {
+      return 'linear-gradient(180deg, #ff6b6b 0%, #ffa726 40%, #4a90e2 100%)'; // Sunset
+    } else {
+      return 'linear-gradient(180deg, #87CEEB 0%, #B0E0E6 100%)'; // Bright day
+    }
+  };
+
+  // Sun/Moon position and appearance
+  const getSunMoonPosition = () => {
+    // Light level 0-100 maps to position
+    const normalizedLight = Math.min(100, Math.max(0, lightLevel));
+    return {
+      top: `${10 + (100 - normalizedLight) * 0.5}%`,
+      right: `${10 + (100 - normalizedLight) * 0.3}%`,
+      opacity: lightLevel < 10 ? 0.3 : 1
+    };
+  };
+
   return (
     <div className="garden-dashboard">
       {/* Top Navigation */}
@@ -236,6 +264,63 @@ export default function SensorDashboard() {
           transition={{ delay: 0.4 }}
         >
           <div className="garden-visualization">
+            {/* Sky Background - Changes with light level */}
+            <motion.div 
+              className="sky-background"
+              animate={{ 
+                background: getBackgroundGradient()
+              }}
+              transition={{ duration: 2 }}
+            >
+              {/* Stars for night time */}
+              {isNight && (
+                <div className="stars">
+                  {[...Array(50)].map((_, i) => (
+                    <motion.div
+                      key={i}
+                      className="star"
+                      style={{
+                        left: `${Math.random() * 100}%`,
+                        top: `${Math.random() * 60}%`,
+                        animationDelay: `${Math.random() * 3}s`
+                      }}
+                      animate={{
+                        opacity: [0.2, 1, 0.2],
+                        scale: [0.5, 1, 0.5]
+                      }}
+                      transition={{
+                        duration: 2 + Math.random() * 2,
+                        repeat: Infinity
+                      }}
+                    />
+                  ))}
+                </div>
+              )}
+              
+              {/* Clouds for day time */}
+              {isDay && (
+                <div className="clouds">
+                  {[...Array(3)].map((_, i) => (
+                    <motion.div
+                      key={i}
+                      className="cloud"
+                      style={{
+                        top: `${10 + i * 15}%`
+                      }}
+                      animate={{
+                        x: ['-100%', '100vw']
+                      }}
+                      transition={{
+                        duration: 30 + i * 10,
+                        repeat: Infinity,
+                        ease: 'linear'
+                      }}
+                    />
+                  ))}
+                </div>
+              )}
+            </motion.div>
+
             {/* Animated Garden Scene */}
             <div className="garden-scene">
               {/* Soil Layer */}
@@ -303,34 +388,102 @@ export default function SensorDashboard() {
                 )}
               </AnimatePresence>
 
-              {/* Animated Sun/Light */}
+              {/* Animated Sun/Moon based on light level */}
               <motion.div 
-                className="sun-light"
-                animate={{ 
-                  rotate: 360,
-                  scale: [1, 1.1, 1]
-                }}
-                transition={{ 
-                  rotate: { duration: 20, repeat: Infinity, ease: "linear" },
-                  scale: { duration: 3, repeat: Infinity }
-                }}
+                className="sun-moon-container"
+                animate={getSunMoonPosition()}
+                transition={{ duration: 2 }}
               >
-                <div className="sun">☀️</div>
-                <div className="light-rays">
-                  {[...Array(8)].map((_, i) => (
-                    <motion.div
-                      key={i}
-                      className="light-ray"
+                {isNight ? (
+                  // Moon for night
+                  <motion.div 
+                    className="moon"
+                    animate={{ 
+                      rotate: 360,
+                      opacity: [0.8, 1, 0.8]
+                    }}
+                    transition={{ 
+                      rotate: { duration: 30, repeat: Infinity, ease: "linear" },
+                      opacity: { duration: 4, repeat: Infinity }
+                    }}
+                  >
+                    🌙
+                    <motion.div 
+                      className="moon-glow"
                       animate={{
-                        opacity: [0.3, 0.8, 0.3]
+                        scale: [1, 1.3, 1],
+                        opacity: [0.3, 0.6, 0.3]
                       }}
                       transition={{
-                        duration: 2,
-                        repeat: Infinity,
+                        duration: 3,
+                        repeat: Infinity
+                      }}
+                    />
+                  </motion.div>
+                ) : isDusk ? (
+                  // Setting sun for dusk
+                  <motion.div 
+                    className="sun sun-setting"
+                    animate={{ 
+                      scale: [1, 1.15, 1]
+                    }}
+                    transition={{ 
+                      duration: 4,
+                      repeat: Infinity
+                    }}
+                  >
+                    🌅
+                  </motion.div>
+                ) : (
+                  // Bright sun for day
+                  <motion.div 
+                    className="sun-light"
+                    animate={{ 
+                      rotate: 360,
+                      scale: [1, 1.1, 1]
+                    }}
+                    transition={{ 
+                      rotate: { duration: 20, repeat: Infinity, ease: "linear" },
+                      scale: { duration: 3, repeat: Infinity }
+                    }}
+                  >
+                    <div className="sun">☀️</div>
+                    <div className="light-rays">
+                      {[...Array(8)].map((_, i) => (
+                        <motion.div
+                          key={i}
+                          className="light-ray"
+                          animate={{
+                            opacity: [0.3, 0.8, 0.3]
+                          }}
+                          transition={{
+                            duration: 2,
+                            repeat: Infinity,
                         delay: i * 0.2
                       }}
                     />
                   ))}
+                </div>
+                  </motion.div>
+                )}
+              </motion.div>
+
+              {/* Light Level Indicator */}
+              <motion.div 
+                className="light-level-indicator"
+                animate={{
+                  opacity: [0.7, 1, 0.7]
+                }}
+                transition={{
+                  duration: 2,
+                  repeat: Infinity
+                }}
+              >
+                <div className="light-badge">
+                  {isNight && <span>🌙 Night Time</span>}
+                  {isDusk && <span>🌅 Sunset</span>}
+                  {isDay && <span>☀️ Day Time</span>}
+                  <div className="light-value">{lightLevel}% Light</div>
                 </div>
               </motion.div>
 
