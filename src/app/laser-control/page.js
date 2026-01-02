@@ -117,6 +117,9 @@ export default function LaserControlPage() {
         const firstId = firstDevice._id?.toString() || firstDevice.deviceId || firstDevice._id;
         setSelectedDevice(firstId);
         console.log('✅ Auto-selected first device:', firstId, firstDevice.deviceName);
+        
+        // Fetch real laser state for all devices
+        fetchLaserStates(allDevices, token);
       } else {
         console.log('⚠️ No laser devices found. Make sure ESP32 has polled the server.');
       }
@@ -126,6 +129,63 @@ export default function LaserControlPage() {
       setLoading(false);
     }
   };
+
+  // Fetch real laser state from device
+  const fetchLaserStates = async (deviceList, token) => {
+    try {
+      setStatusPolling(true);
+      const states = {};
+      
+      for (const device of deviceList) {
+        const deviceId = device._id?.toString() || device.deviceId || device._id;
+        if (!device.macAddress) continue;
+        
+        try {
+          // Poll the device to get current state
+          const response = await fetch('/api/devices/control', {
+            method: 'PATCH',
+            headers: {
+              'x-device-key': 'default-key',
+              'x-device-mac': device.macAddress,
+              'x-device-id': deviceId,
+              'Authorization': `Bearer ${token}`
+            }
+          });
+          
+          if (response.ok) {
+            const data = await response.json();
+            const laserState = data.laserState === 'on' || data.laserState === true;
+            states[deviceId] = laserState;
+            console.log(`📊 Device ${deviceId} laser state: ${laserState ? 'ON' : 'OFF'}`);
+          }
+        } catch (error) {
+          console.error(`Error fetching state for device ${deviceId}:`, error);
+        }
+      }
+      
+      // Update states
+      setLaserStatus(prev => ({ ...prev, ...states }));
+    } catch (error) {
+      console.error('Error fetching laser states:', error);
+    } finally {
+      setStatusPolling(false);
+    }
+  };
+
+  // Poll for state updates periodically
+  useEffect(() => {
+    if (!selectedDevice || devices.length === 0) return;
+    
+    const token = localStorage.getItem('auth_token');
+    if (!token) return;
+    
+    // Poll every 2 seconds for state updates
+    const pollInterval = setInterval(() => {
+      fetchLaserStates(devices, token);
+    }, 2000);
+    
+    return () => clearInterval(pollInterval);
+  }, [selectedDevice, devices]);
 
   const toggleLaser = async (deviceId, currentStatus, macAddress = null) => {
     const token = localStorage.getItem('auth_token');
