@@ -547,9 +547,18 @@ export async function PATCH(request) {
     }, { status: 200 });
 
   } catch (error) {
-    console.error('Device poll error:', error);
+    console.error('❌ Device poll error:', error);
+    console.error('Error details:', {
+      message: error.message,
+      stack: error.stack?.substring(0, 200)
+    });
     return NextResponse.json(
-      { error: 'Internal server error' },
+      { 
+        error: 'Internal server error',
+        details: process.env.NODE_ENV === 'development' ? error.message : undefined,
+        commands: [],
+        laserState: null
+      },
       { status: 500 }
     );
   } finally {
