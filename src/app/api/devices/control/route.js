@@ -409,10 +409,20 @@ export async function PATCH(request) {
     const db = client.db('smartGardenDB');
     const devicesCollection = db.collection('devices');
     const commandsCollection = db.collection('control_commands');
+    const deviceDataCollection = db.collection('iot_device_data');
 
     // Normalize MAC address (remove colons/dashes, uppercase)
     const cleanMac = macAddress.replace(/[:-]/g, '').toUpperCase();
     console.log('📡 PATCH request - MAC address:', { original: macAddress, cleaned: cleanMac });
+    
+    // Validate MAC address
+    if (!cleanMac || cleanMac.length < 12 || cleanMac === '000000000000') {
+      console.error('❌ Invalid MAC address:', cleanMac);
+      return NextResponse.json(
+        { error: 'Invalid MAC address', commands: [], laserState: null },
+        { status: 400 }
+      );
+    }
 
     // Find device by MAC address - try multiple formats
     let device = await devicesCollection.findOne({ 
@@ -484,7 +494,7 @@ export async function PATCH(request) {
     // Also get the latest laser state from device data
     let currentLaserState = null;
     try {
-      const latestData = await db.collection('iot_device_data')
+      const latestData = await deviceDataCollection
         .findOne(
           { 
             $or: [
@@ -499,9 +509,12 @@ export async function PATCH(request) {
       if (latestData) {
         currentLaserState = latestData.laserState === 'on' || latestData.laserState === true ? 'on' : 'off';
         console.log(`📊 Current laser state from device data: ${currentLaserState}`);
+      } else {
+        console.log(`📊 No laser state data found for device ${device._id}`);
       }
     } catch (error) {
       console.error('Error fetching laser state:', error);
+      // Don't fail the request if state fetch fails
     }
 
     // Mark command as delivered (but don't mark as completed yet - ESP32 will do that)

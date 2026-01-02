@@ -138,7 +138,11 @@ export default function LaserControlPage() {
       
       for (const device of deviceList) {
         const deviceId = device._id?.toString() || device.deviceId || device._id;
-        if (!device.macAddress) continue;
+        // Skip devices without valid MAC address
+        if (!device.macAddress || device.macAddress === '000000000000' || device.macAddress.length < 12) {
+          console.log(`⚠️ Skipping device ${deviceId} - invalid MAC: ${device.macAddress}`);
+          continue;
+        }
         
         try {
           // Poll the device to get current state
