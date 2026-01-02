@@ -257,6 +257,24 @@ export async function POST(request) {
         break;
     }
 
+    // Check if there's already a pending/sent command for the same action (prevent duplicates)
+    const existingCommand = await commandsCollection.findOne({
+      deviceId: new ObjectId(targetDeviceId),
+      action: action,
+      status: { $in: ['pending', 'sent', 'delivered'] },
+      createdAt: { $gte: new Date(Date.now() - 5000) } // Within last 5 seconds
+    });
+
+    if (existingCommand) {
+      console.log(`⚠️ Duplicate command prevented - Action: ${action}, Existing ID: ${existingCommand._id}`);
+      return NextResponse.json({
+        message: 'Command already in queue. Please wait...',
+        commandId: existingCommand._id,
+        action,
+        parameters: validatedParams
+      }, { status: 200 });
+    }
+
     // Create control command - set status to 'sent' immediately for instant pickup by ESP32
     const now = new Date();
     const command = {
@@ -264,7 +282,7 @@ export async function POST(request) {
       userId: device.userId || new ObjectId(userId),  // Use device userId if exists, otherwise use request userId
       action,
       parameters: validatedParams,
-      status: 'sent',  // Set to 'sent' immediately so ESP32 can pick it up on next poll (500ms)
+      status: 'sent',  // Set to 'sent' immediately so ESP32 can pick it up on next poll (200ms)
       createdAt: now,
       sentAt: now,  // Mark as sent immediately
       completedAt: null,
@@ -453,20 +471,21 @@ export async function PATCH(request) {
       console.log('✅ Found device:', device._id, 'MAC:', device.macAddress);
     }
 
-    // Get pending commands for this device
+    // Get pending commands for this device (only get the latest one to avoid duplicates)
     const pendingCommands = await commandsCollection
       .find({
         deviceId: device._id,
         status: { $in: ['pending', 'sent'] }
       })
-      .sort({ createdAt: 1 })
+      .sort({ createdAt: -1 })  // Get newest first
+      .limit(1)  // Only get the latest command
       .toArray();
 
-    // Mark commands as delivered
+    // Mark command as delivered (but don't mark as completed yet - ESP32 will do that)
     if (pendingCommands.length > 0) {
-      const commandIds = pendingCommands.map(cmd => cmd._id);
-      await commandsCollection.updateMany(
-        { _id: { $in: commandIds } },
+      const command = pendingCommands[0];
+      await commandsCollection.updateOne(
+        { _id: command._id },
         { 
           $set: { 
             status: 'delivered',
@@ -474,6 +493,7 @@ export async function PATCH(request) {
           }
         }
       );
+      console.log(`📨 Marked command ${command._id} as delivered - Action: ${command.action}`);
     }
 
     console.log(`✅ Returning ${pendingCommands.length} command(s) to device`);

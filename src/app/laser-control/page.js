@@ -134,6 +134,12 @@ export default function LaserControlPage() {
       return;
     }
 
+    // Prevent multiple rapid clicks
+    if (controlLoading) {
+      console.log('⚠️ Command already in progress, ignoring duplicate click');
+      return;
+    }
+
     setControlLoading(true);
     const action = currentStatus ? 'laser_off' : 'laser_on';
     const device = getDeviceById(deviceId);

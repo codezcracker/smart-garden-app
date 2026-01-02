@@ -281,14 +281,16 @@ void checkForCommands() {
         if (commands.size() > 0) {
           Serial.println("📋 Processing " + String(commands.size()) + " command(s)...");
           
-          for (JsonObject command : commands) {
-            String action = command["action"].as<String>();
-            String cmdId = command["_id"] | "";
-            Serial.println("   Action: " + action + " (ID: " + cmdId + ")");
-            
-            JsonObject params = command.containsKey("parameters") ? command["parameters"] : JsonObject();
-            executeCommand(action, params);
-          }
+          // Only process the first (latest) command to avoid duplicate execution
+          JsonObject command = commands[0];
+          String action = command["action"].as<String>();
+          String cmdId = command["_id"] | "";
+          Serial.println("   ⚡ Executing: " + action + " (ID: " + cmdId + ")");
+          
+          JsonObject params = command.containsKey("parameters") ? command["parameters"] : JsonObject();
+          executeCommand(action, params);
+          
+          Serial.println("   ✅ Command executed successfully");
         } else {
           Serial.println("✅ No pending commands");
         }
