@@ -415,13 +415,10 @@ export async function PATCH(request) {
     const cleanMac = macAddress.replace(/[:-]/g, '').toUpperCase();
     console.log('📡 PATCH request - MAC address:', { original: macAddress, cleaned: cleanMac });
     
-    // Validate MAC address
-    if (!cleanMac || cleanMac.length < 12 || cleanMac === '000000000000') {
-      console.error('❌ Invalid MAC address:', cleanMac);
-      return NextResponse.json(
-        { error: 'Invalid MAC address', commands: [], laserState: null },
-        { status: 400 }
-      );
+    // Validate MAC address (but allow it to continue for now - device might not have MAC yet)
+    if (!cleanMac || cleanMac.length < 12) {
+      console.warn('⚠️ Invalid MAC address format:', cleanMac);
+      // Don't fail - device might be registering
     }
 
     // Find device by MAC address - try multiple formats
