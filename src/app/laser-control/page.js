@@ -237,14 +237,45 @@ export default function LaserControlPage() {
       const data = await response.json();
 
       if (response.ok) {
-        // Update laser status
+        // Optimistically update status, but also fetch real state after a delay
+        const newStatus = !currentStatus;
         setLaserStatus(prev => ({
           ...prev,
-          [deviceId]: !currentStatus
+          [deviceId]: newStatus
         }));
         
         const deviceName = device?.deviceName || device?.deviceId || deviceId;
-        console.log(`✅ Laser ${action === 'laser_on' ? 'turned ON' : 'turned OFF'} for ${deviceName}`);
+        console.log(`✅ Command sent - Laser will ${action === 'laser_on' ? 'turn ON' : 'turn OFF'} for ${deviceName}`);
+        
+        // Fetch real state after command execution (wait for ESP32 to process)
+        setTimeout(async () => {
+          const token = localStorage.getItem('auth_token');
+          if (token && device) {
+            try {
+              const stateResponse = await fetch('/api/devices/control', {
+                method: 'PATCH',
+                headers: {
+                  'x-device-key': 'default-key',
+                  'x-device-mac': device.macAddress || macAddress || '',
+                  'x-device-id': deviceId,
+                  'Authorization': `Bearer ${token}`
+                }
+              });
+              
+              if (stateResponse.ok) {
+                const stateData = await stateResponse.json();
+                const realState = stateData.laserState === 'on' || stateData.laserState === true;
+                setLaserStatus(prev => ({
+                  ...prev,
+                  [deviceId]: realState
+                }));
+                console.log(`📊 Real laser state updated: ${realState ? 'ON' : 'OFF'}`);
+              }
+            } catch (error) {
+              console.error('Error fetching real state:', error);
+            }
+          }
+        }, 500); // Wait 500ms for ESP32 to process command
       } else {
         console.error('❌ API Error:', {
           status: response.status,
