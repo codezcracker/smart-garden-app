@@ -26,17 +26,28 @@ export async function POST(request) {
     const decoded = verifyUserToken(request);
     const userId = decoded.userId;
 
-    const { deviceId, action, parameters } = await request.json();
+    const { deviceId, action, parameters, macAddress } = await request.json();
+    
+    console.log('📥 POST /api/devices/control - Received:', { 
+      deviceId, 
+      action, 
+      hasMacAddress: !!macAddress,
+      macAddress: macAddress?.substring(0, 8) + '...' // Log partial MAC for privacy
+    });
 
     // Validate input
-    if (!deviceId || !action) {
+    if (!action) {
       return NextResponse.json(
-        { error: 'Device ID and action are required' },
+        { error: 'Action is required' },
         { status: 400 }
       );
     }
 
-    const validActions = ['water', 'light_on', 'light_off', 'set_light_brightness', 'get_status'];
+    // For testing: Allow MAC address instead of deviceId
+    let targetDeviceId = deviceId;
+    let device = null;
+
+    const validActions = ['water', 'light_on', 'light_off', 'set_light_brightness', 'laser_on', 'laser_off', 'get_status'];
     if (!validActions.includes(action)) {
       return NextResponse.json(
         { error: `Invalid action. Valid actions: ${validActions.join(', ')}` },
@@ -49,24 +60,162 @@ export async function POST(request) {
     const devicesCollection = db.collection('devices');
     const commandsCollection = db.collection('control_commands');
 
-    // Verify user owns this device
-    const device = await devicesCollection.findOne({
-      _id: new ObjectId(deviceId),
-      userId: new ObjectId(userId)
-    });
+    // For testing: If MAC address provided, find or create device
+    if (macAddress && !deviceId) {
+      device = await devicesCollection.findOne({
+        macAddress: macAddress.toUpperCase()
+      });
+      
+      if (!device) {
+        // Auto-register device for testing
+        console.log('⚠️ Auto-registering device for testing:', macAddress);
+        const tempDevice = {
+          macAddress: macAddress.toUpperCase(),
+          deviceName: `ESP32_${macAddress.substring(0, 8)}`,
+          deviceType: 'ESP32_Laser',
+          location: 'Test',
+          status: 'online',
+          firmwareVersion: '1.0.0',
+          lastSeen: new Date(),
+          isTestDevice: true,
+          createdAt: new Date(),
+          updatedAt: new Date()
+        };
+        const insertResult = await devicesCollection.insertOne(tempDevice);
+        device = {
+          _id: insertResult.insertedId,
+          ...tempDevice
+        };
+        console.log('✅ Auto-registered test device:', device._id);
+      }
+      targetDeviceId = device._id.toString();
+    } else if (deviceId) {
+      // Try to find device by ID
+      try {
+        device = await devicesCollection.findOne({
+          _id: new ObjectId(deviceId)
+        });
+      } catch (error) {
+        console.error('Error finding device by ID:', error);
+        device = null;
+      }
 
-    if (!device) {
+      // If device not found by ID and MAC address provided, try finding by MAC
+      if (!device && macAddress) {
+        console.log('🔍 Device not found by ID, trying MAC address:', macAddress);
+        // Try with uppercase
+        device = await devicesCollection.findOne({
+          macAddress: macAddress.toUpperCase()
+        });
+        // If not found, try without colons/dashes
+        if (!device) {
+          const cleanMac = macAddress.replace(/[:-]/g, '').toUpperCase();
+          device = await devicesCollection.findOne({
+            macAddress: cleanMac
+          });
+        }
+        // If still not found, try with colons
+        if (!device) {
+          const colonMac = macAddress.replace(/(.{2})/g, '$1:').slice(0, -1).toUpperCase();
+          device = await devicesCollection.findOne({
+            macAddress: colonMac
+          });
+        }
+        if (device) {
+          targetDeviceId = device._id.toString();
+          console.log('✅ Found device by MAC address:', targetDeviceId);
+        } else {
+          console.log('⚠️ Device not found by MAC either, will auto-register if needed');
+        }
+      }
+
+      if (!device) {
+        console.error('❌ Device not found:', { 
+          deviceId, 
+          macAddress,
+          deviceIdType: typeof deviceId,
+          deviceIdLength: deviceId?.length
+        });
+        
+        // If MAC address provided, auto-register the device
+        if (macAddress) {
+          console.log('🆕 Auto-registering device with MAC:', macAddress);
+          const cleanMac = macAddress.replace(/[:-]/g, '').toUpperCase();
+          const tempDevice = {
+            macAddress: cleanMac,
+            deviceName: `ESP32_${cleanMac.substring(0, 8)}`,
+            deviceType: 'ESP32_Laser',
+            location: 'Auto-registered',
+            status: 'online',
+            firmwareVersion: '1.0.0',
+            lastSeen: new Date(),
+            isTestDevice: true,
+            createdAt: new Date(),
+            updatedAt: new Date()
+          };
+          const insertResult = await devicesCollection.insertOne(tempDevice);
+          device = {
+            _id: insertResult.insertedId,
+            ...tempDevice
+          };
+          targetDeviceId = device._id.toString();
+          console.log('✅ Auto-registered device:', targetDeviceId);
+        } else {
+          // Try to find any device (for debugging)
+          const allDevices = await devicesCollection.find({}).limit(10).toArray();
+          console.log('📋 Sample devices in database:', allDevices.map(d => ({
+            id: d._id?.toString(),
+            mac: d.macAddress,
+            name: d.deviceName
+          })));
+          
+          return NextResponse.json(
+            { 
+              error: 'Device not found. Make sure the ESP32 has polled the server at least once, or provide MAC address.',
+              details: {
+                deviceId,
+                macAddress: macAddress || 'not provided',
+                hint: 'Device will be auto-registered if MAC address is provided'
+              }
+            },
+            { status: 404 }
+          );
+        }
+      }
+
+      // For test devices or if no userId, allow access
+      // Otherwise verify user owns the device
+      if (device.userId && !device.isTestDevice) {
+        const deviceUserId = device.userId.toString ? device.userId.toString() : device.userId;
+        const requestUserId = userId.toString ? userId.toString() : userId;
+        if (deviceUserId !== requestUserId) {
+          return NextResponse.json(
+            { error: 'Device not found or access denied' },
+            { status: 404 }
+          );
+        }
+      }
+      
+      if (!targetDeviceId) {
+        targetDeviceId = deviceId;
+      }
+    } else {
       return NextResponse.json(
-        { error: 'Device not found or access denied' },
-        { status: 404 }
+        { error: 'Device ID or MAC address is required' },
+        { status: 400 }
       );
     }
 
-    // Check if device is online
-    if (device.status !== 'online') {
-      return NextResponse.json(
-        { error: 'Device is offline' },
-        { status: 400 }
+    // Update device status to online (for test devices or if offline)
+    if (device.status !== 'online' || device.isTestDevice) {
+      await devicesCollection.updateOne(
+        { _id: device._id },
+        { 
+          $set: { 
+            status: 'online',
+            lastSeen: new Date()
+          }
+        }
       );
     }
 
@@ -101,6 +250,8 @@ export async function POST(request) {
         break;
         
       case 'light_off':
+      case 'laser_on':
+      case 'laser_off':
       case 'get_status':
         validatedParams = {};
         break;
@@ -108,8 +259,8 @@ export async function POST(request) {
 
     // Create control command
     const command = {
-      deviceId: new ObjectId(deviceId),
-      userId: new ObjectId(userId),
+      deviceId: new ObjectId(targetDeviceId),
+      userId: device.userId || new ObjectId(userId),  // Use device userId if exists, otherwise use request userId
       action,
       parameters: validatedParams,
       status: 'pending',
@@ -237,9 +388,16 @@ export async function PATCH(request) {
     const deviceKey = request.headers.get('x-device-key');
     const macAddress = request.headers.get('x-device-mac');
     
+    console.log('🔵 PATCH /api/devices/control - Device polling:', {
+      hasKey: !!deviceKey,
+      mac: macAddress?.substring(0, 8) + '...',
+      timestamp: new Date().toISOString()
+    });
+    
     if (!deviceKey || !macAddress) {
+      console.log('❌ Missing authentication headers');
       return NextResponse.json(
-        { error: 'Device authentication required' },
+        { error: 'Device authentication required', hint: 'Include x-device-key and x-device-mac headers' },
         { status: 401 }
       );
     }
@@ -249,16 +407,65 @@ export async function PATCH(request) {
     const devicesCollection = db.collection('devices');
     const commandsCollection = db.collection('control_commands');
 
-    // Find device by MAC address
-    const device = await devicesCollection.findOne({ 
-      macAddress: macAddress.toUpperCase() 
-    });
+    // Normalize MAC address (remove colons/dashes, uppercase)
+    const cleanMac = macAddress.replace(/[:-]/g, '').toUpperCase();
+    console.log('📡 PATCH request - MAC address:', { original: macAddress, cleaned: cleanMac });
 
+    // Find device by MAC address - try multiple formats
+    let device = await devicesCollection.findOne({ 
+      macAddress: cleanMac 
+    });
+    
+    // If not found, try with colons
     if (!device) {
-      return NextResponse.json(
-        { error: 'Device not found' },
-        { status: 404 }
+      const colonMac = cleanMac.replace(/(.{2})/g, '$1:').slice(0, -1);
+      device = await devicesCollection.findOne({ 
+        macAddress: colonMac 
+      });
+    }
+    
+    // If still not found, try case-insensitive search
+    if (!device) {
+      const allDevices = await devicesCollection.find({}).toArray();
+      device = allDevices.find(d => {
+        if (!d.macAddress) return false;
+        const dbMac = d.macAddress.replace(/[:-]/g, '').toUpperCase();
+        return dbMac === cleanMac;
+      });
+    }
+
+    // For testing: Auto-register device if not found
+    if (!device) {
+      console.log('⚠️ Device not found, auto-registering for testing:', cleanMac);
+      
+      // Create a temporary device entry for testing
+      const tempDevice = {
+        macAddress: cleanMac,  // Store without colons for consistency
+        deviceName: `ESP32_${cleanMac.substring(0, 8)}`,
+        deviceType: 'ESP32_Laser',
+        location: 'Test',
+        status: 'online',
+        firmwareVersion: '1.0.0',
+        lastSeen: new Date(),
+        isTestDevice: true,  // Mark as test device
+        createdAt: new Date(),
+        updatedAt: new Date()
+      };
+      
+      const insertResult = await devicesCollection.insertOne(tempDevice);
+      device = {
+        _id: insertResult.insertedId,
+        ...tempDevice
+      };
+      
+      console.log('✅ Auto-registered test device:', device._id, 'MAC:', cleanMac);
+    } else {
+      // Update lastSeen timestamp
+      await devicesCollection.updateOne(
+        { _id: device._id },
+        { $set: { lastSeen: new Date(), status: 'online' } }
       );
+      console.log('✅ Found device:', device._id, 'MAC:', device.macAddress);
     }
 
     // Get pending commands for this device
@@ -284,13 +491,20 @@ export async function PATCH(request) {
       );
     }
 
+    console.log(`✅ Returning ${pendingCommands.length} command(s) to device`);
+    if (pendingCommands.length > 0) {
+      console.log(`📨 Commands:`, pendingCommands.map(c => ({ action: c.action, id: c._id })));
+    }
+
     return NextResponse.json({
       commands: pendingCommands.map(cmd => ({
-        id: cmd._id,
+        _id: cmd._id,
         action: cmd.action,
-        parameters: cmd.parameters,
+        parameters: cmd.parameters || {},
         createdAt: cmd.createdAt
-      }))
+      })),
+      deviceId: device._id.toString(),
+      timestamp: new Date().toISOString()
     }, { status: 200 });
 
   } catch (error) {

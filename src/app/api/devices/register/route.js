@@ -139,9 +139,14 @@ export async function GET(request) {
     const db = client.db('smartGardenDB');
     const devicesCollection = db.collection('devices');
 
-    // Get user's devices
+    // Get user's devices AND auto-registered test devices
     const devices = await devicesCollection.find(
-      { userId: new ObjectId(userId) },
+      { 
+        $or: [
+          { userId: new ObjectId(userId) },
+          { isTestDevice: true }  // Include auto-registered test devices
+        ]
+      },
       { 
         projection: { 
           deviceName: 1, 
@@ -150,7 +155,9 @@ export async function GET(request) {
           location: 1, 
           status: 1, 
           lastSeen: 1,
-          firmwareVersion: 1
+          firmwareVersion: 1,
+          isTestDevice: 1,
+          _id: 1
         } 
       }
     ).toArray();
