@@ -351,13 +351,22 @@ void executeCommand(String action, JsonObject params) {
 // ========================================
 
 void turnLaserOn() {
+  Serial.println("🔴 Attempting to turn laser ON...");
+  Serial.println("   Current state: " + String(laserState ? "ON" : "OFF"));
+  Serial.println("   Pin: GPIO " + String(LASER_PIN));
+  
   if (laserState) {
-    Serial.println("🔴 Laser is already ON");
+    Serial.println("⚠️ Laser is already ON - skipping");
     return;
   }
   
   digitalWrite(LASER_PIN, HIGH);
+  delay(10); // Small delay to ensure pin state is set
   laserState = true;
+  
+  // Verify pin state
+  int pinState = digitalRead(LASER_PIN);
+  Serial.println("   Pin state after write: " + String(pinState ? "HIGH" : "LOW"));
   
   Serial.println("🔴✅ Laser turned ON");
   
