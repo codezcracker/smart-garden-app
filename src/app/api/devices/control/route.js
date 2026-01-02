@@ -137,10 +137,23 @@ export async function POST(request) {
           deviceIdLength: deviceId?.length
         });
         
-        // If MAC address provided, auto-register the device
+        // If MAC address provided, auto-register the device (but skip if MAC is invalid)
         if (macAddress) {
-          console.log('🆕 Auto-registering device with MAC:', macAddress);
           const cleanMac = macAddress.replace(/[:-]/g, '').toUpperCase();
+          
+          // Skip auto-registration for invalid MAC addresses
+          if (cleanMac === '000000000000' || cleanMac.length < 12) {
+            console.error('❌ Invalid MAC address, cannot auto-register:', cleanMac);
+            return NextResponse.json(
+              { 
+                error: 'Invalid MAC address. Please ensure ESP32 has polled the server at least once to register with its real MAC address.',
+                hint: 'Check Serial Monitor on ESP32 to see the MAC address'
+              },
+              { status: 400 }
+            );
+          }
+          
+          console.log('🆕 Auto-registering device with MAC:', cleanMac);
           const tempDevice = {
             macAddress: cleanMac,
             deviceName: `ESP32_${cleanMac.substring(0, 8)}`,
