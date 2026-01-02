@@ -257,36 +257,21 @@ export async function POST(request) {
         break;
     }
 
-    // Create control command
+    // Create control command - set status to 'sent' immediately for instant pickup by ESP32
+    const now = new Date();
     const command = {
       deviceId: new ObjectId(targetDeviceId),
       userId: device.userId || new ObjectId(userId),  // Use device userId if exists, otherwise use request userId
       action,
       parameters: validatedParams,
-      status: 'pending',
-      createdAt: new Date(),
-      sentAt: null,
+      status: 'sent',  // Set to 'sent' immediately so ESP32 can pick it up on next poll (500ms)
+      createdAt: now,
+      sentAt: now,  // Mark as sent immediately
       completedAt: null,
       response: null
     };
 
     const result = await commandsCollection.insertOne(command);
-
-    // In a real system, you would:
-    // 1. Send command via MQTT to device
-    // 2. Wait for acknowledgment
-    // 3. Update command status
-    
-    // For now, simulate command being sent
-    await commandsCollection.updateOne(
-      { _id: result.insertedId },
-      { 
-        $set: { 
-          status: 'sent',
-          sentAt: new Date()
-        }
-      }
-    );
 
     // Log the action
     console.log(`Control command sent - Device: ${deviceId}, Action: ${action}, Params:`, validatedParams);
