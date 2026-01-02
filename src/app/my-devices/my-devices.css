@@ -87,17 +87,18 @@
 /* Devices Grid */
 .devices-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
   gap: 1rem;
 }
 
 .device-card {
   background: rgba(255, 255, 255, 0.95);
   border-radius: 15px;
-  padding: 1.25rem;
+  padding: 1rem;
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
   transition: all 0.3s ease;
   border: 2px solid transparent;
+  max-width: 380px;
 }
 
 .device-card:hover {

@@ -76,37 +76,65 @@ export default function Navigation({ children = null }) {
         {
           name: 'Dashboard',
           href: '/dashboard',
-          icon: '📱',
+          icon: '📊',
           gradient: 'linear-gradient(135deg, #4caf50 0%, #388e3c 100%)',
           description: 'IoT Dashboard'
         },
         {
           name: 'Garden Config',
           href: '/garden-config',
-          icon: '🌱',
+          icon: '⚙️',
           gradient: 'linear-gradient(135deg, #16a34a 0%, #15803d 100%)',
           description: 'Configure Your Gardens'
         },
         {
           name: 'My Devices',
           href: '/my-devices',
-          icon: '📱',
+          icon: '💻',
           gradient: 'linear-gradient(135deg, #059669 0%, #047857 100%)',
           description: 'Manage Your IoT Devices'
         },
         {
-          name: 'IoT Device',
-          href: '/iot-device',
-          icon: '🔧',
+          name: 'Device Plan',
+          href: '/device-plan',
+          icon: '⚡',
           gradient: 'linear-gradient(135deg, #ff9800 0%, #f57c00 100%)',
           description: 'Device Design'
         },
         {
+          name: 'Garden Planner',
+          href: '/garden-planner',
+          icon: '🌿',
+          gradient: 'linear-gradient(135deg, #66bb6a 0%, #43a047 100%)',
+          description: 'Plan Sensor Placement'
+        },
+        {
+          name: 'Garden Designer',
+          href: '/garden-designer',
+          icon: '🎨',
+          gradient: 'linear-gradient(135deg, #ab47bc 0%, #8e24aa 100%)',
+          description: 'Interactive Design Tool'
+        },
+        {
           name: 'Sensor Dashboard',
           href: '/sensor-dashboard',
-          icon: '📊',
+          icon: '📈',
           gradient: 'linear-gradient(135deg, #00ff88 0%, #00cc6a 100%)',
           description: 'Animated Garden Dashboard'
+        },
+        {
+          name: 'Interactive Garden',
+          href: '/interactive-garden',
+          icon: '🌳',
+          gradient: 'linear-gradient(135deg, #4CAF50 0%, #2e7d32 100%)',
+          description: 'Manage Your Virtual Garden'
+        },
+        {
+          name: 'Automation',
+          href: '/automation',
+          icon: '🤖',
+          gradient: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+          description: 'Automation Settings'
         },
       ];
 
@@ -116,23 +144,30 @@ export default function Navigation({ children = null }) {
           {
             name: 'Admin Panel',
             href: '/admin',
-            icon: '👑',
+                icon: '🔐',
             gradient: 'linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%)',
             description: 'Super Admin Panel'
           },
           {
             name: 'User Management',
             href: '/admin/users',
-            icon: '👥',
+                icon: '👤',
             gradient: 'linear-gradient(135deg, #a55eea 0%, #8b5cf6 100%)',
             description: 'Manage All Users'
           },
           {
             name: 'Manager Control',
             href: '/admin/managers',
-            icon: '👨‍💼',
+                icon: '👔',
             gradient: 'linear-gradient(135deg, #ff9a56 0%, #ff6b6b 100%)',
             description: 'Manage Managers'
+          },
+              {
+                name: 'Firmware Update',
+                href: '/firmware-update',
+                icon: '📦',
+                gradient: 'linear-gradient(135deg, #4caf50 0%, #388e3c 100%)',
+                description: 'OTA Firmware Updates'
           },
         );
       } else if (user && user.role === 'manager') {
@@ -140,16 +175,23 @@ export default function Navigation({ children = null }) {
           {
             name: 'Manager Panel',
             href: '/manager',
-            icon: '👨‍💼',
+                icon: '🎯',
             gradient: 'linear-gradient(135deg, #ff9a56 0%, #ff6b6b 100%)',
             description: 'Manager Dashboard'
           },
           {
             name: 'My Clients',
             href: '/manager/clients',
-            icon: '👥',
+                icon: '👨‍👩‍👧‍👦',
             gradient: 'linear-gradient(135deg, #a55eea 0%, #8b5cf6 100%)',
             description: 'Manage Assigned Clients'
+          },
+              {
+                name: 'Firmware Update',
+                href: '/firmware-update',
+                icon: '📦',
+                gradient: 'linear-gradient(135deg, #4caf50 0%, #388e3c 100%)',
+                description: 'OTA Firmware Updates'
           },
         );
       }
@@ -168,16 +210,23 @@ export default function Navigation({ children = null }) {
         {
           name: 'Plants',
           href: '/plants',
-          icon: '🌱',
+          icon: '🌺',
           gradient: 'linear-gradient(135deg, #4caf50 0%, #388e3c 100%)',
           description: 'Plant Database'
         },
         {
           name: 'Sensor Dashboard',
           href: '/sensor-dashboard',
-          icon: '📊',
+          icon: '📈',
           gradient: 'linear-gradient(135deg, #00ff88 0%, #00cc6a 100%)',
           description: 'Animated Garden Dashboard'
+        },
+        {
+          name: 'Interactive Garden',
+          href: '/interactive-garden',
+          icon: '🌳',
+          gradient: 'linear-gradient(135deg, #4CAF50 0%, #2e7d32 100%)',
+          description: 'Manage Your Virtual Garden'
         }
       ];
     }

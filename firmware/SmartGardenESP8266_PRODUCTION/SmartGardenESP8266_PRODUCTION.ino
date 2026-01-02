@@ -3,6 +3,7 @@
 #include <ESP8266WiFi.h>
 #include <ESP8266HTTPClient.h>
 #include <WiFiClient.h>
+#include <WiFiClientSecure.h>
 #include <ArduinoJson.h>
 #include <DHT.h>
 #include <EEPROM.h>
@@ -58,6 +59,7 @@ const char* firmwareVersion = "2.0.0";
 
 DHT dht(DHT_PIN, DHT_TYPE);
 WiFiClient client;
+WiFiClientSecure secureClient;
 unsigned long lastDataSend = 0;
 unsigned long lastHeartbeat = 0;
 unsigned long lastButtonPress = 0;
@@ -77,7 +79,10 @@ void setup() {
   Serial.begin(115200);
   delay(1000);
   
-  Serial.println("\n🌱 Smart Garden IoT - Production Firmware v2.0.0");
+  Serial.println("\n🚀 Smart Garden IoT - PRODUCTION VERSION v2.0.0");
+  Serial.println("================================================");
+  Serial.println("📍 Mode: PRODUCTION (Live Server)");
+  Serial.println("🌐 Server: " + String(serverURL));
   Serial.println("================================================");
   
   // Initialize EEPROM
@@ -213,7 +218,7 @@ void sendSensorData() {
     return;
   }
   
-  Serial.println("\n📊 Sending sensor data (every " + String(DATA_SEND_INTERVAL_SECONDS) + " seconds)...");
+  Serial.println("\n📊 [PRODUCTION] Sending sensor data...");
   
   // Read sensor values
   float temperature = dht.readTemperature();
@@ -239,8 +244,8 @@ void sendSensorData() {
   
   // Calculate light percentage (corrected mapping)
   float lightPercent = 0.0;
-  if (ldrValue >= 1020) { lightPercent = 0.0; } // LDR might be disconnected
-  else { lightPercent = map(ldrValue, 0, 1020, 0, 100); } // Corrected mapping
+  if (ldrValue >= 1020) { lightPercent = 0.0; }
+  else { lightPercent = map(ldrValue, 0, 1020, 0, 100); }
   
   // Create JSON payload
   DynamicJsonDocument doc(1024);
@@ -258,14 +263,16 @@ void sendSensorData() {
   doc["systemActive"] = systemActive;
   doc["uptime"] = millis();
   
-  // Send data to server
   String jsonString;
   serializeJson(doc, jsonString);
   
+  // Use HTTPS with WiFiClientSecure for production
   HTTPClient http;
-  http.begin(client, String(serverURL) + serverEndpoint);
+  secureClient.setInsecure();  // Skip SSL certificate validation (ESP8266 limitation)
+  http.begin(secureClient, String(serverURL) + serverEndpoint);
   http.addHeader("Content-Type", "application/json");
-  http.addHeader("User-Agent", "SmartGardenIoT/2.0.0");
+  http.addHeader("User-Agent", "SmartGardenIoT/2.0.0-production");
+  http.setTimeout(15000);  // 15 second timeout for HTTPS
   
   int httpResponseCode = http.POST(jsonString);
   

@@ -35,9 +35,9 @@
 // Initialize DHT sensor
 DHT dht(DHT_PIN, DHT_TYPE);
 
-// WiFi credentials
-const char* ssid = "Qureshi";
-const char* password = "65327050";
+// WiFi credentials - MUST be 2.4GHz network (ESP8266 doesn't support 5GHz)
+const char* ssid = "@s@d";  // Changed from HOME-5G to 2.4GHz network
+const char* password = "@Ahmad.Asad!@";
 
 // Server Configuration - PRODUCTION (HTTPS with SSL support)
 const char* serverURL = "https://smart-garden-app.vercel.app";
@@ -114,6 +114,18 @@ void setup() {
 
 void loop() {
   handleButtonPress();
+
+  // WiFi reconnection check
+  if (WiFi.status() != WL_CONNECTED) {
+    static unsigned long lastWiFiReconnectAttempt = 0;
+    const unsigned long wifiReconnectInterval = 30000;  // Try every 30 seconds
+    
+    if (millis() - lastWiFiReconnectAttempt > wifiReconnectInterval) {
+      Serial.println("⚠️ WiFi disconnected, attempting reconnection...");
+      connectToWiFi();
+      lastWiFiReconnectAttempt = millis();
+    }
+  }
 
   if (deviceOn) {
     if (discoveryMode) {
@@ -416,11 +428,54 @@ void handleDiscoveryMode() {
 }
 
 void connectToWiFi() {
+  Serial.println("📶 Connecting to WiFi....................");
+  Serial.println("   SSID: " + String(ssid));
+  
+  // First, scan for available networks to check if SSID is visible
+  Serial.println("   🔍 Scanning for networks...");
+  WiFi.mode(WIFI_STA);
+  WiFi.disconnect();
+  delay(100);
+  
+  int n = WiFi.scanNetworks();
+  bool ssidFound = false;
+  String availableNetworks = "";
+  
+  if (n > 0) {
+    Serial.print("   Found " + String(n) + " networks:\n");
+    for (int i = 0; i < n; i++) {
+      String networkName = WiFi.SSID(i);
+      int rssi = WiFi.RSSI(i);
+      availableNetworks += "   - " + networkName + " (" + String(rssi) + " dBm)\n";
+      
+      if (networkName == String(ssid)) {
+        ssidFound = true;
+        Serial.println("   ✅ Target network found: " + networkName + " (" + String(rssi) + " dBm)");
+      }
+    }
+    Serial.print(availableNetworks);
+  } else {
+    Serial.println("   ⚠️ No networks found");
+  }
+  
+  // Check for 5GHz network issue
+  if (!ssidFound && String(ssid).indexOf("5G") >= 0) {
+    Serial.println("\n   ⚠️ CRITICAL: ESP8266 only supports 2.4GHz WiFi!");
+    Serial.println("   Your SSID contains '5G' which suggests a 5GHz network.");
+    Serial.println("   Please use a 2.4GHz network instead.");
+    Serial.println("   Look for a network without '5G' in the name (e.g., 'HOME' instead of 'HOME-5G')");
+  } else if (!ssidFound) {
+    Serial.println("\n   ⚠️ SSID not found in scan - trying anyway (may be hidden network)");
+  }
+  
+  // Attempt connection (will work even for hidden networks)
+  Serial.println("\n   🔌 Attempting connection...");
   WiFi.begin(ssid, password);
-  Serial.print("📶 Connecting to WiFi");
 
   int attempts = 0;
-  while (WiFi.status() != WL_CONNECTED && attempts < 20) {
+  int maxAttempts = 30;  // 15 seconds total
+  
+  while (WiFi.status() != WL_CONNECTED && attempts < maxAttempts) {
     delay(500);
     Serial.print(".");
     attempts++;
@@ -428,10 +483,31 @@ void connectToWiFi() {
 
   if (WiFi.status() == WL_CONNECTED) {
     Serial.println("\n✅ WiFi connected!");
-    Serial.print("📡 IP address: ");
-    Serial.println(WiFi.localIP());
+    Serial.println("   📡 IP address: " + WiFi.localIP().toString());
+    Serial.println("   📶 Signal strength: " + String(WiFi.RSSI()) + " dBm");
+    Serial.println("   🌐 Gateway: " + WiFi.gatewayIP().toString());
+    Serial.println("   🔌 Subnet: " + WiFi.subnetMask().toString());
+    setLED(0, 255, 0);  // Green LED = Connected
   } else {
     Serial.println("\n❌ WiFi connection failed");
+    Serial.print("   📡 WiFi Status Code: ");
+    Serial.println(WiFi.status());
+    Serial.println("   ⚠️ Possible causes:");
+    
+    if (!ssidFound && String(ssid).indexOf("5G") >= 0) {
+      Serial.println("   ❌ PRIMARY ISSUE: Trying to connect to 5GHz network!");
+      Serial.println("   ESP8266 ONLY supports 2.4GHz networks.");
+      Serial.println("   SOLUTION: Change SSID to your 2.4GHz network name");
+    } else if (!ssidFound) {
+      Serial.println("   - SSID not found (hidden network or wrong name)");
+    } else {
+      Serial.println("   - Incorrect password");
+      Serial.println("   - Network security incompatibility");
+    }
+    Serial.println("   - Router out of range");
+    Serial.println("   - Router not powered on");
+    
+    setLED(255, 0, 0);  // Red LED = Error
   }
 }
 

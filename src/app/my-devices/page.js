@@ -50,14 +50,23 @@ export default function MyDevicesPage() {
       setPairingStatus('Connecting...');
       showToast('info', `Pairing device ${deviceName}...`, 2000);
       
+      const token = localStorage.getItem('auth_token');
+      if (!token) {
+        showToast('error', 'Please log in to pair devices');
+        window.location.href = '/auth/login';
+        return;
+      }
+      
       const response = await fetch('/api/iot/device-pairing', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json' 
+        },
         body: JSON.stringify({
           discoveryId: discoveryDevice.id,
           deviceId: deviceId,
-          deviceName: deviceName,
-          userId: 'demo-user-123'
+          deviceName: deviceName
         })
       });
       
@@ -139,9 +148,16 @@ export default function MyDevicesPage() {
   const fetchDevices = useCallback(async () => {
     try {
       setLoading(true);
-      // For testing - no authentication required
+      const token = localStorage.getItem('auth_token');
+      if (!token) {
+        setDevices([]);
+        setLoading(false);
+        return;
+      }
+      
       const response = await fetch('/api/iot/user-devices', {
         headers: {
+          'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
         }
       });
@@ -156,6 +172,15 @@ export default function MyDevicesPage() {
         console.log('📱 No devices found or API error:', data);
         setDevices([]);
       }
+      
+      // Handle token expiration
+      if (response.status === 401 || data.error?.includes('expired') || data.error?.includes('Invalid token')) {
+        console.log('⚠️ Token expired, redirecting to login...');
+        localStorage.removeItem('auth_token');
+        localStorage.removeItem('user_data');
+        window.location.href = '/auth/login';
+        return;
+      }
     } catch (error) {
       console.error('❌ Error fetching devices:', error);
       setDevices([]);
@@ -167,9 +192,15 @@ export default function MyDevicesPage() {
 
   const fetchGardens = useCallback(async () => {
     try {
-      // For testing - no authentication required
+      const token = localStorage.getItem('auth_token');
+      if (!token) {
+        setGardens([]);
+        return;
+      }
+      
       const response = await fetch('/api/iot/gardens', {
         headers: {
+          'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
         }
       });
@@ -182,6 +213,15 @@ export default function MyDevicesPage() {
       } else {
         console.log('🌱 No gardens found:', data);
         setGardens([]);
+      }
+      
+      // Handle token expiration
+      if (response.status === 401 || data.error?.includes('expired') || data.error?.includes('Invalid token')) {
+        console.log('⚠️ Token expired, redirecting to login...');
+        localStorage.removeItem('auth_token');
+        localStorage.removeItem('user_data');
+        window.location.href = '/auth/login';
+        return;
       }
     } catch (error) {
       console.error('❌ Error fetching gardens:', error);
@@ -253,9 +293,17 @@ export default function MyDevicesPage() {
     try {
       console.log('🚀 Setting up sample device...');
       
+      const token = localStorage.getItem('auth_token');
+      if (!token) {
+        showToast('error', 'Please log in to setup sample device');
+        window.location.href = '/auth/login';
+        return;
+      }
+      
       const response = await fetch('/api/iot/setup-sample-device', {
         method: 'POST',
         headers: {
+          'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
         }
       });
@@ -296,15 +344,15 @@ export default function MyDevicesPage() {
   const handleEditDevice = (device) => {
     setFormData({
       deviceId: device.deviceId,
-      deviceName: device.deviceName,
-      gardenId: device.gardenId,
-      location: device.location,
-      description: device.description,
-      temperatureEnabled: device.sensors.temperature.enabled,
-      humidityEnabled: device.sensors.humidity.enabled,
-      lightLevelEnabled: device.sensors.lightLevel.enabled,
-      soilMoistureEnabled: device.sensors.soilMoisture.enabled,
-      sendInterval: device.settings.sendInterval
+      deviceName: device.deviceName || device.deviceId,
+      gardenId: device.gardenId || '',
+      location: device.location || '',
+      description: device.description || '',
+      temperatureEnabled: device.sensors?.temperature?.enabled !== false,
+      humidityEnabled: device.sensors?.humidity?.enabled !== false,
+      lightLevelEnabled: device.sensors?.lightLevel?.enabled !== false,
+      soilMoistureEnabled: device.sensors?.soilMoisture?.enabled !== false,
+      sendInterval: device.settings?.sendInterval || 1000
     });
     setEditingDevice(device);
     setShowAddForm(true);
@@ -314,10 +362,18 @@ export default function MyDevicesPage() {
     try {
       console.log('💾 Saving device data:', formData);
       
-      // For testing - no authentication required
+      // Get authentication token
+      const token = localStorage.getItem('auth_token');
+      if (!token) {
+        showToast('error', 'Please log in to add devices');
+        window.location.href = '/auth/login';
+        return;
+      }
+      
       const response = await fetch('/api/iot/user-devices', {
         method: 'POST',
         headers: {
+          'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
         },
         body: JSON.stringify(formData)
@@ -332,6 +388,18 @@ export default function MyDevicesPage() {
         showToast('success', 'Device configuration saved successfully!');
       } else {
         console.error('❌ Save failed:', responseData);
+        
+        // Handle token expiration
+        if (response.status === 401 || responseData.error?.includes('expired') || responseData.error?.includes('Invalid token')) {
+          showToast('error', 'Your session has expired. Please log in again.');
+          localStorage.removeItem('auth_token');
+          localStorage.removeItem('user_data');
+          setTimeout(() => {
+            window.location.href = '/auth/login';
+          }, 2000);
+          return;
+        }
+        
         showToast('error', `Error saving device configuration: ${responseData.error || 'Unknown error'}`);
       }
     } catch (error) {
@@ -344,13 +412,47 @@ export default function MyDevicesPage() {
     try {
       console.log('💾 Updating device data:', formData);
       
-      // For testing - no authentication required
+      // Get authentication token
+      const token = localStorage.getItem('auth_token');
+      if (!token) {
+        showToast('error', 'Please log in to update devices');
+        window.location.href = '/auth/login';
+        return;
+      }
+      
+      // Transform formData to match API structure
+      const updateData = {
+        deviceId: formData.deviceId,
+        deviceName: formData.deviceName,
+        gardenId: formData.gardenId,
+        location: formData.location,
+        description: formData.description,
+        sensors: {
+          temperature: {
+            enabled: formData.temperatureEnabled !== false
+          },
+          humidity: {
+            enabled: formData.humidityEnabled !== false
+          },
+          lightLevel: {
+            enabled: formData.lightLevelEnabled !== false
+          },
+          soilMoisture: {
+            enabled: formData.soilMoistureEnabled !== false
+          }
+        },
+        settings: {
+          sendInterval: formData.sendInterval || 1000
+        }
+      };
+      
       const response = await fetch('/api/iot/device-config', {
         method: 'POST',
         headers: {
+          'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify(formData)
+        body: JSON.stringify(updateData)
       });
 
       const responseData = await response.json();
@@ -362,6 +464,18 @@ export default function MyDevicesPage() {
         showToast('success', 'Device configuration updated successfully!');
       } else {
         console.error('❌ Update failed:', responseData);
+        
+        // Handle token expiration
+        if (response.status === 401 || responseData.error?.includes('expired') || responseData.error?.includes('Invalid token')) {
+          showToast('error', 'Your session has expired. Please log in again.');
+          localStorage.removeItem('auth_token');
+          localStorage.removeItem('user_data');
+          setTimeout(() => {
+            window.location.href = '/auth/login';
+          }, 2000);
+          return;
+        }
+        
         showToast('error', `Error updating device configuration: ${responseData.error || 'Unknown error'}`);
       }
     } catch (error) {
@@ -370,48 +484,445 @@ export default function MyDevicesPage() {
     }
   };
 
+  const handleDeleteDevice = async (device) => {
+    // Confirm deletion
+    if (!confirm(`Are you sure you want to delete device "${device.deviceName}" (${device.deviceId})?\n\nThis action cannot be undone.`)) {
+      return;
+    }
+
+    try {
+      console.log('🗑️ Deleting device:', device.deviceId);
+      
+      // Get authentication token
+      const token = localStorage.getItem('auth_token');
+      if (!token) {
+        showToast('error', 'Please log in to delete devices');
+        window.location.href = '/auth/login';
+        return;
+      }
+      
+      const response = await fetch(`/api/iot/user-devices?deviceId=${device.deviceId}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      const responseData = await response.json();
+      console.log('📡 Delete API Response:', responseData);
+
+      if (response.ok && responseData.success) {
+        showToast('success', `Device "${device.deviceName}" deleted successfully!`);
+        
+        // Immediately remove from local state for instant UI update
+        setDevices(prevDevices => prevDevices.filter(d => d.deviceId !== device.deviceId));
+        
+        // Also remove from device statuses to clear online status immediately
+        setDeviceStatuses(prevStatuses => {
+          const newStatuses = { ...prevStatuses };
+          delete newStatuses[device.deviceId];
+          return newStatuses;
+        });
+        
+        // No delay - instant UI update!
+      } else {
+        console.error('❌ Delete failed:', responseData);
+        
+        // Handle token expiration
+        if (response.status === 401 || responseData.error?.includes('expired') || responseData.error?.includes('Invalid token')) {
+          showToast('error', 'Your session has expired. Please log in again.');
+          localStorage.removeItem('auth_token');
+          localStorage.removeItem('user_data');
+          setTimeout(() => {
+            window.location.href = '/auth/login';
+          }, 2000);
+          return;
+        }
+        
+        showToast('error', `Error deleting device: ${responseData.error || 'Unknown error'}`);
+      }
+    } catch (error) {
+      console.error('❌ Error deleting device:', error);
+      showToast('error', 'Error deleting device: ' + error.message);
+    }
+  };
+
   const generateDeviceCode = (device) => {
-    const code = `/*
- * Smart Garden IoT - Device: ${device.deviceName}
- * Generated on: ${new Date().toLocaleDateString()}
- * 
- * This code will automatically fetch configuration from MongoDB
- * No need to modify this code for configuration changes!
- */
+    // Use the production code from SmartGardenIoT/SmartGardenESP8266_PRODUCTION/SmartGardenESP8266_PRODUCTION.ino
+    const code = `
 
 #include <ESP8266WiFi.h>
 #include <ESP8266HTTPClient.h>
+#include <WiFiClient.h>
+#include <WiFiClientSecure.h>
 #include <ArduinoJson.h>
+#include <DHT.h>
+#include <EEPROM.h>
 
-// This device will fetch ALL configuration from MongoDB
-// Device ID: ${device.deviceId}
-// Owner: Your Account
+// ========================================
+// PRODUCTION CONFIGURATION
+// ========================================
+
+// WiFi Configuration - CHANGE THESE FOR PRODUCTION
+const char* ssid = "YOUR_WIFI_SSID";  // CHANGE THIS!
+const char* password = "YOUR_WIFI_PASSWORD";  // CHANGE THIS!
+
+// Server Configuration - CHANGE TO YOUR PRODUCTION SERVER
+const char* serverURL = "https://smart-garden-app.vercel.app";  // Use HTTPS for production
+const char* serverEndpoint = "/api/sensor-data";
+
+// Production Optimizations
+#define DATA_SEND_INTERVAL_SECONDS 10  // 10 seconds for production (battery life)
+#define MAX_RETRY_ATTEMPTS 3
+#define RETRY_DELAY 5000  // 5 seconds
+#define CONNECTION_TIMEOUT 10000  // 10 seconds
+
+// Device Configuration
+const char* deviceId = "${device.deviceId}";
+const char* deviceName = "${device.deviceName || device.deviceId}";
+const char* firmwareVersion = "2.0.0";
+
+// Pin Definitions (Current Working Configuration)
+#define RGB_RED 16       // D0 = GPIO16 = Red LED
+#define RGB_GREEN 5      // D1 = GPIO5 = Green LED
+#define RGB_BLUE 4       // D2 = GPIO4 = Blue LED
+#define BUTTON_PIN 0     // D3 = GPIO0 = Button
+#define DHT_PIN 2        // D4 = GPIO2 = DHT11
+#define MOISTURE_PIN 14  // D5 = GPIO14 = Moisture Sensor
+#define LDR_PIN A0       // A0 = LDR (Light Sensor)
+
+// Sensor Configuration
+#define DHT_TYPE DHT11
+#define MOISTURE_DRY_THRESHOLD 300
+#define MOISTURE_WET_THRESHOLD 700
+#define LDR_DARK_THRESHOLD 200
+#define LDR_BRIGHT_THRESHOLD 800
+
+// System Configuration
+#define ENABLE_HTTP_SENDING true
+#define ENABLE_SERIAL_DEBUG true
+#define ENABLE_LED_INDICATORS true
+#define ENABLE_DEEP_SLEEP false  // Set to true for battery operation
+
+// ========================================
+// GLOBAL VARIABLES
+// ========================================
+
+DHT dht(DHT_PIN, DHT_TYPE);
+WiFiClient client;
+WiFiClientSecure secureClient;
+unsigned long lastDataSend = 0;
+unsigned long lastHeartbeat = 0;
+unsigned long lastButtonPress = 0;
+bool systemActive = true;
+int retryCount = 0;
+
+// EEPROM addresses
+#define EEPROM_SIZE 512
+#define SYSTEM_STATE_ADDR 0
+#define DEVICE_ID_ADDR 10
+
+// ========================================
+// SETUP FUNCTION
+// ========================================
 
 void setup() {
   Serial.begin(115200);
   delay(1000);
   
-  Serial.println("🌱 Smart Garden IoT - MongoDB Configuration");
-  Serial.println("Device ID: ${device.deviceId}");
-  Serial.println("==========================================");
+  Serial.println("\\n🌱 Smart Garden IoT - Production Firmware v2.0.0");
+  Serial.println("================================================");
   
-  // Load configuration from MongoDB
-  loadDeviceConfiguration();
+  // Initialize EEPROM
+  EEPROM.begin(EEPROM_SIZE);
+  loadDeviceState();
   
-  // Connect to WiFi and start data transmission
+  // Initialize pins
+  initializePins();
+  
+  // Initialize sensors
+  initializeSensors();
+  
+  // Connect to WiFi
   connectToWiFi();
-  testServerConnection();
   
-  Serial.println("🚀 Starting data transmission...");
+  // Test hardware
+  testHardware();
+  
+  Serial.println("✅ System initialized successfully");
+  Serial.println("📡 Ready for production operation");
+  Serial.println("================================================");
 }
+
+// ========================================
+// MAIN LOOP
+// ========================================
 
 void loop() {
-  // Main loop - configuration will be fetched automatically
-  // This code handles everything dynamically!
+  // Handle button press
+  handleButtonPress();
+  
+  // Send sensor data at configured intervals
+  if (ENABLE_HTTP_SENDING && (millis() - lastDataSend > (DATA_SEND_INTERVAL_SECONDS * 1000))) {
+    sendSensorData();
+    lastDataSend = millis();
+  }
+  
+  // Handle WiFi reconnection
+  if (WiFi.status() != WL_CONNECTED) {
+    Serial.println("⚠️ WiFi disconnected, attempting reconnection...");
+    connectToWiFi();
+  }
+  
+  // Small delay to prevent watchdog reset
+  delay(100);
 }
 
-// The rest of the code will be the same as MongoDB_Config_ESP8266.ino
-// This is just the setup portion showing your device configuration`;
+// ========================================
+// INITIALIZATION FUNCTIONS
+// ========================================
+
+void initializePins() {
+  Serial.println("🔧 Initializing pins...");
+  
+  // LED pins
+  pinMode(RGB_RED, OUTPUT);
+  pinMode(RGB_GREEN, OUTPUT);
+  pinMode(RGB_BLUE, OUTPUT);
+  
+  // Button pin
+  pinMode(BUTTON_PIN, INPUT_PULLUP);
+  
+  // Sensor pins
+  pinMode(MOISTURE_PIN, INPUT);
+  pinMode(LDR_PIN, INPUT);
+  
+  // Set initial LED state
+  setLEDColor(0, 255, 0);  // Green = Ready
+  
+  Serial.println("   ✅ Pins initialized");
+}
+
+void initializeSensors() {
+  Serial.println("🌡️ Initializing sensors...");
+  
+  // Initialize DHT sensor
+  dht.begin();
+  delay(2000);  // Allow sensor to stabilize
+  
+  Serial.println("   ✅ DHT11 sensor initialized");
+  Serial.println("   ✅ Moisture sensor ready");
+  Serial.println("   ✅ Light sensor ready");
+}
+
+void connectToWiFi() {
+  Serial.println("📡 Connecting to WiFi...");
+  Serial.println("   SSID: " + String(ssid));
+  
+  WiFi.begin(ssid, password);
+  
+  int attempts = 0;
+  while (WiFi.status() != WL_CONNECTED && attempts < 20) {
+    delay(500);
+    Serial.print(".");
+    attempts++;
+  }
+  
+  if (WiFi.status() == WL_CONNECTED) {
+    Serial.println("\\n   ✅ WiFi connected successfully");
+    Serial.println("   📍 IP Address: " + WiFi.localIP().toString());
+    Serial.println("   📶 Signal Strength: " + String(WiFi.RSSI()) + " dBm");
+    setLEDColor(0, 255, 0);  // Green = Connected
+  } else {
+    Serial.println("\\n   ❌ WiFi connection failed");
+    setLEDColor(255, 0, 0);  // Red = Error
+  }
+}
+
+// ========================================
+// SENSOR FUNCTIONS
+// ========================================
+
+void sendSensorData() {
+  if (!ENABLE_HTTP_SENDING) {
+    Serial.println("📊 HTTP sending disabled for testing");
+    return;
+  }
+  
+  Serial.println("\\n📊 Sending sensor data (every " + String(DATA_SEND_INTERVAL_SECONDS) + " seconds)...");
+  
+  // Read sensor values
+  float temperature = dht.readTemperature();
+  float humidity = dht.readHumidity();
+  int moistureValue = analogRead(MOISTURE_PIN);
+  int ldrValue = analogRead(LDR_PIN);
+  
+  // Validate DHT readings
+  if (isnan(temperature) || isnan(humidity)) {
+    Serial.println("   ⚠️ DHT sensor error, using default values");
+    temperature = 25.0;
+    humidity = 50.0;
+  }
+  
+  // Calculate moisture percentage with improved calibration
+  float moisturePercent = 0.0;
+  if (moistureValue < 50) { moisturePercent = 0; }
+  else if (moistureValue < 200) { moisturePercent = map(moistureValue, 50, 200, 5, 25); }
+  else if (moistureValue < 400) { moisturePercent = map(moistureValue, 200, 400, 25, 50); }
+  else if (moistureValue < 600) { moisturePercent = map(moistureValue, 400, 600, 50, 75); }
+  else if (moistureValue < 800) { moisturePercent = map(moistureValue, 600, 800, 75, 90); }
+  else { moisturePercent = map(moistureValue, 800, 1023, 90, 100); }
+  
+  // Calculate light percentage (corrected mapping)
+  float lightPercent = 0.0;
+  if (ldrValue >= 1020) { lightPercent = 0.0; }
+  else { lightPercent = map(ldrValue, 0, 1020, 0, 100); }
+  
+  // Create JSON payload
+  DynamicJsonDocument doc(1024);
+  doc["deviceId"] = deviceId;
+  doc["deviceName"] = deviceName;
+  doc["firmwareVersion"] = firmwareVersion;
+  doc["timestamp"] = millis();
+  doc["temperature"] = temperature;
+  doc["humidity"] = humidity;
+  doc["soilMoisture"] = moisturePercent;
+  doc["lightLevel"] = lightPercent;
+  doc["moistureRaw"] = moistureValue;
+  doc["lightRaw"] = ldrValue;
+  doc["wifiRSSI"] = WiFi.RSSI();
+  doc["systemActive"] = systemActive;
+  doc["uptime"] = millis();
+  
+  // Send data to server
+  String jsonString;
+  serializeJson(doc, jsonString);
+  
+  // Use secure client for HTTPS, regular client for HTTP
+  HTTPClient http;
+  if (String(serverURL).startsWith("https://")) {
+    secureClient.setInsecure(); // Skip certificate validation for ESP8266
+    http.begin(secureClient, String(serverURL) + serverEndpoint);
+  } else {
+    http.begin(client, String(serverURL) + serverEndpoint);
+  }
+  
+  http.addHeader("Content-Type", "application/json");
+  http.addHeader("User-Agent", "SmartGardenIoT/2.0.0");
+  http.setFollowRedirects(HTTPC_STRICT_FOLLOW_REDIRECTS);
+  http.setTimeout(15000); // 15 second timeout
+  
+  int httpResponseCode = http.POST(jsonString);
+  
+  if (httpResponseCode > 0) {
+    String response = http.getString();
+    Serial.println("   ✅ Data sent successfully (HTTP " + String(httpResponseCode) + ")");
+    Serial.println("   📊 Response: " + response);
+    retryCount = 0;
+    setLEDColor(0, 255, 0);  // Green = Success
+  } else {
+    Serial.println("   ❌ HTTP Error: " + String(httpResponseCode));
+    retryCount++;
+    setLEDColor(255, 255, 0);  // Yellow = Warning
+    
+    if (retryCount >= MAX_RETRY_ATTEMPTS) {
+      Serial.println("   ⚠️ Max retry attempts reached, will retry later");
+      retryCount = 0;
+    }
+  }
+  
+  http.end();
+  
+  // Print sensor data
+  if (ENABLE_SERIAL_DEBUG) {
+    Serial.println("🌡️ Temperature: " + String(temperature) + "°C");
+    Serial.println("💧 Humidity: " + String(humidity) + "%");
+    Serial.println("🌱 Moisture: " + String(moisturePercent) + "% (Raw: " + String(moistureValue) + ")");
+    Serial.println("☀️ Light: " + String(lightPercent) + "% (Raw: " + String(ldrValue) + ")");
+    Serial.println("📶 WiFi RSSI: " + String(WiFi.RSSI()) + " dBm");
+  }
+}
+
+// ========================================
+// UTILITY FUNCTIONS
+// ========================================
+
+void handleButtonPress() {
+  if (digitalRead(BUTTON_PIN) == LOW && (millis() - lastButtonPress > 1000)) {
+    lastButtonPress = millis();
+    systemActive = !systemActive;
+    
+    Serial.println("🔘 Button pressed - System " + String(systemActive ? "ACTIVATED" : "DEACTIVATED"));
+    
+    // Visual feedback
+    if (systemActive) {
+      setLEDColor(0, 255, 0);  // Green
+    } else {
+      setLEDColor(255, 0, 0);  // Red
+    }
+    
+    // Save state to EEPROM
+    saveDeviceState();
+  }
+}
+
+void setLEDColor(int red, int green, int blue) {
+  if (!ENABLE_LED_INDICATORS) return;
+  
+  analogWrite(RGB_RED, red);
+  analogWrite(RGB_GREEN, green);
+  analogWrite(RGB_BLUE, blue);
+}
+
+void testHardware() {
+  Serial.println("🔧 Testing hardware components...");
+  
+  // Test LEDs
+  Serial.println("   🔴 Testing Red LED...");
+  setLEDColor(255, 0, 0);
+  delay(500);
+  
+  Serial.println("   🟢 Testing Green LED...");
+  setLEDColor(0, 255, 0);
+  delay(500);
+  
+  // Test sensors
+  Serial.println("   🌡️ Testing DHT11 sensor...");
+  float temp = dht.readTemperature();
+  float hum = dht.readHumidity();
+  
+  if (!isnan(temp) && !isnan(hum)) {
+    Serial.println("   ✅ DHT11: " + String(temp) + "°C, " + String(hum) + "%");
+  } else {
+    Serial.println("   ❌ DHT11 sensor error");
+  }
+  
+  Serial.println("   🌱 Testing Moisture Sensor (D5)...");
+  int moistureRaw = analogRead(MOISTURE_PIN);
+  Serial.println("   📊 Moisture Raw: " + String(moistureRaw));
+  
+  Serial.println("   ☀️ Testing Light Sensor (A0)...");
+  int lightRaw = analogRead(LDR_PIN);
+  Serial.println("   📊 Light Raw: " + String(lightRaw));
+  
+  // Set ready state
+  setLEDColor(0, 255, 0);  // Green = Ready
+  Serial.println("   ✅ Hardware test completed");
+}
+
+void loadDeviceState() {
+  Serial.println("💾 Loading device state from EEPROM...");
+  systemActive = EEPROM.read(SYSTEM_STATE_ADDR) == 1;
+  Serial.println("   📊 System Active: " + String(systemActive ? "YES" : "NO"));
+}
+
+void saveDeviceState() {
+  Serial.println("💾 Saving device state to EEPROM...");
+  EEPROM.write(SYSTEM_STATE_ADDR, systemActive ? 1 : 0);
+  EEPROM.commit();
+  Serial.println("   ✅ State saved successfully");
+}`;
 
     // Create a blob and download
     const blob = new Blob([code], { type: 'text/plain' });
@@ -583,10 +1094,11 @@ void loop() {
                     ✏️ Edit
                   </button>
                   <button 
-                    className="btn btn-success"
-                    onClick={() => generateDeviceCode(device)}
+                    className="btn btn-danger"
+                    onClick={() => handleDeleteDevice(device)}
+                    style={{ backgroundColor: '#ef4444', color: 'white', marginLeft: '8px' }}
                   >
-                    📥 Download Code
+                    🗑️ Delete
                   </button>
                 </div>
               </div>

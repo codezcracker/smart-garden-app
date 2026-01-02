@@ -1,41 +1,89 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import '../analytics.css';
 
 export default function AnalyticsPage() {
   const [selectedPeriod, setSelectedPeriod] = useState('month');
+  const [loading, setLoading] = useState(true);
+  const [stats, setStats] = useState({
+    totalPlants: 0,
+    growthRate: 0,
+    waterUsage: 0,
+    healthScore: 0
+  });
+  const [growthData, setGrowthData] = useState([]);
+  const [plantHealthData, setPlantHealthData] = useState([]);
+  const [waterUsageData, setWaterUsageData] = useState([]);
+  const [recentActivity, setRecentActivity] = useState([]);
 
-  const growthData = [
-    { month: 'Jan', growth: 12, plants: 8 },
-    { month: 'Feb', growth: 18, plants: 10 },
-    { month: 'Mar', growth: 15, plants: 12 },
-    { month: 'Apr', growth: 22, plants: 14 },
-    { month: 'May', growth: 28, plants: 16 },
-    { month: 'Jun', growth: 35, plants: 18 },
-    { month: 'Jul', growth: 42, plants: 20 },
-    { month: 'Aug', growth: 38, plants: 22 },
-    { month: 'Sep', growth: 45, plants: 24 },
-    { month: 'Oct', growth: 52, plants: 26 },
-    { month: 'Nov', growth: 48, plants: 28 },
-    { month: 'Dec', growth: 55, plants: 30 }
-  ];
+  useEffect(() => {
+    fetchAnalyticsData();
+  }, [selectedPeriod]);
 
-  const plantHealthData = [
-    { name: 'Excellent', count: 18, percentage: 60, color: 'excellent' },
-    { name: 'Good', count: 8, percentage: 27, color: 'good' },
-    { name: 'Needs Attention', count: 4, percentage: 13, color: 'warning' }
-  ];
+  const fetchAnalyticsData = async () => {
+    try {
+      setLoading(true);
+      const token = localStorage.getItem('auth_token');
+      
+      if (!token) {
+        window.location.href = '/auth/login';
+        return;
+      }
 
-  const waterUsageData = [
-    { day: 'Mon', usage: 45 },
-    { day: 'Tue', usage: 52 },
-    { day: 'Wed', usage: 38 },
-    { day: 'Thu', usage: 61 },
-    { day: 'Fri', usage: 48 },
-    { day: 'Sat', usage: 55 },
-    { day: 'Sun', usage: 42 }
-  ];
+      const response = await fetch(`/api/analytics/data?period=${selectedPeriod}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setStats(data.stats || stats);
+        setGrowthData(data.growthData || []);
+        setPlantHealthData(data.plantHealthData || []);
+        setWaterUsageData(data.waterUsageData || []);
+        setRecentActivity(data.recentActivity || []);
+      } else if (response.status === 401) {
+        localStorage.removeItem('auth_token');
+        localStorage.removeItem('user_data');
+        window.location.href = '/auth/login';
+      }
+    } catch (error) {
+      console.error('Error fetching analytics:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const formatTimeAgo = (timestamp) => {
+    const now = new Date();
+    const time = new Date(timestamp);
+    const diffMs = now - time;
+    const diffMins = Math.floor(diffMs / 60000);
+    const diffHours = Math.floor(diffMs / 3600000);
+    const diffDays = Math.floor(diffMs / 86400000);
+
+    if (diffMins < 60) {
+      return `${diffMins} minutes ago`;
+    } else if (diffHours < 24) {
+      return `${diffHours} hours ago`;
+    } else {
+      return `${diffDays} days ago`;
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="analytics-container">
+        <div style={{ textAlign: 'center', padding: '50px' }}>
+          <div className="loading-spinner"></div>
+          <p>Loading analytics data...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="analytics-container">
@@ -50,8 +98,8 @@ export default function AnalyticsPage() {
           <div className="stat-card-content">
             <div className="stat-info">
               <p className="stat-label">Total Plants</p>
-              <p className="stat-value">30</p>
-              <p className="stat-change">+5 this month</p>
+              <p className="stat-value">{stats.totalPlants}</p>
+              <p className="stat-change">Active devices</p>
             </div>
             <div className="stat-icon green">🌱</div>
           </div>
@@ -61,8 +109,8 @@ export default function AnalyticsPage() {
           <div className="stat-card-content">
             <div className="stat-info">
               <p className="stat-label">Growth Rate</p>
-              <p className="stat-value">+55%</p>
-              <p className="stat-change">+7% vs last month</p>
+              <p className="stat-value">{stats.growthRate >= 0 ? '+' : ''}{stats.growthRate}%</p>
+              <p className="stat-change">vs last month</p>
             </div>
             <div className="stat-icon blue">📈</div>
           </div>
@@ -72,7 +120,7 @@ export default function AnalyticsPage() {
           <div className="stat-card-content">
             <div className="stat-info">
               <p className="stat-label">Water Usage</p>
-              <p className="stat-value">48L</p>
+              <p className="stat-value">{stats.waterUsage}L</p>
               <p className="stat-change">This week</p>
             </div>
             <div className="stat-icon blue">💧</div>
@@ -83,8 +131,8 @@ export default function AnalyticsPage() {
           <div className="stat-card-content">
             <div className="stat-info">
               <p className="stat-label">Health Score</p>
-              <p className="stat-value">87%</p>
-              <p className="stat-change">Excellent</p>
+              <p className="stat-value">{stats.healthScore}%</p>
+              <p className="stat-change">{stats.healthScore >= 80 ? 'Excellent' : stats.healthScore >= 60 ? 'Good' : 'Needs Attention'}</p>
             </div>
             <div className="stat-icon green">❤️</div>
           </div>
@@ -170,18 +218,27 @@ export default function AnalyticsPage() {
           </div>
         </div>
         
-        <div className="water-chart-container">
+          <div className="water-chart-container">
           <div className="water-chart">
-            {waterUsageData.map((data, index) => (
-              <div key={index} className="flex flex-col items-center">
-                <div className="water-label">{data.day}</div>
-                <div 
-                  className="water-bar"
-                  style={{ height: `${(data.usage / 61) * 160}px` }}
-                ></div>
-                <div className="water-value">{data.usage}L</div>
+            {waterUsageData.length > 0 ? (
+              waterUsageData.map((data, index) => {
+                const maxUsage = Math.max(...waterUsageData.map(d => d.usage), 1);
+                return (
+                  <div key={index} className="flex flex-col items-center">
+                    <div className="water-label">{data.day}</div>
+                    <div 
+                      className="water-bar"
+                      style={{ height: `${(data.usage / maxUsage) * 160}px` }}
+                    ></div>
+                    <div className="water-value">{data.usage}L</div>
+                  </div>
+                );
+              })
+            ) : (
+              <div style={{ textAlign: 'center', padding: '20px', color: '#6b7280' }}>
+                No water usage data available
               </div>
-            ))}
+            )}
           </div>
         </div>
       </div>
@@ -190,38 +247,36 @@ export default function AnalyticsPage() {
       <div className="activity-section">
         <h2 className="activity-title">Recent Activity</h2>
         <div className="activity-grid">
-          <div className="activity-card">
-            <div className="activity-content">
-              <div className="activity-icon green">🌱</div>
-              <div className="activity-info">
-                <h4 className="activity-title">New Plant Added</h4>
-                <p className="activity-description">Monstera Deliciosa</p>
-                <p className="activity-time">2 hours ago</p>
-              </div>
-            </div>
-          </div>
+          {recentActivity.length > 0 ? (
+            recentActivity.map((activity, index) => {
+              let icon = '🌱';
+              let iconClass = 'green';
+              if (activity.type === 'Health Alert') {
+                icon = '⚠️';
+                iconClass = 'orange';
+              } else if (activity.description.includes('water')) {
+                icon = '💧';
+                iconClass = 'blue';
+              }
 
-          <div className="activity-card">
-            <div className="activity-content">
-              <div className="activity-icon blue">💧</div>
-              <div className="activity-info">
-                <h4 className="activity-title">Watering Complete</h4>
-                <p className="activity-description">All plants watered</p>
-                <p className="activity-time">4 hours ago</p>
-              </div>
+              return (
+                <div key={index} className="activity-card">
+                  <div className="activity-content">
+                    <div className={`activity-icon ${iconClass}`}>{icon}</div>
+                    <div className="activity-info">
+                      <h4 className="activity-title">{activity.type}</h4>
+                      <p className="activity-description">{activity.description}</p>
+                      <p className="activity-time">{formatTimeAgo(activity.timestamp)}</p>
+                    </div>
+                  </div>
+                </div>
+              );
+            })
+          ) : (
+            <div style={{ textAlign: 'center', padding: '20px', color: '#6b7280', gridColumn: '1 / -1' }}>
+              No recent activity
             </div>
-          </div>
-
-          <div className="activity-card">
-            <div className="activity-content">
-              <div className="activity-icon orange">⚠️</div>
-              <div className="activity-info">
-                <h4 className="activity-title">Health Alert</h4>
-                <p className="activity-description">Snake Plant needs attention</p>
-                <p className="activity-time">6 hours ago</p>
-              </div>
-            </div>
-          </div>
+          )}
         </div>
       </div>
     </div>

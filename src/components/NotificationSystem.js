@@ -110,7 +110,8 @@ const NotificationSystem = () => {
                   zIndex: 10000,
                   pointerEvents: 'auto',
                   border: 'none',
-                  cursor: 'pointer'
+                  cursor: 'pointer',
+                  display: 'none'
                 }}
               >
                 🗑️ Clear All Notifications

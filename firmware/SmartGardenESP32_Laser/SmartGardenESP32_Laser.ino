@@ -47,7 +47,7 @@ String deviceKey = "default-key";  // Device authentication key (can be changed)
 #define LED_PIN 2    // Built-in LED (same as laser pin on some boards)
 
 // Timing Configuration
-const unsigned long COMMAND_CHECK_INTERVAL = 500;  // Check for commands every 500ms (instant response!)
+const unsigned long COMMAND_CHECK_INTERVAL = 200;  // Check for commands every 200ms (ultra-fast response!)
 const unsigned long WIFI_RECONNECT_INTERVAL = 30000;  // Reconnect WiFi every 30 seconds if disconnected
 
 // ========================================
@@ -151,7 +151,7 @@ void loop() {
     lastCommandCheck = millis();
   }
   
-  delay(100);  // Small delay to prevent watchdog issues
+  delay(50);  // Minimal delay for ultra-fast polling
 }
 
 // ========================================

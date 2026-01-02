@@ -111,13 +111,11 @@ export default function LaserControlPage() {
         });
         setLaserStatus(initialStatus);
         
-        // Auto-select first device if available
-        if (!selectedDevice) {
-          const firstDevice = allDevices[0];
-          const firstId = firstDevice._id?.toString() || firstDevice.deviceId || firstDevice._id;
-          setSelectedDevice(firstId);
-          console.log('✅ Auto-selected device:', firstId, firstDevice.deviceName);
-        }
+        // Auto-select first device immediately (always select first)
+        const firstDevice = allDevices[0];
+        const firstId = firstDevice._id?.toString() || firstDevice.deviceId || firstDevice._id;
+        setSelectedDevice(firstId);
+        console.log('✅ Auto-selected first device:', firstId, firstDevice.deviceName);
       } else {
         console.log('⚠️ No laser devices found. Make sure ESP32 has polled the server.');
       }

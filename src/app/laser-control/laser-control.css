@@ -1,36 +1,57 @@
-/* Laser Control Page Styling */
+/* Laser Control Page - Modern Premium Design */
 
 .laser-control-container {
   min-height: 100vh;
-  background: #f8fafc;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   padding: 2rem 1rem;
+  position: relative;
+  overflow-x: hidden;
+}
+
+.laser-control-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: 
+    radial-gradient(circle at 20% 50%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
+    radial-gradient(circle at 80% 80%, rgba(255, 255, 255, 0.1) 0%, transparent 50%);
+  pointer-events: none;
 }
 
 .laser-control-main {
-  max-width: 800px;
+  max-width: 900px;
   margin: 0 auto;
+  position: relative;
+  z-index: 1;
 }
 
 /* Header */
 .laser-control-header {
-  margin-bottom: 2rem;
+  text-align: center;
+  margin-bottom: 3rem;
+  color: white;
 }
 
 .laser-control-title {
-  font-size: 36px;
-  font-weight: 800;
-  color: #1f2937;
-  margin: 0 0 8px 0;
-  background: linear-gradient(135deg, #dc2626, #ef4444);
+  font-size: 48px;
+  font-weight: 900;
+  margin: 0 0 12px 0;
+  text-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  background: linear-gradient(135deg, #ffffff 0%, #f0f0f0 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+  letter-spacing: -1px;
 }
 
 .laser-control-subtitle {
-  color: #6b7280;
-  font-size: 16px;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 18px;
   margin: 0;
+  font-weight: 300;
 }
 
 /* Loading */
@@ -40,16 +61,17 @@
   align-items: center;
   justify-content: center;
   min-height: 400px;
-  gap: 1rem;
+  gap: 1.5rem;
+  color: white;
 }
 
 .loading-spinner {
-  width: 48px;
-  height: 48px;
-  border: 4px solid #e5e7eb;
-  border-top-color: #4caf50;
+  width: 56px;
+  height: 56px;
+  border: 4px solid rgba(255, 255, 255, 0.2);
+  border-top-color: white;
   border-radius: 50%;
-  animation: spin 1s linear infinite;
+  animation: spin 0.8s linear infinite;
 }
 
 @keyframes spin {
@@ -57,39 +79,44 @@
 }
 
 .spinner-small {
-  width: 16px;
-  height: 16px;
+  width: 18px;
+  height: 18px;
   border: 2px solid rgba(255, 255, 255, 0.3);
   border-top-color: white;
   border-radius: 50%;
   animation: spin 0.6s linear infinite;
   display: inline-block;
-  margin-right: 8px;
+  margin-right: 10px;
 }
 
 /* No Devices */
 .no-devices {
   text-align: center;
   padding: 4rem 2rem;
-  background: white;
-  border-radius: 12px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border-radius: 24px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
 }
 
 .no-devices-icon {
-  font-size: 64px;
-  margin-bottom: 1rem;
+  font-size: 80px;
+  margin-bottom: 1.5rem;
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.1));
 }
 
 .no-devices h3 {
-  font-size: 24px;
+  font-size: 28px;
   color: #1f2937;
-  margin: 0 0 8px 0;
+  margin: 0 0 12px 0;
+  font-weight: 700;
 }
 
 .no-devices p {
   color: #6b7280;
   margin: 0;
+  font-size: 16px;
+  line-height: 1.6;
 }
 
 /* Content */
@@ -99,214 +126,304 @@
   gap: 2rem;
 }
 
-/* Device Selector */
+/* Device Selector - Glassmorphism */
 .device-selector-section {
-  background: white;
-  padding: 1.5rem;
-  border-radius: 12px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(20px);
+  padding: 2rem;
+  border-radius: 24px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.3);
 }
 
 .device-select-label {
   display: block;
-  font-weight: 600;
+  font-weight: 700;
   color: #1f2937;
-  margin-bottom: 0.75rem;
-  font-size: 16px;
+  margin-bottom: 1rem;
+  font-size: 18px;
+  letter-spacing: -0.5px;
 }
 
 .device-select {
   width: 100%;
-  padding: 0.75rem 1rem;
+  padding: 1rem 1.25rem;
   font-size: 16px;
   border: 2px solid #e5e7eb;
-  border-radius: 8px;
+  border-radius: 16px;
   background: white;
   color: #1f2937;
   cursor: pointer;
-  transition: border-color 0.2s;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  font-weight: 500;
 }
 
 .device-select:hover {
-  border-color: #4caf50;
+  border-color: #667eea;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(102, 126, 234, 0.2);
 }
 
 .device-select:focus {
   outline: none;
-  border-color: #4caf50;
-  box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.1);
+  border-color: #667eea;
+  box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1), 0 8px 20px rgba(102, 126, 234, 0.2);
 }
 
 /* Laser Control Section */
 .laser-control-section {
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: 2rem;
 }
 
 .device-info-card {
-  background: white;
-  padding: 1.5rem;
-  border-radius: 12px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(20px);
+  padding: 2rem;
+  border-radius: 24px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.3);
 }
 
 .device-name {
-  font-size: 24px;
-  font-weight: 700;
+  font-size: 28px;
+  font-weight: 800;
   color: #1f2937;
   margin: 0 0 8px 0;
+  letter-spacing: -0.5px;
 }
 
 .device-location {
   color: #6b7280;
   margin: 0 0 1rem 0;
-  font-size: 14px;
+  font-size: 15px;
+  font-weight: 500;
 }
 
 .device-status-badge {
-  display: inline-block;
-  padding: 0.375rem 0.75rem;
-  border-radius: 6px;
-  font-size: 14px;
-  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0.5rem 1rem;
+  border-radius: 12px;
+  font-size: 13px;
+  font-weight: 700;
   text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 .device-status-badge.online {
-  background: #dcfce7;
-  color: #166534;
+  background: linear-gradient(135deg, #10b981, #059669);
+  color: white;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
 }
 
 .device-status-badge.offline {
-  background: #fee2e2;
-  color: #991b1b;
+  background: linear-gradient(135deg, #ef4444, #dc2626);
+  color: white;
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
 }
 
-/* Laser Control Card */
+.device-status-badge.test {
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+  color: white;
+  box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+}
+
+/* Laser Control Card - Premium Design */
 .laser-control-card {
-  background: white;
-  padding: 3rem 2rem;
-  border-radius: 12px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(20px);
+  padding: 4rem 3rem;
+  border-radius: 32px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.3);
   text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.laser-control-card::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(102, 126, 234, 0.1) 0%, transparent 70%);
+  animation: rotate 20s linear infinite;
+  pointer-events: none;
+}
+
+@keyframes rotate {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }
 
 .laser-status-indicator {
-  margin-bottom: 2rem;
+  margin-bottom: 3rem;
+  position: relative;
+  z-index: 1;
 }
 
 .laser-indicator {
   display: inline-flex;
   align-items: center;
-  gap: 1rem;
-  padding: 1rem 2rem;
-  border-radius: 12px;
-  transition: all 0.3s;
+  gap: 1.5rem;
+  padding: 1.5rem 3rem;
+  border-radius: 20px;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  z-index: 1;
 }
 
 .laser-indicator.on {
-  background: #fef2f2;
-  border: 2px solid #dc2626;
+  background: linear-gradient(135deg, #fee2e2, #fecaca);
+  border: 3px solid #ef4444;
+  box-shadow: 0 8px 30px rgba(239, 68, 68, 0.4);
 }
 
 .laser-indicator.off {
-  background: #f9fafb;
-  border: 2px solid #e5e7eb;
+  background: linear-gradient(135deg, #f9fafb, #f3f4f6);
+  border: 3px solid #e5e7eb;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
 }
 
 .laser-dot {
-  width: 24px;
-  height: 24px;
+  width: 32px;
+  height: 32px;
   border-radius: 50%;
-  transition: all 0.3s;
-  box-shadow: 0 0 0 rgba(220, 38, 38, 0);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
 }
 
 .laser-indicator.on .laser-dot {
-  background: #dc2626;
-  box-shadow: 0 0 20px rgba(220, 38, 38, 0.6), 0 0 40px rgba(220, 38, 38, 0.4);
-  animation: pulse 2s ease-in-out infinite;
+  background: linear-gradient(135deg, #ef4444, #dc2626);
+  box-shadow: 
+    0 0 30px rgba(239, 68, 68, 0.8),
+    0 0 60px rgba(239, 68, 68, 0.5),
+    0 0 90px rgba(239, 68, 68, 0.3);
+  animation: pulse-glow 2s ease-in-out infinite;
 }
 
 .laser-indicator.off .laser-dot {
-  background: #9ca3af;
+  background: linear-gradient(135deg, #9ca3af, #6b7280);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
-@keyframes pulse {
+@keyframes pulse-glow {
   0%, 100% {
     opacity: 1;
     transform: scale(1);
+    box-shadow: 
+      0 0 30px rgba(239, 68, 68, 0.8),
+      0 0 60px rgba(239, 68, 68, 0.5),
+      0 0 90px rgba(239, 68, 68, 0.3);
   }
   50% {
-    opacity: 0.8;
-    transform: scale(1.1);
+    opacity: 0.9;
+    transform: scale(1.15);
+    box-shadow: 
+      0 0 40px rgba(239, 68, 68, 1),
+      0 0 80px rgba(239, 68, 68, 0.7),
+      0 0 120px rgba(239, 68, 68, 0.5);
   }
 }
 
 .laser-status-text {
-  font-size: 24px;
-  font-weight: 700;
-  color: #1f2937;
+  font-size: 32px;
+  font-weight: 800;
+  letter-spacing: -1px;
 }
 
 .laser-indicator.on .laser-status-text {
-  color: #dc2626;
+  background: linear-gradient(135deg, #dc2626, #991b1b);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 .laser-indicator.off .laser-status-text {
   color: #6b7280;
 }
 
-/* Toggle Button */
+/* Advanced Toggle Buttons */
 .laser-toggle-button {
   width: 100%;
-  max-width: 300px;
-  padding: 1.25rem 2rem;
-  font-size: 18px;
-  font-weight: 700;
+  max-width: 400px;
+  padding: 1.75rem 3rem;
+  font-size: 20px;
+  font-weight: 800;
   border: none;
-  border-radius: 12px;
+  border-radius: 20px;
   cursor: pointer;
-  transition: all 0.3s;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 0.75rem;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  gap: 1rem;
+  position: relative;
+  overflow: hidden;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  z-index: 1;
+}
+
+.laser-toggle-button::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.3);
+  transform: translate(-50%, -50%);
+  transition: width 0.6s, height 0.6s;
+  z-index: -1;
+}
+
+.laser-toggle-button:active::before {
+  width: 300px;
+  height: 300px;
 }
 
 .laser-toggle-button.off {
-  background: #dc2626;
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
   color: white;
+  box-shadow: 0 10px 30px rgba(239, 68, 68, 0.4);
 }
 
 .laser-toggle-button.off:hover:not(:disabled) {
-  background: #b91c1c;
-  transform: translateY(-2px);
-  box-shadow: 0 6px 12px rgba(220, 38, 38, 0.3);
+  background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+  transform: translateY(-4px) scale(1.02);
+  box-shadow: 0 15px 40px rgba(239, 68, 68, 0.5);
 }
 
 .laser-toggle-button.on {
-  background: #374151;
+  background: linear-gradient(135deg, #1f2937 0%, #111827 100%);
   color: white;
+  box-shadow: 0 10px 30px rgba(31, 41, 55, 0.4);
 }
 
 .laser-toggle-button.on:hover:not(:disabled) {
-  background: #1f2937;
-  transform: translateY(-2px);
-  box-shadow: 0 6px 12px rgba(55, 65, 81, 0.3);
+  background: linear-gradient(135deg, #111827 0%, #030712 100%);
+  transform: translateY(-4px) scale(1.02);
+  box-shadow: 0 15px 40px rgba(31, 41, 55, 0.5);
 }
 
 .laser-toggle-button:disabled,
 .laser-toggle-button.loading {
-  opacity: 0.6;
+  opacity: 0.7;
   cursor: not-allowed;
   transform: none;
 }
 
 .laser-toggle-button .button-icon {
-  font-size: 24px;
+  font-size: 28px;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
 }
 
 .button-loading {
@@ -316,96 +433,42 @@
 }
 
 .device-offline-warning {
-  margin-top: 1rem;
-  padding: 0.75rem;
-  background: #fef3c7;
-  border: 1px solid #fbbf24;
-  border-radius: 8px;
+  margin-top: 1.5rem;
+  padding: 1rem 1.5rem;
+  background: linear-gradient(135deg, #fef3c7, #fde68a);
+  border: 2px solid #fbbf24;
+  border-radius: 16px;
   color: #92400e;
-  font-size: 14px;
-  margin-bottom: 0;
-}
-
-/* Test Mode */
-.test-mode-section {
-  background: white;
-  padding: 1.5rem;
-  border-radius: 12px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  margin-bottom: 1.5rem;
-}
-
-.test-mode-toggle {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  cursor: pointer;
+  font-size: 15px;
   font-weight: 600;
-  color: #1f2937;
-}
-
-.test-mode-toggle input[type="checkbox"] {
-  width: 20px;
-  height: 20px;
-  cursor: pointer;
-}
-
-.test-mac-input {
-  margin-top: 1rem;
-  padding-top: 1rem;
-  border-top: 1px solid #e5e7eb;
-}
-
-.test-mac-input label {
-  display: block;
-  font-weight: 600;
-  color: #1f2937;
-  margin-bottom: 0.5rem;
-  font-size: 14px;
-}
-
-.test-mac-input input {
-  width: 100%;
-  padding: 0.75rem;
-  font-size: 16px;
-  font-family: monospace;
-  border: 2px solid #e5e7eb;
-  border-radius: 8px;
-  text-transform: uppercase;
-  letter-spacing: 2px;
-}
-
-.test-mac-input input:focus {
-  outline: none;
-  border-color: #4caf50;
-  box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.1);
-}
-
-.test-hint {
-  margin-top: 0.5rem;
-  font-size: 12px;
-  color: #6b7280;
   margin-bottom: 0;
-}
-
-.device-status-badge.test {
-  background: #fef3c7;
-  color: #92400e;
+  box-shadow: 0 4px 12px rgba(251, 191, 36, 0.2);
 }
 
 /* Responsive */
 @media (max-width: 640px) {
   .laser-control-title {
-    font-size: 28px;
+    font-size: 36px;
+  }
+
+  .laser-control-subtitle {
+    font-size: 16px;
   }
 
   .laser-control-card {
-    padding: 2rem 1.5rem;
+    padding: 3rem 2rem;
   }
 
   .laser-toggle-button {
-    padding: 1rem 1.5rem;
-    font-size: 16px;
+    padding: 1.5rem 2rem;
+    font-size: 18px;
+  }
+
+  .laser-status-text {
+    font-size: 24px;
+  }
+
+  .device-name {
+    font-size: 24px;
   }
 }
-

@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { MongoClient, ObjectId } from 'mongodb';
+import { checkAutomationRules } from '../../../../lib/automation-rules';
 
 const uri = process.env.MONGODB_URI || 'mongodb://localhost:27017';
 const client = new MongoClient(uri);
@@ -148,8 +149,16 @@ export async function POST(request) {
       }
     );
 
-    // Check for automation rules (future enhancement)
-    // await checkAutomationRules(device._id, readings);
+    // Check for automation rules and execute actions
+    try {
+      const automationResult = await checkAutomationRules(device._id, readings);
+      if (automationResult.triggered) {
+        console.log('Automation rules triggered:', automationResult.actions);
+      }
+    } catch (automationError) {
+      console.error('Error checking automation rules:', automationError);
+      // Don't fail the sensor data insertion if automation check fails
+    }
 
     return NextResponse.json({
       message: 'Sensor data received successfully',

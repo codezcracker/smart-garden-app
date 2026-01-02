@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import '../automation.css';
 
 export default function AutomationPage() {
@@ -19,81 +19,185 @@ export default function AutomationPage() {
     systemStatus: true
   });
 
-  const wateringSchedule = [
-    {
-      id: 1,
-      plant: 'Bird of Paradise',
-      time: '09:00 AM',
-      status: 'active',
-      icon: '🌿'
-    },
-    {
-      id: 2,
-      plant: 'Monstera Deliciosa',
-      time: '10:30 AM',
-      status: 'pending',
-      icon: '🌱'
-    },
-    {
-      id: 3,
-      plant: 'Snake Plant',
-      time: '02:00 PM',
-      status: 'active',
-      icon: '🌵'
-    }
-  ];
+  const [devices, setDevices] = useState([]);
+  const [sensors, setSensors] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
 
-  const sensors = [
-    {
-      id: 1,
-      name: 'Soil Moisture Sensor',
-      status: 'online',
-      value: '65%',
-      icon: '💧'
-    },
-    {
-      id: 2,
-      name: 'Temperature Sensor',
-      status: 'online',
-      value: '22°C',
-      icon: '🌡️'
-    },
-    {
-      id: 3,
-      name: 'Humidity Sensor',
-      status: 'warning',
-      value: '45%',
-      icon: '💨'
-    },
-    {
-      id: 4,
-      name: 'Light Sensor',
-      status: 'offline',
-      value: 'N/A',
-      icon: '☀️'
+  useEffect(() => {
+    fetchSettings();
+    fetchDevices();
+  }, []);
+
+  const fetchSettings = async () => {
+    try {
+      const token = localStorage.getItem('auth_token');
+      if (!token) {
+        window.location.href = '/auth/login';
+        return;
+      }
+
+      const response = await fetch('/api/automation/settings', {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        if (data.automationSettings) {
+          setAutomationSettings(data.automationSettings);
+        }
+        if (data.notificationSettings) {
+          setNotificationSettings(data.notificationSettings);
+        }
+      } else if (response.status === 401) {
+        localStorage.removeItem('auth_token');
+        localStorage.removeItem('user_data');
+        window.location.href = '/auth/login';
+      }
+    } catch (error) {
+      console.error('Error fetching settings:', error);
+    } finally {
+      setLoading(false);
     }
-  ];
+  };
+
+  const fetchDevices = async () => {
+    try {
+      const token = localStorage.getItem('auth_token');
+      if (!token) return;
+
+      const response = await fetch('/api/iot/user-devices', {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setDevices(data.devices || []);
+
+        // Get sensor status from devices
+        const sensorStatus = [];
+        data.devices?.forEach(device => {
+          if (device.latestData?.sensors) {
+            const s = device.latestData.sensors;
+            if (s.soilMoisture !== undefined) {
+              sensorStatus.push({
+                id: `moisture-${device.deviceId}`,
+                name: 'Soil Moisture Sensor',
+                status: device.status === 'online' ? 'online' : 'offline',
+                value: `${Math.round(s.soilMoisture)}%`,
+                icon: '💧'
+              });
+            }
+            if (s.temperature !== undefined) {
+              sensorStatus.push({
+                id: `temp-${device.deviceId}`,
+                name: 'Temperature Sensor',
+                status: device.status === 'online' ? 'online' : 'offline',
+                value: `${Math.round(s.temperature)}°C`,
+                icon: '🌡️'
+              });
+            }
+            if (s.humidity !== undefined) {
+              sensorStatus.push({
+                id: `humidity-${device.deviceId}`,
+                name: 'Humidity Sensor',
+                status: device.status === 'online' ? 'online' : 'offline',
+                value: `${Math.round(s.humidity)}%`,
+                icon: '💨'
+              });
+            }
+            if (s.lightLevel !== undefined) {
+              sensorStatus.push({
+                id: `light-${device.deviceId}`,
+                name: 'Light Sensor',
+                status: device.status === 'online' ? 'online' : 'offline',
+                value: `${Math.round(s.lightLevel)}%`,
+                icon: '☀️'
+              });
+            }
+          }
+        });
+        setSensors(sensorStatus);
+      }
+    } catch (error) {
+      console.error('Error fetching devices:', error);
+    }
+  };
+
+  const saveSettings = async (settingsType, settings) => {
+    try {
+      setSaving(true);
+      const token = localStorage.getItem('auth_token');
+      
+      const payload = {};
+      if (settingsType === 'automation') {
+        payload.automationSettings = settings;
+      } else {
+        payload.notificationSettings = settings;
+      }
+
+      const response = await fetch('/api/automation/settings', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(payload)
+      });
+
+      if (response.ok) {
+        console.log('Settings saved successfully');
+      } else {
+        console.error('Failed to save settings');
+      }
+    } catch (error) {
+      console.error('Error saving settings:', error);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const toggleSetting = (setting: keyof typeof automationSettings) => {
+    const newSettings = {
+      ...automationSettings,
+      [setting]: !automationSettings[setting]
+    };
+    setAutomationSettings(newSettings);
+    saveSettings('automation', newSettings);
+  };
+
+  const toggleNotification = (notification: keyof typeof notificationSettings) => {
+    const newSettings = {
+      ...notificationSettings,
+      [notification]: !notificationSettings[notification]
+    };
+    setNotificationSettings(newSettings);
+    saveSettings('notification', newSettings);
+  };
+
+  if (loading) {
+    return (
+      <div className="automation-container">
+        <div style={{ textAlign: 'center', padding: '50px' }}>
+          <div className="loading-spinner"></div>
+          <p>Loading automation settings...</p>
+        </div>
+      </div>
+    );
+  }
 
   const systemStatus = [
     { label: 'System Status', value: 'online', status: 'online' },
     { label: 'Database Connection', value: 'connected', status: 'online' },
     { label: 'API Services', value: 'operational', status: 'online' },
-    { label: 'Backup System', value: 'last backup 2h ago', status: 'warning' }
+    { label: 'Active Devices', value: `${devices.filter(d => d.status === 'online').length} of ${devices.length}`, status: devices.length > 0 ? 'online' : 'warning' }
   ];
-
-  const toggleSetting = (setting: keyof typeof automationSettings) => {
-    setAutomationSettings(prev => ({
-      ...prev,
-      [setting]: !prev[setting]
-    }));
-  };
-
-  const toggleNotification = (notification: keyof typeof notificationSettings) => {
-    setNotificationSettings(prev => ({
-      ...prev,
-      [notification]: !prev[notification]
-    }));
-  };
 
   return (
     <div className="automation-container">
@@ -171,20 +275,26 @@ export default function AutomationPage() {
           </div>
           
           <div className="watering-schedule">
-            {wateringSchedule.map((schedule) => (
-              <div key={schedule.id} className="schedule-item">
-                <div className="schedule-info">
-                  <div className="schedule-icon">{schedule.icon}</div>
-                  <div className="schedule-details">
-                    <div className="schedule-plant">{schedule.plant}</div>
-                    <div className="schedule-time">{schedule.time}</div>
+            {devices.length > 0 ? (
+              devices.map((device) => (
+                <div key={device.deviceId} className="schedule-item">
+                  <div className="schedule-info">
+                    <div className="schedule-icon">🌱</div>
+                    <div className="schedule-details">
+                      <div className="schedule-plant">{device.deviceName}</div>
+                      <div className="schedule-time">{device.location || 'Garden'}</div>
+                    </div>
+                  </div>
+                  <div className={`schedule-status ${device.status === 'online' ? 'active' : 'pending'}`}>
+                    {device.status === 'online' ? 'Active' : 'Offline'}
                   </div>
                 </div>
-                <div className={`schedule-status ${schedule.status}`}>
-                  {schedule.status === 'active' ? 'Active' : 'Pending'}
-                </div>
+              ))
+            ) : (
+              <div style={{ textAlign: 'center', padding: '20px', color: '#6b7280' }}>
+                No devices configured
               </div>
-            ))}
+            )}
           </div>
         </div>
 
@@ -199,18 +309,24 @@ export default function AutomationPage() {
           </div>
           
           <div className="sensor-grid">
-            {sensors.map((sensor) => (
-              <div key={sensor.id} className="sensor-item">
-                <div className={`sensor-icon ${sensor.status}`}>
-                  {sensor.icon}
+            {sensors.length > 0 ? (
+              sensors.map((sensor) => (
+                <div key={sensor.id} className="sensor-item">
+                  <div className={`sensor-icon ${sensor.status}`}>
+                    {sensor.icon}
+                  </div>
+                  <div className="sensor-info">
+                    <div className="sensor-name">{sensor.name}</div>
+                    <div className="sensor-status">{sensor.status}</div>
+                  </div>
+                  <div className="sensor-value">{sensor.value}</div>
                 </div>
-                <div className="sensor-info">
-                  <div className="sensor-name">{sensor.name}</div>
-                  <div className="sensor-status">{sensor.status}</div>
-                </div>
-                <div className="sensor-value">{sensor.value}</div>
+              ))
+            ) : (
+              <div style={{ textAlign: 'center', padding: '20px', color: '#6b7280', gridColumn: '1 / -1' }}>
+                No sensor data available
               </div>
-            ))}
+            )}
           </div>
         </div>
 

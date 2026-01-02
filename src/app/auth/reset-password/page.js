@@ -53,8 +53,7 @@ export default function ResetPasswordPage() {
       const data = await response.json();
 
       if (response.ok) {
-        setSuccess(`Reset token generated for ${formData.email}. Use this token: ${data.token}`);
-        // In production, you would send the token via email
+        setSuccess(data.message || 'Password reset link has been sent to your email address. Please check your inbox.');
       } else {
         setError(data.error || 'Failed to generate reset token');
       }
@@ -216,5 +215,6 @@ export default function ResetPasswordPage() {
     </div>
   );
 }
+
 
 

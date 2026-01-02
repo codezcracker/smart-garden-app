@@ -1,32 +1,117 @@
 'use client';
 
 import { useState } from 'react';
-import './iot-device.css';
+import './device-plan.css';
 
-export default function IoTDevicePage() {
+export default function DevicePlanPage() {
   const [activeTab, setActiveTab] = useState<'current' | 'future'>('current');
 
   const currentComponents = [
-    { category: 'Power', component: '18650 Li-ion battery', purpose: 'Main power source (3.0–4.2V)' },
-    { category: 'Power', component: 'BMS 1S protection board', purpose: 'Battery protection (overcharge/discharge)' },
-    { category: 'Power', component: 'Techtonics 1.5V to 5V DC-DC Boost Converter', purpose: 'Step-up voltage for ESP or other modules' },
-    { category: 'MCU / Main', component: '2B4 ESP8266 ESP-12 D1 Mini NodeMCU', purpose: 'Microcontroller + WiFi' },
-    { category: 'Sensors', component: 'DHT22 (or DHT11)', purpose: 'Temperature & humidity' },
-    { category: 'Sensors', component: 'LDR + 10kΩ resistor', purpose: 'Light intensity measurement' },
-    { category: 'Sensors', component: 'Soil moisture sensor (analog)', purpose: 'Soil wet/dry monitoring' },
-    { category: 'Actuators', component: 'LED + 220Ω resistor', purpose: 'Status / indicator light' },
-    { category: 'Actuators', component: 'RGB LED', purpose: 'Multi-color indicator' },
-    { category: 'Actuators', component: 'Buzzer (active type)', purpose: 'Alerts / notifications' },
-    { category: 'Input', component: 'Push button (with pull-up resistor)', purpose: 'Manual reset / trigger input' },
-    { category: 'Misc.', component: 'Wires, resistors (220Ω, 10kΩ), breadboard / PCB', purpose: 'Basic wiring and prototyping' }
+    { 
+      category: 'Power', 
+      component: '18650 Li-ion battery', 
+      purpose: 'Main power source (3.0–4.2V)',
+      icon: '🔋'
+    },
+    { 
+      category: 'Power', 
+      component: 'BMS 1S protection board', 
+      purpose: 'Battery protection (overcharge/discharge)',
+      icon: '🛡️'
+    },
+    { 
+      category: 'Power', 
+      component: 'Techtonics 1.5V to 5V DC-DC Boost Converter', 
+      purpose: 'Step-up voltage for ESP or other modules',
+      icon: '⚡'
+    },
+    { 
+      category: 'MCU / Main', 
+      component: '2B4 ESP8266 ESP-12 D1 Mini NodeMCU', 
+      purpose: 'Microcontroller + WiFi',
+      icon: '💻'
+    },
+    { 
+      category: 'Sensors', 
+      component: 'DHT22 (or DHT11)', 
+      purpose: 'Temperature & humidity',
+      icon: '🌡️'
+    },
+    { 
+      category: 'Sensors', 
+      component: 'LDR + 10kΩ resistor', 
+      purpose: 'Light intensity measurement',
+      icon: '💡'
+    },
+    { 
+      category: 'Sensors', 
+      component: 'Soil moisture sensor (analog)', 
+      purpose: 'Soil wet/dry monitoring',
+      icon: '💧'
+    },
+    { 
+      category: 'Actuators', 
+      component: 'LED + 220Ω resistor', 
+      purpose: 'Status / indicator light',
+      icon: '💡'
+    },
+    { 
+      category: 'Actuators', 
+      component: 'RGB LED', 
+      purpose: 'Multi-color indicator',
+      icon: '🌈'
+    },
+    { 
+      category: 'Actuators', 
+      component: 'Buzzer (active type)', 
+      purpose: 'Alerts / notifications',
+      icon: '🔔'
+    },
+    { 
+      category: 'Input', 
+      component: 'Push button (with pull-up resistor)', 
+      purpose: 'Manual reset / trigger input',
+      icon: '🔘'
+    },
+    { 
+      category: 'Misc.', 
+      component: 'Wires, resistors (220Ω, 10kΩ), breadboard / PCB', 
+      purpose: 'Basic wiring and prototyping',
+      icon: '🔌'
+    }
   ];
 
   const futureComponents = [
-    { category: 'MCU / Main', component: 'ADS1115 ADC module', purpose: 'High-resolution analog readings (for pH/EC/etc.)' },
-    { category: 'Sensors', component: 'pH sensor', purpose: 'Soil acidity/alkalinity monitoring' },
-    { category: 'Sensors', component: 'EC sensor', purpose: 'Soil nutrient measurement' },
-    { category: 'Sensors', component: 'MH-Z19 CO₂ sensor', purpose: 'Air CO₂ measurement' },
-    { category: 'Actuators', component: 'Additional RGB or status LEDs', purpose: 'Visual multi-state indicators' }
+    { 
+      category: 'MCU / Main', 
+      component: 'ADS1115 ADC module', 
+      purpose: 'High-resolution analog readings (for pH/EC/etc.)',
+      icon: '📊'
+    },
+    { 
+      category: 'Sensors', 
+      component: 'pH sensor', 
+      purpose: 'Soil acidity/alkalinity monitoring',
+      icon: '🧪'
+    },
+    { 
+      category: 'Sensors', 
+      component: 'EC sensor', 
+      purpose: 'Soil nutrient measurement',
+      icon: '⚗️'
+    },
+    { 
+      category: 'Sensors', 
+      component: 'MH-Z19 CO₂ sensor', 
+      purpose: 'Air CO₂ measurement',
+      icon: '🌬️'
+    },
+    { 
+      category: 'Actuators', 
+      component: 'Additional RGB or status LEDs', 
+      purpose: 'Visual multi-state indicators',
+      icon: '💫'
+    }
   ];
 
   const getCategoryColor = (category: string) => {
@@ -48,6 +133,7 @@ export default function IoTDevicePage() {
         <table className="components-table">
           <thead>
             <tr>
+              <th>Image</th>
               <th>Category</th>
               <th>Component</th>
               <th>Purpose / Notes</th>
@@ -56,6 +142,20 @@ export default function IoTDevicePage() {
           <tbody>
             {components.map((item, index) => (
               <tr key={index}>
+                <td className="component-image-cell">
+                  <div 
+                    className="component-image"
+                    style={{
+                      fontSize: '40px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center'
+                    }}
+                    title={item.component}
+                  >
+                    {item.icon}
+                  </div>
+                </td>
                 <td>
                   <span 
                     className="category-badge" 
@@ -75,7 +175,7 @@ export default function IoTDevicePage() {
   );
 
   return (
-    <div className="iot-device-page">
+    <div className="device-plan-page">
       <div className="page-header">
         <h1>🔧 Smart Garden IoT Device Components</h1>
         <p>Design and plan your IoT device with current and future components</p>
@@ -133,3 +233,4 @@ export default function IoTDevicePage() {
     </div>
   );
 }
+

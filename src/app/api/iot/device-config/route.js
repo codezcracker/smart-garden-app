@@ -1,5 +1,33 @@
 import { NextResponse } from 'next/server';
 import { connectToDatabase } from '@/lib/mongodb';
+import jwt from 'jsonwebtoken';
+import { ObjectId } from 'mongodb';
+
+// Middleware to verify JWT token
+function verifyToken(request) {
+  const authHeader = request.headers.get('authorization');
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    throw new Error('No token provided');
+  }
+
+  const token = authHeader.substring(7);
+  if (!token || token.length === 0) {
+    throw new Error('Token is empty');
+  }
+
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'your-secret-key');
+    return decoded;
+  } catch (error) {
+    if (error.name === 'TokenExpiredError') {
+      throw new Error('JWT expired - please log in again');
+    } else if (error.name === 'JsonWebTokenError') {
+      throw new Error('Invalid token - please log in again');
+    } else {
+      throw new Error(`Invalid token: ${error.message}`);
+    }
+  }
+}
 
 // GET /api/iot/device-config - Get device configuration by deviceId (with garden config)
 export async function GET(request) {
@@ -97,6 +125,27 @@ export async function GET(request) {
 export async function POST(request) {
   try {
     const { db } = await connectToDatabase();
+    
+    // Verify JWT token and get user ID
+    let decoded;
+    try {
+      decoded = verifyToken(request);
+    } catch (error) {
+      return NextResponse.json({
+        success: false,
+        error: error.message || 'Authentication required'
+      }, { status: 401 });
+    }
+    
+    const actualUserId = decoded.userId || decoded.id;
+    
+    if (!actualUserId) {
+      return NextResponse.json({
+        success: false,
+        error: 'Invalid token: user ID not found'
+      }, { status: 401 });
+    }
+    
     const updateData = await request.json();
     
     if (!updateData.deviceId) {
@@ -106,13 +155,19 @@ export async function POST(request) {
       }, { status: 400 });
     }
     
-    // Find device
-    const device = await db.collection('user_devices').findOne({ deviceId: updateData.deviceId });
+    // Convert userId to string for consistency
+    const userIdString = actualUserId.toString ? actualUserId.toString() : actualUserId;
+    
+    // Find device and verify ownership
+    const device = await db.collection('user_devices').findOne({ 
+      deviceId: updateData.deviceId,
+      userId: { $in: [userIdString, actualUserId, new ObjectId(userIdString)] }
+    });
     
     if (!device) {
       return NextResponse.json({
         success: false,
-        error: 'Device not found'
+        error: 'Device not found or access denied'
       }, { status: 404 });
     }
     

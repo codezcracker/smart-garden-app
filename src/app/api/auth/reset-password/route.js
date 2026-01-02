@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { MongoClient } from 'mongodb';
+import { sendPasswordResetEmail } from '../../../../lib/email-service';
 
 const uri = process.env.MONGODB_URI || 'mongodb://localhost:27017';
 const client = new MongoClient(uri);
@@ -123,17 +124,21 @@ export async function PUT(request) {
       { expiresIn: '1h' }
     );
 
-    // In a real application, you would send this token via email
-    // For now, we'll just return it in the response for testing
-    const resetUrl = `${process.env.NEXTAUTH_URL || 'http://localhost:3000'}/auth/reset-password?token=${resetToken}&email=${encodeURIComponent(email)}`;
+    const resetUrl = `${process.env.NEXTAUTH_URL || process.env.APP_URL || 'http://localhost:3001'}/auth/reset-password?token=${resetToken}&email=${encodeURIComponent(email)}`;
 
-    console.log('Password reset token generated for:', email);
-    console.log('Reset URL:', resetUrl);
+    // Send password reset email
+    const emailResult = await sendPasswordResetEmail(email, resetToken, resetUrl);
 
+    if (!emailResult.success) {
+      console.error('Failed to send password reset email:', emailResult.error);
+      // Still return success to user (security: don't reveal if email exists)
+      // But log the error for debugging
+    }
+
+    // Don't return the token/URL in production for security
+    // Only return success message
     return NextResponse.json({
-      message: 'Password reset token generated',
-      resetUrl: resetUrl, // Only for testing - remove in production
-      token: resetToken   // Only for testing - remove in production
+      message: 'If the email exists, a password reset link has been sent to your email address.'
     }, { status: 200 });
 
   } catch (error) {
@@ -146,5 +151,6 @@ export async function PUT(request) {
     await client.close();
   }
 }
+
 
 

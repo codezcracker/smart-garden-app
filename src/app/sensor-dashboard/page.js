@@ -4,80 +4,239 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   LineChart, Line, AreaChart, Area,
-  XAxis, YAxis, ResponsiveContainer
+  XAxis, YAxis, ResponsiveContainer, Tooltip, CartesianGrid
 } from 'recharts';
 import './sensor-dashboard.css';
 
 export default function SensorDashboard() {
+  const [devices, setDevices] = useState([]);
+  const [selectedDevice, setSelectedDevice] = useState(null);
   const [sensorData, setSensorData] = useState([]);
   const [latestData, setLatestData] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [lastUpdate, setLastUpdate] = useState(null);
   const [selectedPlant, setSelectedPlant] = useState('tomato');
 
-  const fetchSensorData = async () => {
+  // Fetch user devices
+  const fetchDevices = async () => {
     try {
-      const response = await fetch('/api/sensor-test');
-      const data = await response.json();
-      setSensorData(data.slice(0, 20));
-      if (data.length > 0) {
-        setLatestData(data[0]);
+      const token = localStorage.getItem('auth_token');
+      if (!token) {
+        setError('Please log in to view sensor data');
+        setIsLoading(false);
+        return;
+      }
+
+      const response = await fetch('/api/iot/user-devices', {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        const userDevices = data.devices || [];
+        
+        if (userDevices.length === 0) {
+          setError('No devices found. Please add a device first.');
+          setIsLoading(false);
+          return;
+        }
+
+        setDevices(userDevices);
+        
+        // Auto-select first device if none selected
+        if (!selectedDevice && userDevices.length > 0) {
+          setSelectedDevice(userDevices[0]);
+        }
+      } else {
+        if (response.status === 401) {
+          localStorage.removeItem('auth_token');
+          localStorage.removeItem('user_data');
+          window.location.href = '/auth/login';
+        } else {
+          setError('Failed to fetch devices');
+        }
+        setIsLoading(false);
       }
     } catch (err) {
-      console.error('Error fetching data:', err);
+      console.error('Error fetching devices:', err);
+      setError('Error connecting to server');
+      setIsLoading(false);
+    }
+  };
+
+  // Fetch sensor data for selected device
+  const fetchSensorData = async () => {
+    if (!selectedDevice) return;
+
+    try {
+      const token = localStorage.getItem('auth_token');
+      if (!token) return;
+
+      // Get latest sensor readings from device
+      const deviceId = selectedDevice.deviceId || selectedDevice._id;
+      
+      // Try to get historical data from sensor readings API
+      const response = await fetch(`/api/sensors/data?deviceId=${deviceId}&limit=50`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        const readings = data.readings || [];
+        
+        // If we have readings, use them
+        if (readings.length > 0) {
+          const formattedData = readings.map(reading => ({
+            time: new Date(reading.timestamp).toLocaleTimeString(),
+            timestamp: new Date(reading.timestamp),
+            temperature: reading.temperature || reading.data?.temperature || 0,
+            humidity: reading.humidity || reading.data?.humidity || 0,
+            moisture: reading.soilMoisture || reading.data?.soilMoisture || 0,
+            light: reading.lightLevel || reading.data?.lightLevel || 0
+          }));
+          
+          setSensorData(formattedData);
+          
+          if (formattedData.length > 0) {
+            setLatestData(formattedData[0]);
+          }
+        } else {
+          // Fallback to device's latest data
+          const latestReading = {
+            temperature: selectedDevice.temperature || selectedDevice.sensors?.temperature || 25,
+            humidity: selectedDevice.humidity || selectedDevice.sensors?.humidity || 50,
+            moisture: selectedDevice.soilMoisture || selectedDevice.sensors?.soilMoisture || 60,
+            light: selectedDevice.lightLevel || selectedDevice.sensors?.lightLevel || 50
+          };
+          
+          setLatestData(latestReading);
+          setSensorData([{
+            time: new Date().toLocaleTimeString(),
+            timestamp: new Date(),
+            ...latestReading
+          }]);
+        }
+        
+        setLastUpdate(new Date());
+        setError(null);
+      } else {
+        // Fallback to device's stored data
+        const latestReading = {
+          temperature: selectedDevice.temperature || selectedDevice.sensors?.temperature || 25,
+          humidity: selectedDevice.humidity || selectedDevice.sensors?.humidity || 50,
+          moisture: selectedDevice.soilMoisture || selectedDevice.sensors?.soilMoisture || 60,
+          light: selectedDevice.lightLevel || selectedDevice.sensors?.lightLevel || 50
+        };
+        
+        setLatestData(latestReading);
+        setSensorData([{
+          time: new Date().toLocaleTimeString(),
+          timestamp: new Date(),
+          ...latestReading
+        }]);
+      }
+    } catch (err) {
+      console.error('Error fetching sensor data:', err);
+      // Don't set error - use fallback data from device
+      const latestReading = {
+        temperature: selectedDevice.temperature || 25,
+        humidity: selectedDevice.humidity || 50,
+        moisture: selectedDevice.soilMoisture || 60,
+        light: selectedDevice.lightLevel || 50
+      };
+      
+      setLatestData(latestReading);
     } finally {
       setIsLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchSensorData();
-    const interval = setInterval(fetchSensorData, 3000);
-    return () => clearInterval(interval);
+    fetchDevices();
   }, []);
 
-  if (isLoading) {
+  useEffect(() => {
+    if (selectedDevice) {
+      setIsLoading(true);
+      fetchSensorData();
+      
+      // Auto-refresh every 5 seconds
+      const interval = setInterval(fetchSensorData, 5000);
+      return () => clearInterval(interval);
+    }
+  }, [selectedDevice]);
+
+  if (isLoading && !selectedDevice) {
     return (
       <div className="garden-dashboard">
         <div className="loading-container">
           <div className="plant-loading">
             <div className="plant-sprout"></div>
-            <div className="loading-text">🌱 Growing your garden...</div>
+            <div className="loading-text">🌱 Loading your garden...</div>
           </div>
         </div>
       </div>
     );
   }
 
-  if (!sensorData.length) {
+  if (error && !selectedDevice) {
     return (
       <div className="garden-dashboard">
         <div className="no-data-container">
           <div className="sad-plant">🥀</div>
-          <h3>No Garden Data</h3>
-          <p>Connect your ESP8266 to see your garden</p>
+          <h3>{error}</h3>
+          <p>
+            {error.includes('log in') ? (
+              <a href="/auth/login" style={{ color: '#00ff88', textDecoration: 'underline' }}>Login here</a>
+            ) : error.includes('No devices') ? (
+              <a href="/my-devices" style={{ color: '#00ff88', textDecoration: 'underline' }}>Add a device here</a>
+            ) : (
+              'Please check your connection and try again'
+            )}
+          </p>
         </div>
       </div>
     );
   }
 
-  // Format data for charts
-  const chartData = sensorData.slice(0, 10).map((item, index) => ({
+  if (!latestData) {
+    return (
+      <div className="garden-dashboard">
+        <div className="no-data-container">
+          <div className="sad-plant">🌱</div>
+          <h3>No Sensor Data</h3>
+          <p>Waiting for sensor readings from {selectedDevice?.deviceName || selectedDevice?.deviceId || 'device'}...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Format data for charts (last 20 readings)
+  const chartData = sensorData.slice(0, 20).reverse().map((item, index) => ({
     time: index,
-    temp: item.temperature,
-    humidity: item.humidity,
-    moisture: item.soilMoisture,
-    light: item.lightLevel
+    label: item.time,
+    temp: item.temperature || 0,
+    humidity: item.humidity || 0,
+    moisture: item.moisture || 0,
+    light: item.light || 0
   }));
 
   // Plant health calculation
   const plantHealth = Math.round(
-    ((latestData?.soilMoisture || 0) + 
-     (latestData?.lightLevel || 0) + 
+    ((latestData?.moisture || 0) + 
+     (latestData?.light || 0) + 
      (latestData?.temperature || 0) * 2) / 4
   );
 
   // Day/Night calculation based on light level
-  const lightLevel = latestData?.lightLevel || 0;
+  const lightLevel = latestData?.light || 0;
   const isDay = lightLevel > 40;
   const isDusk = lightLevel > 20 && lightLevel <= 40;
   const isNight = lightLevel <= 20;
@@ -95,7 +254,6 @@ export default function SensorDashboard() {
 
   // Sun/Moon position and appearance
   const getSunMoonPosition = () => {
-    // Light level 0-100 maps to position
     const normalizedLight = Math.min(100, Math.max(0, lightLevel));
     return {
       top: `${10 + (100 - normalizedLight) * 0.5}%`,
@@ -103,6 +261,12 @@ export default function SensorDashboard() {
       opacity: lightLevel < 10 ? 0.3 : 1
     };
   };
+
+  // Device status
+  const deviceStatus = selectedDevice?.status === 'online' ? '🟢 ONLINE' : '🔴 OFFLINE';
+  const lastSeen = selectedDevice?.lastSeen 
+    ? new Date(selectedDevice.lastSeen).toLocaleString() 
+    : 'Never';
 
   return (
     <div className="garden-dashboard">
@@ -120,9 +284,8 @@ export default function SensorDashboard() {
           </div>
           <nav className="nav-links">
             <a href="/" className="nav-link">Home</a>
-            <a href="/plants" className="nav-link">Plants</a>
-            <a href="/analytics" className="nav-link">Analytics</a>
-            <a href="/settings" className="nav-link">Settings</a>
+            <a href="/my-devices" className="nav-link">My Devices</a>
+            <a href="/interactive-garden" className="nav-link">Interactive Garden</a>
           </nav>
         </div>
         <div className="header-right">
@@ -134,17 +297,55 @@ export default function SensorDashboard() {
             />
             <span>Live Garden</span>
           </div>
+          {lastUpdate && (
+            <div className="last-update" style={{ fontSize: '12px', color: '#7f8c8d', marginLeft: '20px' }}>
+              Updated: {lastUpdate.toLocaleTimeString()}
+            </div>
+          )}
         </div>
       </motion.div>
 
       <div className="dashboard-content">
-        {/* Left Sidebar - Plant Info */}
+        {/* Left Sidebar - Device & Plant Info */}
         <motion.div 
           className="left-sidebar"
           initial={{ opacity: 0, x: -50 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ delay: 0.2 }}
         >
+          {/* Device Selection */}
+          <div className="plant-selection">
+            <h3>📱 Select Device</h3>
+            <select 
+              className="device-select"
+              value={selectedDevice?.deviceId || selectedDevice?._id || ''}
+              onChange={(e) => {
+                const device = devices.find(d => (d.deviceId || d._id) === e.target.value);
+                setSelectedDevice(device);
+              }}
+              style={{
+                width: '100%',
+                padding: '10px',
+                borderRadius: '8px',
+                border: '2px solid #e0e0e0',
+                background: 'white',
+                fontSize: '14px',
+                cursor: 'pointer',
+                marginTop: '10px'
+              }}
+            >
+              {devices.map(device => (
+                <option key={device.deviceId || device._id} value={device.deviceId || device._id}>
+                  {device.deviceName || device.deviceId || 'Unknown Device'}
+                </option>
+              ))}
+            </select>
+            <div className="device-status-info" style={{ marginTop: '10px', fontSize: '12px', color: '#7f8c8d' }}>
+              <div>Status: {deviceStatus}</div>
+              <div>Last Seen: {lastSeen}</div>
+            </div>
+          </div>
+
           {/* Plant Selection */}
           <div className="plant-selection">
             <h3>🌿 Plant Selection</h3>
@@ -190,18 +391,18 @@ export default function SensorDashboard() {
             </div>
             <div className="plant-info">
               <h4>{selectedPlant === 'tomato' ? 'Tomato Plant' : 'Lettuce Plant'}</h4>
-              <p>Age: 45 days</p>
-              <p>Growth Stage: Flowering</p>
+              <p>Device: {selectedDevice?.deviceName || selectedDevice?.deviceId || 'Unknown'}</p>
+              <p>Location: {selectedDevice?.location || 'Not set'}</p>
             </div>
             <div className="health-metrics">
               <div className="metric-card">
                 <div className="metric-icon">💧</div>
-                <div className="metric-value">{latestData?.soilMoisture?.toFixed(0) || '--'}%</div>
+                <div className="metric-value">{latestData?.moisture?.toFixed(0) || '--'}%</div>
                 <div className="metric-label">Soil Moisture</div>
               </div>
               <div className="metric-card">
                 <div className="metric-icon">☀️</div>
-                <div className="metric-value">{latestData?.lightLevel?.toFixed(0) || '--'}%</div>
+                <div className="metric-value">{latestData?.light?.toFixed(0) || '--'}%</div>
                 <div className="metric-label">Light Level</div>
               </div>
             </div>
@@ -328,8 +529,8 @@ export default function SensorDashboard() {
                 className="soil-layer"
                 animate={{ 
                   background: `linear-gradient(45deg, 
-                    #8B4513 ${latestData?.soilMoisture || 0}%, 
-                    #D2691E ${100 - (latestData?.soilMoisture || 0)}%)`
+                    #8B4513 ${latestData?.moisture || 0}%, 
+                    #D2691E ${100 - (latestData?.moisture || 0)}%)`
                 }}
                 transition={{ duration: 1 }}
               >
@@ -362,7 +563,7 @@ export default function SensorDashboard() {
 
               {/* Animated Water Drops */}
               <AnimatePresence>
-                {latestData?.soilMoisture > 30 && (
+                {latestData?.moisture > 30 && (
                   <motion.div 
                     className="water-drops"
                     initial={{ opacity: 0 }}
@@ -459,11 +660,11 @@ export default function SensorDashboard() {
                           transition={{
                             duration: 2,
                             repeat: Infinity,
-                        delay: i * 0.2
-                      }}
-                    />
-                  ))}
-                </div>
+                            delay: i * 0.2
+                          }}
+                        />
+                      ))}
+                    </div>
                   </motion.div>
                 )}
               </motion.div>
@@ -483,7 +684,7 @@ export default function SensorDashboard() {
                   {isNight && <span>🌙 Night Time</span>}
                   {isDusk && <span>🌅 Sunset</span>}
                   {isDay && <span>☀️ Day Time</span>}
-                  <div className="light-value">{lightLevel}% Light</div>
+                  <div className="light-value">{lightLevel.toFixed(0)}% Light</div>
                 </div>
               </motion.div>
 
@@ -518,9 +719,9 @@ export default function SensorDashboard() {
 
             {/* Garden Controls */}
             <div className="garden-controls">
-              <button className="control-btn">🌱</button>
-              <button className="control-btn">ℹ️</button>
-              <button className="control-btn">▶️</button>
+              <button className="control-btn" title="Refresh Data" onClick={fetchSensorData}>🔄</button>
+              <button className="control-btn" title="Device Info">ℹ️</button>
+              <button className="control-btn" title="Full Screen">⛶</button>
             </div>
           </div>
         </motion.div>
@@ -552,8 +753,10 @@ export default function SensorDashboard() {
                 </motion.span>
               </div>
               <div className="metric-chart">
-                <ResponsiveContainer width="100%" height={40}>
+                <ResponsiveContainer width="100%" height={60}>
                   <AreaChart data={chartData}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#e0e0e0" opacity={0.3} />
+                    <Tooltip />
                     <Area 
                       type="monotone" 
                       dataKey="temp" 
@@ -582,8 +785,10 @@ export default function SensorDashboard() {
                 </motion.span>
               </div>
               <div className="metric-chart">
-                <ResponsiveContainer width="100%" height={40}>
+                <ResponsiveContainer width="100%" height={60}>
                   <AreaChart data={chartData}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#e0e0e0" opacity={0.3} />
+                    <Tooltip />
                     <Area 
                       type="monotone" 
                       dataKey="humidity" 
@@ -603,17 +808,19 @@ export default function SensorDashboard() {
               </div>
               <div className="metric-value">
                 <motion.span
-                  key={latestData?.soilMoisture}
+                  key={latestData?.moisture}
                   initial={{ scale: 1.2 }}
                   animate={{ scale: 1 }}
                   transition={{ duration: 0.3 }}
                 >
-                  {latestData?.soilMoisture?.toFixed(0) || '--'}%
+                  {latestData?.moisture?.toFixed(0) || '--'}%
                 </motion.span>
               </div>
               <div className="metric-chart">
-                <ResponsiveContainer width="100%" height={40}>
+                <ResponsiveContainer width="100%" height={60}>
                   <AreaChart data={chartData}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#e0e0e0" opacity={0.3} />
+                    <Tooltip />
                     <Area 
                       type="monotone" 
                       dataKey="moisture" 
@@ -633,17 +840,19 @@ export default function SensorDashboard() {
               </div>
               <div className="metric-value">
                 <motion.span
-                  key={latestData?.lightLevel}
+                  key={latestData?.light}
                   initial={{ scale: 1.2 }}
                   animate={{ scale: 1 }}
                   transition={{ duration: 0.3 }}
                 >
-                  {latestData?.lightLevel?.toFixed(0) || '--'}%
+                  {latestData?.light?.toFixed(0) || '--'}%
                 </motion.span>
               </div>
               <div className="metric-chart">
-                <ResponsiveContainer width="100%" height={40}>
+                <ResponsiveContainer width="100%" height={60}>
                   <AreaChart data={chartData}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#e0e0e0" opacity={0.3} />
+                    <Tooltip />
                     <Area 
                       type="monotone" 
                       dataKey="light" 
@@ -657,29 +866,29 @@ export default function SensorDashboard() {
             </div>
           </div>
 
-          {/* Garden History */}
+          {/* Recent Activity */}
           <div className="garden-history">
-            <h3>📈 Garden History</h3>
+            <h3>📈 Recent Activity</h3>
             <div className="history-list">
               <div className="history-item">
-                <span className="history-icon">🌱</span>
-                <span className="history-text">Plant Growth Check</span>
-                <span className="history-date">Today</span>
+                <span className="history-icon">🌡️</span>
+                <span className="history-text">Temperature: {latestData?.temperature?.toFixed(1)}°C</span>
+                <span className="history-date">{lastUpdate?.toLocaleTimeString() || 'Now'}</span>
               </div>
               <div className="history-item">
                 <span className="history-icon">💧</span>
-                <span className="history-text">Watering Cycle</span>
-                <span className="history-date">2h ago</span>
+                <span className="history-text">Humidity: {latestData?.humidity?.toFixed(0)}%</span>
+                <span className="history-date">{lastUpdate?.toLocaleTimeString() || 'Now'}</span>
               </div>
               <div className="history-item">
-                <span className="history-icon">🌡️</span>
-                <span className="history-text">Temperature Alert</span>
-                <span className="history-date">4h ago</span>
+                <span className="history-icon">🌱</span>
+                <span className="history-text">Soil Moisture: {latestData?.moisture?.toFixed(0)}%</span>
+                <span className="history-date">{lastUpdate?.toLocaleTimeString() || 'Now'}</span>
               </div>
               <div className="history-item">
                 <span className="history-icon">☀️</span>
-                <span className="history-text">Light Adjustment</span>
-                <span className="history-date">6h ago</span>
+                <span className="history-text">Light Level: {latestData?.light?.toFixed(0)}%</span>
+                <span className="history-date">{lastUpdate?.toLocaleTimeString() || 'Now'}</span>
               </div>
             </div>
           </div>
