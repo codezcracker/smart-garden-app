@@ -257,15 +257,16 @@ export default function LaserControlPage() {
         console.log(`✅ Command sent - Laser will ${action === 'laser_on' ? 'turn ON' : 'turn OFF'} for ${deviceName}`);
         
         // Fetch real state after command execution (wait for ESP32 to process)
+        // Increased delay to ensure ESP32 has time to process
         setTimeout(async () => {
           const token = localStorage.getItem('auth_token');
-          if (token && device) {
+          if (token && device && device.macAddress) {
             try {
               const stateResponse = await fetch('/api/devices/control', {
                 method: 'PATCH',
                 headers: {
                   'x-device-key': 'default-key',
-                  'x-device-mac': device.macAddress || macAddress || '',
+                  'x-device-mac': device.macAddress,
                   'x-device-id': deviceId,
                   'Authorization': `Bearer ${token}`
                 }
@@ -279,12 +280,15 @@ export default function LaserControlPage() {
                   [deviceId]: realState
                 }));
                 console.log(`📊 Real laser state updated: ${realState ? 'ON' : 'OFF'}`);
+              } else {
+                console.log(`⚠️ Could not fetch state (${stateResponse.status}), but command was sent`);
               }
             } catch (error) {
               console.error('Error fetching real state:', error);
+              // Don't fail - command was already sent
             }
           }
-        }, 500); // Wait 500ms for ESP32 to process command
+        }, 1000); // Wait 1 second for ESP32 to process command
       } else {
         console.error('❌ API Error:', {
           status: response.status,
