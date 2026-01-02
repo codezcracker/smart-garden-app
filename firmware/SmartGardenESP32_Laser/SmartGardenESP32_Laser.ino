@@ -293,10 +293,12 @@ void checkForCommands() {
           String action = command["action"].as<String>();
           String cmdId = command["_id"] | "";
           Serial.println("   ⚡ Executing: " + action + " (ID: " + cmdId + ")");
+          Serial.println("   📍 Current laser state before: " + String(laserState ? "ON" : "OFF"));
           
           JsonObject params = command.containsKey("parameters") ? command["parameters"] : JsonObject();
           executeCommand(action, params);
           
+          Serial.println("   📍 Current laser state after: " + String(laserState ? "ON" : "OFF"));
           Serial.println("   ✅ Command executed successfully");
         } else {
           Serial.println("✅ No pending commands");
@@ -364,13 +366,22 @@ void turnLaserOn() {
 }
 
 void turnLaserOff() {
+  Serial.println("⚫ Attempting to turn laser OFF...");
+  Serial.println("   Current state: " + String(laserState ? "ON" : "OFF"));
+  Serial.println("   Pin: " + String(LASER_PIN));
+  
   if (!laserState) {
-    Serial.println("⚫ Laser is already OFF");
+    Serial.println("⚠️ Laser is already OFF - skipping");
     return;
   }
   
   digitalWrite(LASER_PIN, LOW);
+  delay(10); // Small delay to ensure pin state is set
   laserState = false;
+  
+  // Verify pin state
+  int pinState = digitalRead(LASER_PIN);
+  Serial.println("   Pin state after write: " + String(pinState ? "HIGH" : "LOW"));
   
   Serial.println("⚫✅ Laser turned OFF");
   

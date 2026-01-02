@@ -258,15 +258,16 @@ export async function POST(request) {
     }
 
     // Check if there's already a pending/sent command for the same action (prevent duplicates)
+    // Only check for pending/sent, not delivered (delivered means ESP32 already got it)
     const existingCommand = await commandsCollection.findOne({
       deviceId: new ObjectId(targetDeviceId),
       action: action,
-      status: { $in: ['pending', 'sent', 'delivered'] },
-      createdAt: { $gte: new Date(Date.now() - 5000) } // Within last 5 seconds
+      status: { $in: ['pending', 'sent'] }, // Only check pending/sent, not delivered
+      createdAt: { $gte: new Date(Date.now() - 2000) } // Within last 2 seconds (more lenient)
     });
 
     if (existingCommand) {
-      console.log(`⚠️ Duplicate command prevented - Action: ${action}, Existing ID: ${existingCommand._id}`);
+      console.log(`⚠️ Duplicate command prevented - Action: ${action}, Existing ID: ${existingCommand._id}, Status: ${existingCommand.status}`);
       return NextResponse.json({
         message: 'Command already in queue. Please wait...',
         commandId: existingCommand._id,
