@@ -197,11 +197,37 @@ export async function POST(request) {
       }
       
       if (!targetDeviceId) {
-        targetDeviceId = deviceId;
+        // If we have a device but no targetDeviceId, use device._id
+        if (device && device._id) {
+          targetDeviceId = device._id.toString();
+        } else {
+          targetDeviceId = deviceId;
+        }
       }
     } else {
       return NextResponse.json(
         { error: 'Device ID or MAC address is required' },
+        { status: 400 }
+      );
+    }
+
+    // Validate targetDeviceId before proceeding
+    if (!targetDeviceId) {
+      console.error('❌ No targetDeviceId after device lookup:', { deviceId, macAddress, device });
+      return NextResponse.json(
+        { error: 'Could not determine target device. Please ensure device is registered or provide valid MAC address.' },
+        { status: 400 }
+      );
+    }
+
+    // Validate ObjectId format
+    let targetObjectId;
+    try {
+      targetObjectId = new ObjectId(targetDeviceId);
+    } catch (error) {
+      console.error('❌ Invalid ObjectId format:', targetDeviceId, error);
+      return NextResponse.json(
+        { error: 'Invalid device ID format' },
         { status: 400 }
       );
     }
@@ -260,7 +286,7 @@ export async function POST(request) {
     // Check if there's already a pending/sent command for the same action (prevent duplicates)
     // Only check for pending/sent, not delivered (delivered means ESP32 already got it)
     const existingCommand = await commandsCollection.findOne({
-      deviceId: new ObjectId(targetDeviceId),
+      deviceId: targetObjectId,
       action: action,
       status: { $in: ['pending', 'sent'] }, // Only check pending/sent, not delivered
       createdAt: { $gte: new Date(Date.now() - 1000) } // Within last 1 second only (very lenient)
@@ -280,8 +306,8 @@ export async function POST(request) {
     // Create control command - set status to 'sent' immediately for instant pickup by ESP32
     const now = new Date();
     const command = {
-      deviceId: new ObjectId(targetDeviceId),
-      userId: device.userId || new ObjectId(userId),  // Use device userId if exists, otherwise use request userId
+      deviceId: targetObjectId,
+      userId: device?.userId ? (device.userId.toString ? new ObjectId(device.userId.toString()) : new ObjectId(userId)) : new ObjectId(userId),  // Use device userId if exists, otherwise use request userId
       action,
       parameters: validatedParams,
       status: 'sent',  // Set to 'sent' immediately so ESP32 can pick it up on next poll (200ms)
@@ -304,7 +330,15 @@ export async function POST(request) {
     }, { status: 200 });
 
   } catch (error) {
-    console.error('Device control error:', error);
+    console.error('❌ Device control error:', error);
+    console.error('Error stack:', error.stack);
+    console.error('Error details:', {
+      message: error.message,
+      name: error.name,
+      deviceId,
+      macAddress,
+      action
+    });
     
     if (error.message === 'No token provided' || error.message === 'Invalid token') {
       return NextResponse.json(
@@ -314,7 +348,10 @@ export async function POST(request) {
     }
 
     return NextResponse.json(
-      { error: 'Internal server error' },
+      { 
+        error: 'Internal server error',
+        details: process.env.NODE_ENV === 'development' ? error.message : undefined
+      },
       { status: 500 }
     );
   } finally {
