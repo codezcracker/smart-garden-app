@@ -198,7 +198,10 @@ export default function LaserControlPage() {
       console.error('❌ Network/Request Error:', error);
       alert(`Failed to send command: ${error.message || 'Network error'}\n\nCheck browser console for details.`);
     } finally {
-      setControlLoading(false);
+      // Add small delay before allowing next click to prevent rapid clicking
+      setTimeout(() => {
+        setControlLoading(false);
+      }, 500);
     }
   };
 
