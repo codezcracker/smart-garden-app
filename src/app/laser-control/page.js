@@ -118,8 +118,10 @@ export default function LaserControlPage() {
         setSelectedDevice(firstId);
         console.log('✅ Auto-selected first device:', firstId, firstDevice.deviceName);
         
-        // Fetch real laser state for all devices
-        fetchLaserStates(allDevices, token);
+        // Fetch real laser state for all devices (only if they have valid MAC)
+        setTimeout(() => {
+          fetchLaserStates(allDevices, token);
+        }, 1000); // Delay to avoid conflicts
       } else {
         console.log('⚠️ No laser devices found. Make sure ESP32 has polled the server.');
       }
@@ -176,20 +178,23 @@ export default function LaserControlPage() {
     }
   };
 
-  // Poll for state updates periodically
+  // Poll for state updates periodically (less aggressive - every 5 seconds)
   useEffect(() => {
     if (!selectedDevice || devices.length === 0) return;
     
     const token = localStorage.getItem('auth_token');
     if (!token) return;
     
-    // Poll every 2 seconds for state updates
+    // Poll every 5 seconds for state updates (less aggressive to avoid conflicts)
     const pollInterval = setInterval(() => {
-      fetchLaserStates(devices, token);
-    }, 2000);
+      // Only poll if not currently sending a command
+      if (!controlLoading) {
+        fetchLaserStates(devices, token);
+      }
+    }, 5000);
     
     return () => clearInterval(pollInterval);
-  }, [selectedDevice, devices]);
+  }, [selectedDevice, devices, controlLoading]);
 
   const toggleLaser = async (deviceId, currentStatus, macAddress = null) => {
     const token = localStorage.getItem('auth_token');

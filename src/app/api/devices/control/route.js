@@ -263,13 +263,14 @@ export async function POST(request) {
       deviceId: new ObjectId(targetDeviceId),
       action: action,
       status: { $in: ['pending', 'sent'] }, // Only check pending/sent, not delivered
-      createdAt: { $gte: new Date(Date.now() - 2000) } // Within last 2 seconds (more lenient)
+      createdAt: { $gte: new Date(Date.now() - 1000) } // Within last 1 second only (very lenient)
     });
 
     if (existingCommand) {
       console.log(`⚠️ Duplicate command prevented - Action: ${action}, Existing ID: ${existingCommand._id}, Status: ${existingCommand.status}`);
+      // Still return success but with existing command ID
       return NextResponse.json({
-        message: 'Command already in queue. Please wait...',
+        message: 'Command already in queue',
         commandId: existingCommand._id,
         action,
         parameters: validatedParams
