@@ -482,16 +482,27 @@ export async function PATCH(request) {
       .toArray();
 
     // Also get the latest laser state from device data
-    const latestData = await db.collection('iot_device_data')
-      .findOne(
-        { 
-          deviceId: device.deviceId || device._id.toString(),
-          laserState: { $exists: true }
-        },
-        { sort: { receivedAt: -1 } }
-      );
-    
-    const currentLaserState = latestData?.laserState || null;
+    let currentLaserState = null;
+    try {
+      const latestData = await db.collection('iot_device_data')
+        .findOne(
+          { 
+            $or: [
+              { deviceId: device.deviceId || device._id.toString() },
+              { deviceMAC: cleanMac }
+            ],
+            laserState: { $exists: true }
+          },
+          { sort: { receivedAt: -1 } }
+        );
+      
+      if (latestData) {
+        currentLaserState = latestData.laserState === 'on' || latestData.laserState === true ? 'on' : 'off';
+        console.log(`📊 Current laser state from device data: ${currentLaserState}`);
+      }
+    } catch (error) {
+      console.error('Error fetching laser state:', error);
+    }
 
     // Mark command as delivered (but don't mark as completed yet - ESP32 will do that)
     if (pendingCommands.length > 0) {
