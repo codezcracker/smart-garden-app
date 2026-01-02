@@ -312,17 +312,10 @@ export default function LaserControlPage() {
                       </span>
                     ) : (
                       <>
-                        {laserStatus[selectedDevice] ? (
-                          <>
-                            <span className="button-icon">🔴</span>
-                            Turn Laser OFF
-                          </>
-                        ) : (
-                          <>
-                            <span className="button-icon">⚫</span>
-                            Turn Laser ON
-                          </>
-                        )}
+                        <span className="button-icon">
+                          {laserStatus[selectedDevice] ? '🔴' : '⚡'}
+                        </span>
+                        {laserStatus[selectedDevice] ? 'Turn OFF Laser' : 'Turn ON Laser'}
                       </>
                     )}
                   </button>
