@@ -8,6 +8,7 @@ export default function LaserControlPage() {
   const [laserStatus, setLaserStatus] = useState({}); // Track laser status per device
   const [loading, setLoading] = useState(true);
   const [controlLoading, setControlLoading] = useState(false);
+  const [statusPolling, setStatusPolling] = useState(false);
 
   useEffect(() => {
     // Check if user is logged in

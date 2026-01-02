@@ -35,6 +35,7 @@ export async function POST(request) {
       humidity: data.humidity,
       soilMoisture: data.soilMoisture,
       lightLevel: data.lightLevel,
+      laserState: data.laserState || null, // Store laser state if provided
       updatedAt: new Date()
     };
 

@@ -151,6 +151,13 @@ void loop() {
     lastCommandCheck = millis();
   }
   
+  // Send status update every 5 seconds to keep state synced
+  static unsigned long lastStatusUpdate = 0;
+  if (wifiConnected && (millis() - lastStatusUpdate >= 5000)) {
+    sendStatus();
+    lastStatusUpdate = millis();
+  }
+  
   delay(50);  // Minimal delay for ultra-fast polling
 }
 
